@@ -210,7 +210,7 @@ alias rld="rld"
 
 #this function for rld alias
 function rld(){
-  clear && source /root/.zshrc && cat /root/.zshrc > /home/h471x/NTSOA/zsh_config/wsl/"zshrc[root].txt" && all /home/h471x/NTSOA/zsh_config/wsl/"zshrc[root].txt" && c && echo -e && echo "z s h    s a v e d " | figlet -t -c | lolcat && echo -e && sleep 0.5 && cv;
+  clear && source /root/.zshrc && cat /root/.zshrc > /home/h471x/NTSOA/zsh_config/wsl_config/"zshrc[root].txt" && all /home/h471x/NTSOA/zsh_config/wsl_config/"zshrc[root].txt" && c && echo -e && echo "z s h    s a v e d " | figlet -t -c | lolcat && echo -e && sleep 0.5 && cv;
 }
 
 #this alias to break a line
