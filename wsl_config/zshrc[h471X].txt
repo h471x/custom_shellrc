@@ -253,8 +253,8 @@ alias rld="rld"
 function rld(){
   clear;
   source ~/.zshrc;
-  sv ~/.zshrc ~/NTSOA/zsh_config/wsl/"zshrc[h471X].txt";
-  all ~/NTSOA/zsh_config/wsl/"zshrc[h471X].txt";
+  sv ~/.zshrc ~/NTSOA/zsh_config/wsl_config/"zshrc[h471X].txt";
+  all ~/NTSOA/zsh_config/wsl_config/"zshrc[h471X].txt";
   c && br;
   echo "z s h    s a v e d " | figlet -t -c;
   br && sleep 0.5;
