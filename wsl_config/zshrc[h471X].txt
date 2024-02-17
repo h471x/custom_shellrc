@@ -1,38 +1,9 @@
 set autocd #change directory just by typing his name
 setopt promptsubst #enable command substitution in prompt
 
-# enable completion features
-#autoload -Uz compinit
-#compinit -d ~/.cache/zcompdump
-#zstyle ':completion:*:*:*:*:*' menu select
-#zstyle ':completion:*' auto-description 'specify: %d'
-#zstyle ':completion:*' completer _expand _complete
-#zstyle ':completion:*' format 'Completing %d'
-#zstyle ':completion:*' group-name ''
-#zstyle ':completion:*' list-colors ''
-#zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
-#zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={a-zA-Z}'
-#zstyle ':completion:*' rehash true
-#zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
-#zstyle ':completion:*' use-compctl false
-#zstyle ':completion:*' verbose true
-#zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
-
-#enable auto-suggestions based on the history
-#if [ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
-#	. /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-	#change suggestion color
-	#ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE=fg=#999'
-#fi
-
 #configure keybindings
 bindkey -e #emacs keybindings
 bindkey ' ' magic-space #do history expansion on space
-
-#clear && cvi
-
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 fastfile_var_prefix='$'
 
@@ -51,15 +22,6 @@ EDGE_PATH=/mnt/c/Program\ Files\ (x86)/Microsoft/Edge/Application/
 NPM_PATH=/mnt/c/Users/lab_l/AppData/Roaming/npm/npm
 
 PATH=$SQLITE_PATH:$QT_PATH:$CHROME_PATH:$WSL_PATH:$EDGE_PATH:$NPM_PATH:$PATH
-# PATH=$PATH:/mnt/c/Program\ Files\ (x86)/Microsoft/Edge/Application:/mnt/c/Program\ Files/Google/chrome/Application
-# export PATH="/mnt/c/Program\ Files\ (x86)/Microsoft/Edge/Application:$PATH"
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time oh-my-zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-# ZSH_THEME="robbyrussell"
-
-# ZSH_THEME="xiong-chiamiov-plus"
 
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
@@ -88,60 +50,8 @@ ZSH_HIGHLIGHT_STYLES[command-substitution-delimiter]='fg=#d30ccf,bold'
 #        *)tmux att -t 0 2>/dev/null|| tmux;;
 #esac;
 
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
-
 # Uncomment the following line to use case-sensitive completion.
 CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
-
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
-
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS="true"
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# You can also set it to another string to have that shown instead of the default red dots.
-# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
 
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
@@ -154,32 +64,6 @@ plugins=(fastfile copyfile vscode extract docker zsh-autosuggestions git nmap te
 #ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE=fg=#0000ff"
 DISABLE_AUTO_UPDATE="true" #here to disable oh-my-zsh auto update  
 source $ZSH/oh-my-zsh.sh
-
-# User configuration
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
 
 #this alias to clear
 alias c="clear"
@@ -899,30 +783,12 @@ function open_web_app(){
   local check="sudo ping -c 1 -W 5 "
   local check_message="Checking $app_name ..."
   local reachable="br && echo ' $check_message' && eval $check $app_domain &> /dev/null;"
-  # local open_app="chrome.exe --profile-directory=Default --app-id=$app_id;"
-  # local open_app="$browser ${app_id:+--profile-directory=Default --app-id=$app_id}${app_id:+;}$app_domain"
-  # local open_app="$browser ${app_id:+--profile-directory=Default --app-id=$app_id;}${app_id:+$app_domain}"
 
   if [ -n "$app_id" ]; then
     open_app="$browser --profile-directory=Default --app-id=$app_id;"
   else
     open_app="$browser $app_domain;"
   fi
-
-  # This script sets open_app based on the existence of $app_id. 
-  # If $app_id exists, it includes --profile-directory=Default --app-id=$app_id
-  # in the command; otherwise, it omits these options and includes only $app_domain.
-  #
-  # ${app_id:+--profile-directory=Default --app-id=$app_id}:
-  # If $app_id is set and not null, this will include
-  # --profile-directory=Default --app-id=$app_id in the command;
-  # otherwise, it will be empty.
-  #
-  # ${app_id:+;}: If $app_id is set and not null, this will
-  # include a semicolon (;) in the command; otherwise, it will be empty.
-  #
-  # $app_domain: Regardless of whether $app_id is set or not,
-  # this will always be appended to the open_app command.
 
   # this function to display the web app status
   function web_app_stat(){
@@ -1205,39 +1071,39 @@ function reach(){
 #local pxl_ip = 192.168.68.112"
 
 #this alias to connect to the Pixel 3XL ssh server
-alias cnt="ssh -p 8022 u0_a249@192.168.68.112 && cv"
-
-#this alias to download a file from the Pixel 3XL ssh server
-alias dwld="dwld"
-
-#this function for dwld alias
-function dwld(){
-  if [[ -f $1 ]]; then #if the argument is a file
-    scp -P 8022 u0_a249@192.168.68.112:~/"$1" $PWD
-  else
-    scp -P 8022 -r u0_a249@192.168.68.112:~/"$1" $PWD
-  fi
-}
-
-#this alias to upload a file from this PC to the Pixel 3XL ssh server
-alias upld="upld"
-
-#this function for dwld alias
-function upld(){
-  if [[ $# -eq 1 ]]; then #if there is only one argument it will upload the file to home directory
-    if [[ -f $1 ]]; then #if the argument is a file
-      scp -P 8022 "$1" u0_a249@192.168.68.112:~
-    else
-      scp -P 8022 -r "$1" u0_a249@192.168.68.112:~
-    fi # upload the file / directory in the second argument
-  elif [[ $# -eq 2 ]]; then
-    if [[ -f $1 ]]; then #if the argument is a file
-      scp -P 8022 "$1" u0_a249@192.168.68.112:~/"$2"
-    else
-      scp -P 8022 -r "$1" u0_a249@192.168.68.112:~/"$2"
-    fi
-  fi
-}
+# alias cnt="ssh -p 8022 u0_a249@192.168.68.112 && cv"
+#
+# #this alias to download a file from the Pixel 3XL ssh server
+# alias dwld="dwld"
+#
+# #this function for dwld alias
+# function dwld(){
+#   if [[ -f $1 ]]; then #if the argument is a file
+#     scp -P 8022 u0_a249@192.168.68.112:~/"$1" $PWD
+#   else
+#     scp -P 8022 -r u0_a249@192.168.68.112:~/"$1" $PWD
+#   fi
+# }
+#
+# #this alias to upload a file from this PC to the Pixel 3XL ssh server
+# alias upld="upld"
+#
+# #this function for dwld alias
+# function upld(){
+#   if [[ $# -eq 1 ]]; then #if there is only one argument it will upload the file to home directory
+#     if [[ -f $1 ]]; then #if the argument is a file
+#       scp -P 8022 "$1" u0_a249@192.168.68.112:~
+#     else
+#       scp -P 8022 -r "$1" u0_a249@192.168.68.112:~
+#     fi # upload the file / directory in the second argument
+#   elif [[ $# -eq 2 ]]; then
+#     if [[ -f $1 ]]; then #if the argument is a file
+#       scp -P 8022 "$1" u0_a249@192.168.68.112:~/"$2"
+#     else
+#       scp -P 8022 -r "$1" u0_a249@192.168.68.112:~/"$2"
+#     fi
+#   fi
+# }
 
 #this function to sanitize the repository name
 function sanitize_repo_name() {
@@ -1290,20 +1156,6 @@ function ghc() {
 alias ghd="ghd"
 
 #this function for ghd alias 
-# function ghd(){
-#   if [[ $# -eq 1 ]]; then
-#     rm -rf "$1";
-#     gh repo delete $1 --yes;
-#   else
-#     echo "wrong usage";
-#   fi
-# }
-
-# function ghd(){
-#   gh repo delete "$(basename $PWD)" --yes;
-#   rm -rf .git;
-# }
-
 function ghd(){
   if [[ $# -eq 0 ]]; then
     local repo_name="$(basename $PWD)"
@@ -1358,8 +1210,6 @@ alias gck="gck";
 
 #this function for gck alias
 function gck(){
-  # if [[ -d ./.git ]]; then
-  # old code, not working with subdirectories
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
@@ -1441,8 +1291,6 @@ alias gbd="gbd"
 
 #this function for gbd alias
 function gbd(){
-  # if [[ -d ./.git ]]; then
-  # old code, not working with subdirectories
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
@@ -1554,9 +1402,6 @@ kill-line() {
 
 zle -N kill-line
 bindkey "²²" kill-line
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-# [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
