@@ -2276,7 +2276,9 @@ alias gcb="gcb";
 
 #this function for gcb alias
 function gcb(){
-  if [[ -d ./.git ]]; then
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
     if [[ $# -eq 0 ]]; then
       git checkout -;
     else
@@ -2292,7 +2294,9 @@ alias gnm="gnm"
 
 #this function for gnm alias
 function gnm(){
-  if [[ -d ./.git ]]; then
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
     local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
 
     if [[ $# -eq 1 ]]; then
@@ -2313,7 +2317,9 @@ alias gbr="gbr"
 
 #this function for gbr alias
 function gbr(){
-  if [[ -d ./.git ]]; then
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
     if [[ $# -eq 1 ]]; then
       git checkout -b "$1";
     elif [[ $# -eq 0 ]]; then
