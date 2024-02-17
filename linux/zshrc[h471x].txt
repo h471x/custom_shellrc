@@ -497,7 +497,7 @@ function exop(){
 
 
 #this alias to enter the zshrc file
-alias ct='nano ~/.zshrc; cv;'
+alias ct='nvim ~/.zshrc; cv;'
 
 # this alias to count the number of file/directory
 # inside a directory
