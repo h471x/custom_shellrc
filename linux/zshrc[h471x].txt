@@ -1107,7 +1107,7 @@ alias dtp="op /home/h471x/Desktop"
 alias dev="op /home/h471x/Desktop/dev"
 
 #this alias to open the text notes
-alias nt="op /home/h471x/Desktop/dev/NOTES"
+alias nt="op /home/h471x/NTSOA/notes"
 
 #this alias to open HTX USB
 alias htx="op /media/h471x/HTX\ USB"
