@@ -275,11 +275,11 @@ function all(){
 }
 
 #this alias to reload the zshrx file
-alias rld="rld"
+dalias rld="rld"
 
 #this function for rld alias
 function rld(){
-  cat ~/.zshrc > /home/h471x/NTSOA/"zsh config"/"zshrc[root].txt" && all /home/h471x/NTSOA/"zsh config"/"zshrc[root].txt" && c && echo -e && echo "z s h    s a v e d " | figlet -t -c && echo -e && sleep 0.5 && source ~/.zshrc;}
+  cat ~/.zshrc > /home/h471x/NTSOA/zsh_config/linux/"zshrc[root].txt" && all /home/h471x/NTSOA/zsh_config/linux/"zshrc[root].txt" && c && echo -e && echo "z s h    s a v e d " | figlet -t -c && echo -e && sleep 0.5 && source ~/.zshrc;}
 
 
 #this alias to show the welcome message
