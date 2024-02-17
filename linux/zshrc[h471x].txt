@@ -2102,9 +2102,12 @@ alias rdb="rdb"
 
 #this function for rdb alias
 function rdb(){
-  clear && br 2 && sudo clear;
+  allow_sudo;
+  local user=${1:-root}
   sudo systemctl start mysql;
-  sudo mysql -u root;
+  echo "MySQL Server Active"
+  echo "User : $user"
+  sudo mysql -u $user -p;
   sudo systemctl stop mysql;
 }
 
