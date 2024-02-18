@@ -1011,8 +1011,9 @@ function nvm(){
   local file="$1"
   nvim "${file:-.}";
   cv;
-  #if we have one argument then nvim will be launched with it,
-  #otherwise open the current directory if there is no argument
+  # if we have one argument then nvim will be launched with it,
+  # if the file doesn't exist we create just like nano do
+  # otherwise open the current directory if there is no argument
 }
 
 #this alias is the same as ed but it uses nano instead of nvim
