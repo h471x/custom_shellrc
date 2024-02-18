@@ -2105,9 +2105,11 @@ function rdb(){
   allow_sudo;
   local user=${1:-root}
   sudo systemctl start mysql;
-  echo "MySQL Server Active"
+  echo "MySQL Server Active [${GREEN}$CHECKMARK${WHITE}]"
   echo "User : $user"
-  sudo mysql -u $user -p;
+  local not_user='[[ "$user" == "root" ]]';
+  local flag=$(eval "$not_user" && echo "" || echo "-p");
+  sudo mysql -u $user $flag;
   sudo systemctl stop mysql;
 }
 
