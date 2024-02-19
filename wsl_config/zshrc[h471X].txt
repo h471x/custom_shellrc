@@ -924,7 +924,7 @@ alias setup="op /mnt/d/NTSOA/SETUP"
 alias sd="op /mnt/d"
 
 #this alias to access directly the eni folder
-alias eni="op /mnt/d/NTSOA/0\ ENI/0\ ENI\ 2024/"
+alias eni="op /mnt/d/NTSOA/0\ ENI/ENI\ 2024/"
 
 #this alias to access the ENI time schedule
 alias edt="exop /mnt/d/NTSOA/0\ ENI/0\ ENI\ 2024/0\ EDT/L2\ 2024"
