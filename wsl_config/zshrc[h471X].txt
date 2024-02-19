@@ -450,6 +450,9 @@ function rn(){
     com)
       open_web_app "$1";
       ;;
+    bat)
+      cmd.exe /c "$1";
+      ;;
     *)
       all "$1" && c && ./"$1";;
  esac
@@ -676,7 +679,7 @@ alias dt="dt"
 
 #this function for dst alias
 function dt(){
-  dest="$PWD" && c && echo -e && echo "d e s t   s a v e d" | figlet -t -c | lolcat && sleep 0.6 && cv;
+  dest="$PWD" && c && echo -e && echo "d e s t   s a v e d" | figlet -t -c && sleep 0.6 && cv;
 }
 
 #this alias to copy a file then display it
@@ -927,7 +930,7 @@ alias sd="op /mnt/d"
 alias eni="op /mnt/d/NTSOA/0\ ENI/ENI\ 2024/"
 
 #this alias to access the ENI time schedule
-alias edt="exop /mnt/d/NTSOA/0\ ENI/0\ ENI\ 2024/0\ EDT/L2\ 2024"
+alias edt="exop /mnt/d/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/L2\ 2024"
 
 #this alias to view the devops folder
 alias dvps="op /mnt/d/NTSOA/DEVOPS/devops"
