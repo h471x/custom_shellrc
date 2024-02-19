@@ -1295,6 +1295,9 @@ alias hst="hst"
 # this alias to open the shareed folder
 alias kali="op /media/sf_KALI_LINUX"
 
+# this alias to open the books shared folder
+alias books="op /media/sf_BOOKS"
+
 #this function for hst alias
 function hst(){
   if [[ $# -eq 0 ]]; then
