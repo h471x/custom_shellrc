@@ -777,7 +777,7 @@ function ist(){
       c && br 2;
       sudo clear;
       br 2;
-      # echo "   I n s t a l l i n g .  .  . " | figlet;
+      echo "   I n s t a l l i n g .  .  . " | figlet;
       br;
       echo "Package =======> "${1%.*}" ";
       br;
@@ -1005,15 +1005,10 @@ alias nvm="nvm"
 
 #this function for nvm aliases
 function nvm(){
-  if [[ ! -e "$1" ]]; then
-    touch "$1"
-  fi
-  local file="$1"
-  nvim "${file:-.}";
+  nvim "${1:-.}";
   cv;
-  # if we have one argument then nvim will be launched with it,
-  # if the file doesn't exist we create just like nano do
-  # otherwise open the current directory if there is no argument
+  #if we have one argument then nvim will be launched with it,
+  #otherwise open the current directory if there is no argument
 }
 
 #this alias is the same as ed but it uses nano instead of nvim
