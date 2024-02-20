@@ -755,7 +755,7 @@ alias dev="op /mnt/d/NTSOA/dev/github_repo/"
 alias nt="op /mnt/d/NTSOA/dev/0\ NOTES"
 
 # this alias to open the kali linux Vm Shared folder
-alias kali="op /mnt/d/NTSOA/Kali\ Linux"
+alias kali="op /mnt/d/NTSOA/INSTALLED/KALI_LINUX"
 
 # this function to convert url to name
 function convert_url(){
