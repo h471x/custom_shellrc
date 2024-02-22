@@ -1709,9 +1709,7 @@ alias wls="wls"
 
 # this function for wls alias
 function wls(){
-  c && br 2;
-  sudo clear;
-
+  allow_sudo
   if [ -d /sys/class/net/wlan0 ]; then
     downnet eth0 && upnet wlan0;
     c && br 2;
