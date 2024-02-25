@@ -1,14 +1,14 @@
-set autocd #change directory just by typing his name
-setopt promptsubst #enable command substitution in prompt
+set autocd # change directory just by typing his name
+setopt promptsubst # enable command substitution in prompt
 
-#configure keybindings
+# configure keybindings
 bindkey -e #emacs keybindings
 bindkey ' ' magic-space #do history expansion on space
 
 fastfile_var_prefix='$'
 
-#this to make Github CLI know which default browser it would use
-#this WSL issue was solved in gh GitHub Repo Pull Request
+# this to make Github CLI know which default browser it would use
+# this WSL issue was solved in gh GitHub Repo Pull Request
 export BROWSER="/mnt/c/Program\ Files/Google/chrome/Application/chrome.exe"
 
 # Path to your oh-my-zsh installation.
@@ -18,7 +18,9 @@ export ZSH="$HOME/.oh-my-zsh"
 WSL_PATH=/home/h471x/.local/bin/
 SQLITE_PATH=/mnt/c/Program\ Files/sqlite
 QT_PATH=/mnt/d/NTSOA/INSTALLED/QT/Tools/QtCreator/bin
-BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH
+VIRTUAL_BOX_PATH=/mnt/c/Virtual\ Box
+BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$VIRTUAL_BOX_PATH
+
 
 # Browsers
 CHROME_PATH=/mnt/c/Program\ Files/Google/chrome/Application/
@@ -394,10 +396,22 @@ function op(){
 }
 
 # this alias to open the download folder
-alias dwl="op /mnt/c/Users/lab_l/Downloads"
+alias dwl="dwl"
+
+# this function for dwl alias
+function dwl(){
+  local download_folder_path=/mnt/c/Users/lab_l/Downloads
+  op $download_folder_path
+}
 
 # this alias to open the desktop
-alias dtp="op /mnt/c/Users/lab_l/OneDrive/Bureau"
+alias dtp="dtp"
+
+# this function for dtp alias
+function dtp(){
+  local desktop_folder_path=/mnt/c/Users/lab_l/OneDrive/Bureau
+  op $desktop_folder_path
+}
 
 # this alias to view the books
 alias books='exop /mnt/d/NTSOA/"ENI 2023"/"ENI L1 LESSONS"/BOOKS'
@@ -505,8 +519,7 @@ alias upd="upd"
 
 # this function for up alias
 function upd(){
-  c && br 2;
-  sudo clear;
+  allow_sudo;
   br 2;
   echo "u p d a t i n g .  .  ." | figlet -t -c;
   br && sudo apt update && br;
@@ -625,10 +638,11 @@ alias mns="mns"
 # this function for mn alias
 function mns(){
   if [[ $(command -v "$1") ]]; then
+    local manual_path=~/NTSOA/manual
     #here to check if the command exists
-    man "$1" | cat > ~/NTSOA/manual/"$1"_manual.txt;
-    all ~/NTSOA/manual/"$1"_manual.txt;
-    vf ~/NTSOA/manual/"$1"_manual.txt;
+    man "$1" | cat > $manual_path/"$1"_manual.txt;
+    all $manual_path/"$1"_manual.txt;
+    vf $manual_path/"$1"_manual.txt;
     cv;
   else
     cv
@@ -980,6 +994,9 @@ alias setup="op /mnt/d/NTSOA/SETUP"
 # this alias to open FL Studio
 alias fl="FL64.exe; cv"
 
+# this alias to open VirtualBox
+alias vm="VirtualBox.exe"
+
 # this alias to open the state drive
 alias sd="op /mnt/d"
 
@@ -1056,6 +1073,16 @@ function ipsh(){
     echo " wifi0  ==> $wifi_ip" && br;
   # fi
 }
+
+# I don't know why but this alias
+# make the PC slow down
+# # this alias to view saved wifi password
+# alias wpass="wpass"
+#
+# # this function for wpass alias
+# function wpass(){
+#   cmd.exe /c 'netsh wlan show profiles "ENI 1" key=clear' | grep "Key Content" | awk '{print $4}'
+# }
 
 #this alias to view the ssh server status
 alias sth="sth"
