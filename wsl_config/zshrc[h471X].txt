@@ -364,8 +364,9 @@ command_not_found_handler() {
     # c && br;
     # echo "n o t     f o u n d " | figlet -t -c | lolcat;
     # br && sleep 0.5 && cv;
-    echo "fuck, wrong command"
-    fuck
+    cv
+    # echo "fuck, wrong command"
+    # fuck
   fi
 }
 
@@ -1473,6 +1474,31 @@ function sqlite(){
 
 # this alias to launch windows python
 alias py="/mnt/d/NTSOA/INSTALLED/PYTHON/python.exe"
+
+# # this alias to locate python modules
+# alias pyfn="pyfn"
+#
+# # this function for pyfn alias
+# function pyfn() {
+#   c && br
+#   local python_module="$1"
+#   local module_location
+#   module_location=$(pip show "$python_module" | awk '/Location:/{print $2; exit}')
+#   if [ -n "$module_location" ]; then
+#     local module_status="Found"
+#     cd "$module_location/$python_module" || return 1
+#   else
+#     c && br
+#     local module_status="Not Found"
+#   fi
+#   echo "*********************"
+#   br
+#   echo " Module : $python_module"
+#   echo " Status : $module_status"
+#   br
+#   echo "*********************"
+# }
+
 
 # this alias to run npm
 alias np="/mnt/d/NTSOA/INSTALLED/NODEJS/npm"
