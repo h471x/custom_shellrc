@@ -41,6 +41,12 @@ bindkey ' ' magic-space #do history expansion on space
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH:/home/h471x/Qt5.7.0/Tools/QtCreator/bin:/home/h471x/NTSOA/HACK/cupp
 
+# Binary
+CUPP_PATH=/usr/share/cupp
+HOME_PATH=$HOME/bin
+
+PATH=$CUPP_PATH:$HOME_PATH:$PATH
+
 fastfile_var_prefix='$'
 
 # Path to your oh-my-zsh installation.
@@ -444,7 +450,7 @@ command_not_found_handler() {
   if [[ $command_found -eq 0 ]]; then
     # c && br && echo "n o t     f o u n d " | figlet -t -c | lolcat;
     # br && sleep 0.5 && cv;
-    cv;
+    # cv;
   fi
 }
 
@@ -882,37 +888,38 @@ alias vf="vf"
 # update 09/14/2023
 function vf() {
   local file="$1"
-  local extension="${file##*.}"
-
-  # here if you don't know the default app,
-  # use xdg-open instead of those cmd
-
-  case "$extension" in
-    jpg|jpeg|ico|png)
-      cmd="ristretto";;
-    pdf)
-      cmd="evince";;
-    cap|pcapng)
-      cmd="wireshark";;
-    csv|ods|xlsx)
-      cmd="xdg-open";;
-    mp*)
-      cmd="vlc";;
-    gz|rar)
-      cmd="engrampa";;
-    html|c|cpp|tf|py|java|js|css|json)
-      cmd="code";;
-    mcd)
-      cmd="katyushamcd";;
-    *)
-      cmd="nvim";;
-  esac
-
-  if [[ -f "$file" ]]; then
-    "$cmd" "$file" && cv
-  elif [[ -d "$file" ]]; then
-    op "$file" && cv
-  fi
+  xdg-open $file;
+  # local extension="${file##*.}"
+  #
+  # # here if you don't know the default app,
+  # # use xdg-open instead of those cmd
+  #
+  # case "$extension" in
+  #   jpg|jpeg|ico|png)
+  #     cmd="eog";;
+  #   pdf)
+  #     cmd="evince";;
+  #   cap|pcapng)
+  #     cmd="wireshark";;
+  #   csv|ods|xlsx)
+  #     cmd="xdg-open";;
+  #   mp*)
+  #     cmd="vlc";;
+  #   gz|rar)
+  #     cmd="engrampa";;
+  #   html|c|cpp|tf|py|java|js|css|json)
+  #     cmd="code";;
+  #   mcd)
+  #     cmd="katyushamcd";;
+  #   *)
+  #     cmd="nvim";;
+  # esac
+  #
+  # if [[ -f "$file" ]]; then
+  #   "$cmd" "$file" && cv
+  # elif [[ -d "$file" ]]; then
+  #   op "$file" && cv
+  # fi
 }
 
 #this alias to view binary file
@@ -1284,7 +1291,7 @@ alias hn="op ~/NTSOA"
 alias dwl="op /home/h471x/Downloads"
 
 #this alias to open the HACK directory
-alias hack="op /home/h471x/NTSOA/HACK"
+alias hack="op /home/h471x/NTSOA/hack"
 
 #this alias to open the ENI CYBERSECURITY directory
 alias cs="op /home/h471x/NTSOA/ENI\ CYBERSECURITY"
@@ -1292,26 +1299,31 @@ alias cs="op /home/h471x/NTSOA/ENI\ CYBERSECURITY"
 #this alias to view the history
 alias hst="hst"
 
-# this alias to open the shareed folder
-alias kali="op /media/sf_KALI_LINUX"
-
-# this alias to open the books shared folder
-alias books="op /media/sf_BOOKS"
-
-#this function for hst alias
+# this function for hst alias
 function hst(){
   if [[ $# -eq 0 ]]; then
     history | less && cv
   else
     re='^[0-9]+$'
     if [[ $1 =~ $re ]]; then
-      #check if the argument is an integrer
+      # check if the argument is an integrer
       history | tail -$1 | less && cv
-    else  #else if it's a text to grep
+    else
+      # else if it's a text to grep
       history | grep "$1" | less && cv
     fi
   fi
 }
+
+# this alias to open the shareed folder
+alias kali="op /media/sf_KALI_LINUX"
+
+# this alias to open the books shared folder
+alias books="op /media/sf_BOOKS"
+
+# this alias to open ENI shared folder
+alias eni="op /media/sf_ENI/ENI\ 2024"
+
 
 #this alias to locate packages
 alias lc="lc"
@@ -1396,12 +1408,19 @@ function ipsh(){
   # br;
   local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
 
-  if [ -d /sys/class/net/wlan0 ]; then
-    local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
-    echo " wlan0 ==> $wlan_ip";
-    echo " eth0  ==> $eth_ip" && br;
+  # Add a conditon to make it view
+  # IP from interface passed as argument
+  if [[ $# -eq 1 ]]; then
+    local iface_ip=$(ifconfig "$1" | grep "inet " | awk '{print $2}');
+    echo " $1 ==> $iface_ip";
   else
-    echo " eth0 IP ==> $eth_ip" && br;
+    if [ -d /sys/class/net/wlan0 ]; then
+      local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
+      echo " wlan0 ==> $wlan_ip";
+      echo " eth0  ==> $eth_ip" && br;
+    else
+      echo " eth0 IP ==> $eth_ip" && br;
+    fi
   fi
 
   # ifconfig | awk -F '[ :]+' '/^[a-z]/ {interface=$1} /inet / {print interface " ==> " $3}'
@@ -1597,30 +1616,40 @@ alias whk="whk"
 
 # this function for whk alias
 function whk(){
-  c && br 2 && sudo clear;
-  sudo wifite --kill;
-  br;
-  #echo -ne " ${WHITE}[${RED}$QUESTION_MARK${WHITE}]${WHITE} Do you want to ${GREEN}restart ${WHITE}the wifi hacking ?  (y/n) ";
-  echo -ne " ${WHITE}[${GREEN}?${WHITE}]${WHITE} ${GREEN}Restart ${WHITE}the wifi hacking ? (y/n) ";
-  read wifi
-  if [ "$wifi" = "y" ]; then
-    whk
-  elif [[ "$wifi" = "n" ]]; then
-    #echo -ne " ${WHITE}[${GREEN}#${WHITE}]${WHITE} Do you want to keep the ${GREEN}monitor ${WHITE}mode ?     (y/n) ";
-    #read ans
-    #if [ "$ans" = "y" ]; then
-     # br && echo " Keeping Monitor Mode  ... "
-    #else
-      echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Switching to ${GREEN}Managed ${WHITE}Mode  ";
-      downnet eth0 && upnet wlan0;
-      wtp wlan0 managed;
-      echo "${GREEN}$CHECKMARK${WHITE}"
-      # echo " ==> wlan0 set to Managed Mode"
-      #br;
-    #fi
-    echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Restarting Network Manager "
-    sudo service NetworkManager restart;
-    echo "${GREEN}$CHECKMARK${WHITE}"
+  allow_sudo;
+
+  function hack_wifi(){
+    sudo wifite --kill;
+    br;
+
+    # this function will ask if the
+    # hacking should restart or not
+    function check_quit(){
+      echo -ne " ${WHITE}[${GREEN}?${WHITE}]${WHITE} ${GREEN}Restart ${WHITE}the wifi hacking ? (y/n) ";
+      read wifi
+      if [ "$wifi" = "y" ]; then
+        whk
+      elif [[ "$wifi" = "n" ]]; then
+        echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Switching to ${GREEN}Managed ${WHITE}Mode  ";
+        downnet eth0 && upnet wlan0;
+        wtp wlan0 managed;
+        echo "${GREEN}$CHECKMARK${WHITE}"
+        echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Restarting Network Manager "
+        sudo service NetworkManager restart;
+        echo "${GREEN}$CHECKMARK${WHITE}"
+      else
+        check_quit
+      fi
+    }
+    check_quit
+  }
+
+  if [ -d /sys/class/net/wlan0 ]; then
+    hack_wifi
+  else
+    br
+    echo "  ${WHITE}[${RED}x${WHITE}]${WHITE} No ${RED}Wireless Card ${WHITE}Available"
+    br
   fi
 }
 
@@ -1737,7 +1766,8 @@ alias rhk="rhk"
 
 # this function for rhk alias
 function rhk(){
-  clear && br 2 && sudo clear && sudo airgeddon
+  allow_sudo
+  sudo airgeddon
 }
 
 # this alias to run the cupp command
@@ -1966,6 +1996,7 @@ function pfsense_connect(){
   # as a background process so
   # the terminal won't be filled with logs
   $browser $pfsense_IP &> /dev/null &;
+  # xdg-open http://$pfsense_IP
 
   # here to store the pfsense PID
   # used to kill its process after
@@ -1976,7 +2007,7 @@ function pfsense_connect(){
 # 01/29/2024
 alias pfson="pfson"
 
-#this function for pfsense alias
+# this function for pfsense alias
 function pfson(){
   #we will need permission
   allow_sudo;
@@ -1990,11 +2021,11 @@ function pfson(){
   pfst;
 }
 
-#this alias to close the pfsense GUI
+# this alias to close the pfsense GUI
 # 01/29/2024
 alias pfsoff="pfsoff"
 
-#this function for pfsoff alias
+# this function for pfsoff alias
 function pfsoff(){
   #we will need permission
   #for the following operations
@@ -2016,30 +2047,30 @@ function pfsoff(){
   clear && pfst;
 }
 
-#this alias to start the sql service
+# this alias to start the sql service
 alias sqlon="sqlon"
 
-#this function for sqlon alias
+# this function for sqlon alias
 function sqlon(){
   clear && br 2 && sudo clear;
   sudo systemctl start mysql;
   sqls;
 }
 
-#this alias to stop the sql service
+# this alias to stop the sql service
 alias sqloff="sqloff"
 
-#this function for sqloff alias
+# this function for sqloff alias
 function sqloff(){
   clear && br 2 && sudo clear;
   sudo systemctl stop mysql;
   sqls;
 }
 
-#this alias to view the sql service
+# this alias to view the sql service
 alias sqls="sqls"
 
-#this function for sqloff alias
+# this function for sqloff alias
 function sqls(){
   clear && br 2 && sudo clear;
   br;
@@ -2048,30 +2079,30 @@ function sqls(){
   sudo systemctl status mysql;
 }
 
-#this alias to start the postgresql service
+# this alias to start the postgresql service
 alias psqlon="psqlon"
 
-#this function for sqlon alias
+# this function for sqlon alias
 function psqlon(){  
   clear && br 2 && sudo clear;
   sudo systemctl start psql;
   sqls;
 }
 
-#this alias to stop the postgresql service
+# this alias to stop the postgresql service
 alias psqloff="psqloff"
 
-#this function for sqloff alias
+# this function for sqloff alias
 function psqloff(){
   clear && br 2 && sudo clear;
   sudo systemctl stop psql;
   sqls;
 }
 
-#this alias to view the postgresql service
+# this alias to view the postgresql service
 alias psqls="psqls"
 
-#this function for psqls alias
+# this function for psqls alias
 function psqls(){
   clear && br 2 && sudo clear;
   br;
@@ -2080,10 +2111,10 @@ function psqls(){
   sudo systemctl status psql;
 }
 
-#this alias to call the sqlite3.Exe file
+# this alias to call the sqlite3.Exe file
 alias sqlite="sqlite"
 
-#this function for ssqlite alias
+# this function for ssqlite alias
 function sqlite(){
   if [[ $# -eq 0 ]]; then
     echo "■■▶ Please specify a file.db  ";  
@@ -2098,10 +2129,10 @@ function sqlite(){
   fi
 }
 
-#this alias to start the sql cli
+# this alias to start the sql cli
 alias rdb="rdb"
 
-#this function for rdb alias
+# this function for rdb alias
 function rdb(){
   allow_sudo;
   local user=${1:-root}
@@ -2114,10 +2145,10 @@ function rdb(){
   sudo systemctl stop mysql;
 }
 
-#this alias to start the sql cli
+# this alias to start the sql cli
 alias rdbp="rdbp"
 
-#this function for rdbp alias
+# this function for rdbp alias
 function rdbp(){
   clear && br 2 && sudo clear;
   sudo systemctl start psql;
@@ -2125,10 +2156,10 @@ function rdbp(){
   sudo systemctl stop psql;
 }
 
-#this alias to view the irc sever status
+# this alias to view the irc sever status
 alias irth="irth"
 
-#this function for irth alias
+# this function for irth alias
 function irth(){
   c && br 2 && sudo clear;
   echo "    irc server status : ";
@@ -2137,30 +2168,30 @@ function irth(){
   br;
 }
 
-#this alias to start the irc server
+# this alias to start the irc server
 alias ircon="ircon"
 
-#this function for ircon alias
+# this function for ircon alias
 function ircon(){
   clear && br 2 && sudo clear;
   sudo service inspircd start;
   irth;
 }
 
-#this alias to restart the irc server
+# this alias to restart the irc server
 alias ircrst="ircrst"
 
-#this function for ircrst alias
+# this function for ircrst alias
 function ircrst(){
   clear && br 2 && sudo clear;
   sudo service inspircd restart;
   irth;
 }
 
-#this alias to stop the irc server
+# this alias to stop the irc server
 alias ircoff="ircoff"
 
-#this function for ircoff alias
+# this function for ircoff alias
 function ircoff(){
   clear && br 2 && sudo clear;
   sudo service inspircd stop;
@@ -2178,7 +2209,7 @@ function gad(){
 # this alias to create a new github repository using github cli
 alias ghc="ghc"
 
-#this function to sanitize the repository name
+# this function to sanitize the repository name
 function sanitize_repo_name() {
   local repo_name="$1"
   # Replace any characters that are not alphanumeric or hyphen with hyphen
@@ -2486,3 +2517,5 @@ kill-line() {
 
 zle -N kill-line
 bindkey "²²" kill-line
+
+eval $(thefuck --alias)
