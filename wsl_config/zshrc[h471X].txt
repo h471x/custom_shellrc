@@ -364,7 +364,8 @@ command_not_found_handler() {
     # c && br;
     # echo "n o t     f o u n d " | figlet -t -c | lolcat;
     # br && sleep 0.5 && cv;
-    cv;
+    echo "fuck, wrong command"
+    fuck
   fi
 }
 
@@ -414,7 +415,7 @@ function dtp(){
 }
 
 # this alias to view the books
-alias books='exop /mnt/d/NTSOA/"ENI 2023"/"ENI L1 LESSONS"/BOOKS'
+alias books='exop /mnt/d/NTSOA/"0 ENI"/"ENI 2023"/"ENI L1 LESSONS"/BOOKS'
 
 # this alias to create a directory
 alias dr="dr"
@@ -893,7 +894,8 @@ alias gpt="gpt"
 # this function for gpt alias
 function gpt(){
   local gpt_id="jckaldkomadaenmmgladeopgmfbahfjm"
-  open_web_app chat.openai.com $gpt_id ChatGpt
+  local gpt_link="chat.openai.com"
+  open_web_app $gpt_link $gpt_id ChatGpt
   # chrome.exe --profile-directory=Default --app-id=$gpt_id
 }
 
@@ -1504,3 +1506,5 @@ bindkey "²²" kill-line
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+eval $(thefuck --alias)
