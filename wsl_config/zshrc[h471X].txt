@@ -59,6 +59,36 @@ ZSH_HIGHLIGHT_STYLES[globbing]='fg=#ff9000,bold'
 ZSH_HIGHLIGHT_STYLES[command-substitution-unquoted]='fg=#d30ccf,bold'
 ZSH_HIGHLIGHT_STYLES[command-substitution-delimiter]='fg=#d30ccf,bold'
 
+# ANSI CODES ARIABLES
+# Text
+RESET="$(printf '\033[0m')"
+BOLD="$(printf '\033[1m')"
+RED="$(printf '\033[31m')"
+GREEN="$(printf '\033[32m')"
+ORANGE="$(printf '\033[33m')"
+YELLOW="$(printf '\033[33m')"
+BLUE="$(printf '\033[34m')"
+MAGENTA="$(printf '\033[35m')"
+CYAN="$(printf '\033[36m')"
+#WHITE="$(printf '\033[37m')"
+WHITE="$(printf '\e[97m')"
+BLACK="$(printf '\033[30m')"
+NC="$(printf '\033[0m')" #Reset colour
+#Background
+REDBG="$(printf '\033[41m')"
+GREENBG="$(printf '\033[42m')"
+ORANGEBG="$(printf '\033[43m')"
+BLUEBG="$(printf '\033[44m')"
+MAGENTABG="$(printf '\033[45m')"
+CYANBG="$(printf '\033[46m')"
+WHITEBG="$(printf '\033[47m')"
+BLACKBG="$(printf '\033[40m')"
+RESETBG="$(printf '\e[0m\n')" #Reset background
+
+# Character
+CHECKMARK="$(printf '\xE2\x9C\x94')"
+QUESTION_MARK="$(printf '\xE2\x9D\x93')"
+
 #Here to launch tmux as default
 #case $TERM in
 #        screen|tmux-256color);;
@@ -155,7 +185,8 @@ function rld(){
   sv ~/.zshrc ~/NTSOA/zsh_config/wsl_config/"zshrc[h471X].txt";
   all ~/NTSOA/zsh_config/wsl_config/"zshrc[h471X].txt";
   c && br;
-  echo "z s h    s a v e d " | figlet -t -c;
+  local saved_message="z s h    s a v e d"
+  echo "$saved_message" | figlet -t -c;
   br && sleep 0.5;
   op ~/NTSOA/zsh_config
 }
@@ -367,9 +398,9 @@ command_not_found_handler() {
     # c && br;
     # echo "n o t     f o u n d " | figlet -t -c | lolcat;
     # br && sleep 0.5 && cv;
-    cv
-    # echo "fuck, wrong command"
-    # fuck
+    # cv
+    echo "${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Did you mean ... "
+    fuck
   fi
 }
 
