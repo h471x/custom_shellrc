@@ -451,6 +451,9 @@ command_not_found_handler() {
     # c && br && echo "n o t     f o u n d " | figlet -t -c | lolcat;
     # br && sleep 0.5 && cv;
     # cv;
+    # echo "fuck, wrong command"
+    echo "${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Did you mean ... "
+    fuck
   fi
 }
 
@@ -964,7 +967,7 @@ function mns(){
     #here to check if the command exists
     man "$1" | cat > ~/NTSOA/manual/"$1".txt;
     all ~/NTSOA/manual/"$1".txt;
-    vf ~/NTSOA/manual/"$1".txt;
+    nvm ~/NTSOA/manual/"$1".txt;
     cv;
   else
     c && br;
@@ -1584,7 +1587,9 @@ function rst(){
 # COLOUR VARIABLES
 # they are all ANSI characters
 
-#Text
+# Text
+RESET="$(printf '\033[0m')"
+BOLD="$(printf '\033[1m')"
 RED="$(printf '\033[31m')"
 GREEN="$(printf '\033[32m')"
 ORANGE="$(printf '\033[33m')"
