@@ -18,8 +18,9 @@ export ZSH="$HOME/.oh-my-zsh"
 WSL_PATH=/home/h471x/.local/bin/
 SQLITE_PATH=/mnt/c/Program\ Files/sqlite
 QT_PATH=/mnt/d/NTSOA/INSTALLED/QT/Tools/QtCreator/bin
+PYTHON_PATH=/mnt/d/NTSOA/INSTALLED/PYTHON
 VIRTUAL_BOX_PATH=/mnt/c/Virtual\ Box
-BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$VIRTUAL_BOX_PATH
+BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$VIRTUAL_BOX_PATH:$PYTHON_PATH
 
 
 # Browsers
@@ -1469,11 +1470,11 @@ function sqlite(){
     else
       sqlite3.exe $@;
     fi
-  fi  
+  fi
 }
 
 # this alias to launch windows python
-alias py="/mnt/d/NTSOA/INSTALLED/PYTHON/python.exe"
+alias py="python.exe"
 
 # # this alias to locate python modules
 # alias pyfn="pyfn"
