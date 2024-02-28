@@ -5,11 +5,8 @@ setopt promptsubst # enable command substitution in prompt
 bindkey -e #emacs keybindings
 bindkey ' ' magic-space #do history expansion on space
 
+# This is for fastfile Oh-My-Zsh Plugin
 fastfile_var_prefix='$'
-
-# this to make Github CLI know which default browser it would use
-# this WSL issue was solved in gh GitHub Repo Pull Request
-export BROWSER="/mnt/c/Program\ Files/Google/chrome/Application/chrome.exe"
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
@@ -22,7 +19,6 @@ PYTHON_PATH=/mnt/d/NTSOA/INSTALLED/PYTHON
 VIRTUAL_BOX_PATH=/mnt/c/Virtual\ Box
 BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$VIRTUAL_BOX_PATH:$PYTHON_PATH
 
-
 # Browsers
 CHROME_PATH=/mnt/c/Program\ Files/Google/chrome/Application/
 EDGE_PATH=/mnt/c/Program\ Files\ (x86)/Microsoft/Edge/Application/
@@ -34,8 +30,14 @@ POT_PLAYER_PATH=/mnt/d/NTSOA/INSTALLED/POT\ PLAYER/PotPlayer
 FL_STUDIO_PATH=/mnt/d/NTSOA/INSTALLED/FL\ STUDIO\ 12
 APP_PATH=$NPM_PATH:$POT_PLAYER_PATH:$FL_STUDIO_PATH
 
+# Including all the paths
 PATH=$BINARY_PATH:$BROWSER_PATH:$APP_PATH:$PATH
 
+# this to make Github CLI know which default browser it would use
+# this WSL issue was solved in gh GitHub Repo Pull Request
+export BROWSER="chrome.exe"
+
+# Oh-My-Zsh custom theme
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
 # Declare the variable for zsh-syntax-highlighting styles
