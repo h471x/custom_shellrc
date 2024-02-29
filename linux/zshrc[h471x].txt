@@ -1584,9 +1584,7 @@ function rst(){
   cv;
 }
 
-# COLOUR VARIABLES
-# they are all ANSI characters
-
+# ANSI CODES ARIABLES
 # Text
 RESET="$(printf '\033[0m')"
 BOLD="$(printf '\033[1m')"
@@ -1802,7 +1800,7 @@ function stap(){
       echo " wlan0 Interface Connection : http://$wlan_ip";
       br;
     else
-      echo " $eth_ip" && br;
+      echo " eth0  Interface Connection : http://$eth_ip" && br;
     fi
   else
     c && br && echo " Apache Server is Off" && br;
