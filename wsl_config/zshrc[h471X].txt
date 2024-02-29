@@ -225,24 +225,26 @@ function exop(){
   cv;
 }
 
-# this function to open file with browser
+# this alias to open file with browser
+alias bwsop="bwsop"
+
+# this function bwsop alias
 function bwsop(){
-  local file="$1"
+  local file_name="$1"
+  local file_extension="${file_name##*.}"
+
+  # Replace all Spaces and Back-slashes with %20
   local formatted_path=$(wslpath -m . | sed -e 's/ /%20/g' -e 's/\\//g')
-  local formatted_file=$(echo "$file" | sed -e 's/ /%20/g' -e 's/\\//g')
-  case "${1##*.}" in
-    html)
-      browser="chrome.exe"
-      ;;
-    pdf)
-      browser="msedge.exe"
-      ;;
-    *)
-      browser="chrome.exe"
-      ;;
-  esac
-  $browser "file:///$formatted_path/$formatted_file"
-  # nd
+  local formatted_file=$(echo "$file_name" | sed -e 's/ /%20/g' -e 's/\\//g')
+
+  # Check if it a Pdf file
+  local isPdf="[[ "$file_extension" == "pdf" ]]"
+
+  # Open Pdf file with edge and the other files with chrome
+  local browser=$( eval $isPdf && echo msedge.exe || echo chrome.exe)
+  $browser file:///$formatted_path/$formatted_file
+
+  # Reload the terminal screen
   cv
 }
 
@@ -986,6 +988,24 @@ function dsc(){
   open_web_app discord.com $disord_id Discord
 }
 
+# this alias to open Twitter X Web App
+alias twx="twx"
+
+# this function for twx alias
+function twx(){
+  local twitter_id="jgeocpdicgmkeemopbanhokmhcgcflmi"
+  open_web_app twitter.com $twitter_id TwitterX
+}
+
+# this alias to open YouTube Web App
+alias ytb="ytb"
+
+# this function for ytb alias
+function ytb(){
+  local youtube_id="agimnkijcaahngcdmfeangaknmldooml"
+  open_web_app youtube.com $youtube_id YouTube
+}
+
 # this alias to recharge the router
 alias rtr="rtr"
 
@@ -1017,6 +1037,7 @@ alias clock="clock"
 function clock(){
   cd /mnt/d/NTSOA/Desktop/DIGITAL\ CLOCK
   bwsop clock.html
+  hm
 }
 
 # this alias to access my musics
