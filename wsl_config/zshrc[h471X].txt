@@ -962,11 +962,7 @@ alias fb="fb"
 # this function for fb alias
 function fb(){
   local fb_id="gelmehpcmiomoockkmdlfadoankpigol"
-  # if [[ $# -eq 0 ]]; then
-    # chrome.exe --profile-directory=Default --app-id=$fb_id
-  # elif [[ $1 -eq "-i" ]]; then
-    open_web_app facebook.com $fb_id
-  # fi
+  open_web_app facebook.com $fb_id
 }
 
 # this alias to open Instagram app
@@ -976,7 +972,6 @@ alias itg="itg"
 function itg(){
   local insta_id="akpamiohjfcnimfljfndmaldlcfphjmp"
   open_web_app instagram.com $insta_id
-  # chrome.exe --profile-directory=Default --app-id=$insta_id
 }
 
 # this alias to open the discord app
@@ -1006,12 +1001,20 @@ function ytb(){
   open_web_app youtube.com $youtube_id YouTube
 }
 
+# this alias to open hackerank
+alias hcrk="hcrk"
+
+# this function for hcrk alias
+function hcrk(){
+  local hackerrank_id="jhcacpbneohogfnaanlbdfpjpfmfmpdk"
+  open_web_app hackerrank.com $hackerrank_id HackerRank
+}
+
 # this alias to recharge the router
 alias rtr="rtr"
 
 # this function for rtr alias
 function rtr(){
-  # chrome.exe "https://www.airtel.mg/broadband/#/user/login" && exit;
   local airtel_id="phkfjlcmjmnindcbhfmnmlikainlhodg"
   open_web_app www.airtel.mg $airtel_id "Airtel Router"
 }
@@ -1021,7 +1024,6 @@ alias htx="htx"
 
 # this function for htx alias
 function htx(){
-  # chrome.exe "http://192.168.19.1/index.html#" && exit;
   local router_id="kmkglniimomjkiakgepingonppimlibg"
   local router_IP="192.168.19.1"
   open_web_app $router_IP $router_id "h471x Router"
@@ -1076,31 +1078,31 @@ function edt(){
   cv
 }
 
-#this alias to view the devops folder
+# this alias to view the devops folder
 alias dvps="op /mnt/d/NTSOA/DEVOPS/devops"
 
-#this alias to view the history
+# this alias to view the history
 alias hst="hst"
 
-#this function for hst alias
+# this function for hst alias
 function hst(){
   if [[ $# -eq 0 ]]; then
     history | less && cv
   else
     re='^[0-9]+$'
-    #check if the argument is an integrer
+    # check if the argument is an integrer
     if [[ $1 =~ $re ]]; then
       history | tail -$1 | less && cv
-    else  #else if it's a text to grep
+    else  # else if it's a text to grep
       history | grep "$1" | less && cv
     fi
   fi
 }
 
-#this alias to specify which command in the history to search
+# this alias to specify which command in the history to search
 alias hsg="hsg"
 
-#this function for hsg alias
+# this function for hsg alias
 function hsg(){
   if [[ $# -eq 0 ]]; then
     history | less && cv;
@@ -1109,10 +1111,10 @@ function hsg(){
   fi
 }
 
-#this alias to show the network configuration
+# this alias to show the network configuration
 alias ipsh="ipsh"
 
-#this function for ntsh alias
+# this function for ntsh alias
 function ipsh(){
   c && br;
   echo "  Available IP Adresses : ";
@@ -1142,10 +1144,10 @@ function ipsh(){
 #   cmd.exe /c 'netsh wlan show profiles "ENI 1" key=clear' | grep "Key Content" | awk '{print $4}'
 # }
 
-#this alias to view the ssh server status
+# this alias to view the ssh server status
 alias sth="sth"
 
-#this function for sth alias
+# this function for sth alias
 function sth(){
   # c && br;
   # sudo clear;
@@ -1161,24 +1163,22 @@ function sth(){
   fi
 }
 
-#this alias to enable the ssh server
+# this alias to enable the ssh server
 alias sshon="sshon"
 
-#this function for sshon alias
+# this function for sshon alias
 function sshon(){
-  clear && br 2;
-  sudo clear && br;
+  allow_sudo
   sudo /etc/init.d/ssh start;
   sth;
 }
 
-#this alias to kill the ssh server process
+# this alias to kill the ssh server process
 alias sshoff="sshoff"
 
-#this function for sshoff alias
+# this function for sshoff alias
 function sshoff(){
-  clear && br 2;
-  sudo clear && br;
+  allow_sudo
   # sudo /etc/init.d/ssh stop;
   if [[ $(pgrep sshd) ]]; then
     sudo kill $(pgrep sshd);
@@ -1186,11 +1186,11 @@ function sshoff(){
   sth;
 }
 
-#this alias to give sudo
-#access before command execution
+# this alias to give sudo
+# access before command execution
 alias allow_sudo="allow_sudo"
 
-#this function for allow_sudo alias
+# this function for allow_sudo alias
 function allow_sudo(){
   #A simple trick is just to clear
   #the screen, clever ain't it ?
@@ -1198,7 +1198,7 @@ function allow_sudo(){
   sudo clear
 }
 
-#this function to check if pfsense is reachable
+# this function to check if pfsense is reachable
 # coded 01/29/2024
 function reach(){
   c && br;
@@ -1224,10 +1224,10 @@ function reach(){
   fi
 }
 
-#this variable will store the pixel ssh server IP adress
-#local pxl_ip = 192.168.68.112"
+# this variable will store the pixel ssh server IP adress
+# local pxl_ip = 192.168.68.112"
 
-#this alias to connect to the Pixel 3XL ssh server
+# this alias to connect to the Pixel 3XL ssh server
 # alias cnt="ssh -p 8022 u0_a249@192.168.68.112 && cv"
 #
 # #this alias to download a file from the Pixel 3XL ssh server
@@ -1262,7 +1262,7 @@ function reach(){
 #   fi
 # }
 
-#this function to sanitize the repository name
+# this function to sanitize the repository name
 function sanitize_repo_name() {
   local repo_name="$1"
   # Replace any characters that are not alphanumeric or hyphen with hyphen
@@ -1270,7 +1270,7 @@ function sanitize_repo_name() {
   echo "$sanitized_name"
 }
 
-#this alias to create a new github repository using github cli 
+# this alias to create a new github repository using github cli 
 alias ghc="ghc"
 
 # function ghc() {
@@ -1308,11 +1308,10 @@ function ghc() {
   fi
 }
 
-
-#this alias to delete a github repo via Github CLI
+# this alias to delete a github repo via Github CLI
 alias ghd="ghd"
 
-#this function for ghd alias 
+# this function for ghd alias 
 function ghd(){
   if [[ $# -eq 0 ]]; then
     local repo_name="$(basename $PWD)"
@@ -1330,12 +1329,23 @@ function ghd(){
   fi
 }
 
-#this alias to git add and git commit at the same 00:31
+# this alias to git add and git commit at the same 00:31
 alias gad="gad"
 
-#this function for gad alias
+# this function for gad alias
 function gad(){
-  git add "$1" && git commit "$1" -m "$2";
+  # if [[ $# -eq 1 ]]; then
+    git add . && git commit -m "$1"
+  # fi
+  # git add "$1" && git commit "$1" -m "$2";
+}
+
+# this alias to make a long commit
+alias gcm="gcm"
+
+# this function for gcm alias
+function gcm(){
+  git add . && git commit
 }
 
 #this alias to view all repos in the GitHub
