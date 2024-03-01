@@ -1014,6 +1014,15 @@ function hcrk(){
   open_web_app hackerrank.com $hackerrank_id HackerRank
 }
 
+# this alias to open LinkedIn WebApp
+alias lnk="lnk"
+
+# this function for lnk alias
+function lnk(){
+  local linkedin_id="ohghonlafcimfigiajnmhdklcbjlbfda"
+  open_web_app linkedin.com $linkedin_id LinkedIn
+}
+
 # this alias to recharge the router
 alias rtr="rtr"
 
