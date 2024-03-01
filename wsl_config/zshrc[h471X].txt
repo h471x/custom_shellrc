@@ -429,6 +429,10 @@ function op(){
       cd "$1" && cvg "$2";
     fi
   elif [[ -f "$1" ]]; then
+    # local file_name="$1"
+    # local file_extension="${file_name##*.}"
+    # local is_site="[[ "$file_extension" == "com" ]]"
+    # local cmd=$(eval $is_site && echo "open_web_app" || echo "vf")
     vf "$1"
   fi
 }
@@ -1334,10 +1338,13 @@ alias gad="gad"
 
 # this function for gad alias
 function gad(){
-  # if [[ $# -eq 1 ]]; then
+  if [[ $# -eq 0 ]]; then
+    git add . && git commit
+  elif [[ $# -eq 1 ]]; then
     git add . && git commit -m "$1"
-  # fi
-  # git add "$1" && git commit "$1" -m "$2";
+  elif [[ $# -eq 2 ]]; then
+    git add "$1" && git commit "$1" -m "$2";
+  fi
 }
 
 # this alias to make a long commit
