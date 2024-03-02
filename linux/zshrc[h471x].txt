@@ -659,7 +659,8 @@ alias edt="edt"
 
 #this function for edt alias
 function edt(){
-  vf /home/h471x/NTSOA/'EDT ENI'/ODS/"EDT ENI L1 2023.ods";
+  cd /home/h471x/NTSOA/'EDT ENI'/ODS;
+  op "EDT ENI L2 2024.ods"
   op /home/h471x/NTSOA/'EDT ENI'/PDF;
 }
 
@@ -668,7 +669,7 @@ alias edt="edtv"
 
 #this function for edt alias
 function edtv(){
-  vf /home/h471x/NTSOA/'EDT ENI';
+  op /home/h471x/NTSOA/'EDT ENI';
 }
 
 #this alias to open a directory and make it as destination
@@ -2201,12 +2202,18 @@ function ircoff(){
   irth;
 }
 
-# this alias to add & commit at the same time
+# this alias to git add and git commit at the same 00:31
 alias gad="gad"
 
 # this function for gad alias
 function gad(){
-  git add "$1" && git commit "$1" -m "$2"
+  if [[ $# -eq 0 ]]; then
+    git add --all && git commit
+  elif [[ $# -eq 1 ]]; then
+    git add --all && git commit -m "$1"
+  elif [[ $# -eq 2 ]]; then
+    git add "$1" && git commit "$1" -m "$2";
+  fi
 }
 
 # this alias to create a new github repository using github cli
