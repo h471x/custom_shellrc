@@ -452,8 +452,8 @@ command_not_found_handler() {
     # br && sleep 0.5 && cv;
     # cv;
     # echo "fuck, wrong command"
-    echo "${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Did you mean ... "
-    fuck
+    echo "${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Command Not Found "
+    # fuck
   fi
 }
 
@@ -733,6 +733,11 @@ function rn(){
       br;;
     html)
       google-chrome "$1" && cv;;
+    asm)
+      nasm -felf64 "$1"
+      ld ${1%.*}.o -o ${1%.*}
+      ./${1%.*}
+      ;;
     *)
       all "$1" && c && ./"$1";;
  esac
@@ -1115,7 +1120,7 @@ alias eni="op /home/h471x/NTSOA/COURSE/ENI"
 alias dtp="op /home/h471x/Desktop"
 
 #this alias to go to the to dev
-alias dev="op /home/h471x/Desktop/dev"
+alias dev="op /home/h471x/NTSOA/dev"
 
 #this alias to open the text notes
 alias nt="op /home/h471x/NTSOA/notes"
@@ -2146,7 +2151,16 @@ function rdb(){
   local is_root='[[ "$user" == "root" ]]';
   local flag=$(eval "$is_root" && echo "" || echo "-p");
   sudo mysql -u $user $flag;
-  sudo systemctl stop mysql;
+  echo -ne " ${WHITE}[${GREEN}?${WHITE}]${WHITE} ${GREEN}Stop ${WHITE}MySQL Server ? (y/n) ";
+  read server
+  if [ "$server" = "y" ]; then
+    # echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping ${GREEN}MySQL ${WHITE}Server  ";
+    echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping MySQL Server ... "
+    sudo systemctl stop mysql;
+    echo "${GREEN}$CHECKMARK${WHITE}"
+  elif [ "$server" = "n" ];then
+    echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping ${GREEN}MySQL ${WHITE}Server  ";
+  fi
 }
 
 # this alias to start the sql cli
@@ -2202,7 +2216,7 @@ function ircoff(){
   irth;
 }
 
-# this alias to git add and git commit at the same 00:31
+# this alias to git add and git commit at the same time
 alias gad="gad"
 
 # this function for gad alias
