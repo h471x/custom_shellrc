@@ -1,3 +1,10 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 set autocd # change directory just by typing his name
 setopt promptsubst # enable command substitution in prompt
 
@@ -140,6 +147,7 @@ function cvii(){
   br 2;
 }
 
+# clear && echo -e && echo -e && echo -e && echo -e
 x;
 # sleep 0.5 && cvi;
 
@@ -401,8 +409,8 @@ command_not_found_handler() {
     # echo "n o t     f o u n d " | figlet -t -c | lolcat;
     # br && sleep 0.5 && cv;
     # cv
-    echo "${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Did you mean ... "
-    fuck
+    echo "${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Command Not Found ... "
+    # fuck
   fi
 }
 
@@ -853,6 +861,18 @@ alias pc="c && echo -e && echo -e && neofetch --source ~/.config/neofetch/hn.txt
 #call this pc alias at startup
 #pc
 
+# this alias to give sudo
+# access before command execution
+alias allow_sudo="allow_sudo"
+
+# this function for allow_sudo alias
+function allow_sudo(){
+  #A simple trick is just to clear
+  #the screen, clever ain't it ?
+  c && br 2;
+  sudo clear
+}
+
 # this alias to go to home directory
 alias hm="cd && cv"
 
@@ -926,6 +946,8 @@ function open_web_app(){
   else
     web_app_stat "Not Connected"
   fi
+
+  # check the stat
   eval $open_app
 }
 
@@ -948,6 +970,15 @@ function gmn(){
   local gmn_id="acehpdabncjaanhpihehcmhidhmbdcoo"
   open_web_app gemini.google.com $gmn_id Gemini
   # chrome.exe --profile-directory=Default --app-id=$gpt_id
+}
+
+# this alias to open ClaudeAI app
+alias cld="cld"
+
+# this function for cld alias
+fuction cld(){
+  local claude_id="fmpnliohjhemenmnlpbfagaolkdacoja"
+  open_web_app claude.ai $claude_id ClaudeAI
 }
 
 # this alias to open the GitHub app
@@ -983,7 +1014,7 @@ alias dsc="dsc"
 
 # this function for dsc alias
 function dsc(){
-  local disord_id="magkoliahgffibhgfkmoealggombgknl"
+  local discord_id="magkoliahgffibhgfkmoealggombgknl"
   open_web_app discord.com $disord_id Discord
 }
 
@@ -1032,7 +1063,7 @@ function rtr(){
   open_web_app www.airtel.mg $airtel_id "Airtel Router"
 }
 
-# this alias to view the HTX_AP leaderboard
+# this alias to view the HTX_AP dashboard
 alias htx="htx"
 
 # this function for htx alias
@@ -1089,6 +1120,11 @@ function edt(){
   # Open the most recent time schedule
   explorer.exe $recent_file
   cv
+}
+
+# this alias to set the recent file variable
+function rctf(){
+  echo $(ls -tR | head)
 }
 
 # this alias to view the devops folder
@@ -1199,16 +1235,129 @@ function sshoff(){
   sth;
 }
 
-# this alias to give sudo
-# access before command execution
-alias allow_sudo="allow_sudo"
+# this function to view the current apache2
+# service, its status
+function stap(){
+  if [[ $(pgrep apache2) ]]; then
+    c && br && echo " Apache Server is Active" && br;
 
-# this function for allow_sudo alias
-function allow_sudo(){
-  #A simple trick is just to clear
-  #the screen, clever ain't it ?
-  c && br 2;
-  sudo clear
+    local eth_iface="eth0"
+    local wifi_iface="wifi0"
+
+    # local eth_ip=$(ifconfig $eth_iface | grep "inet " | awk '{print $2}');
+
+    # if [ -d /sys/class/net/wlan0 ]; then
+      local wlan_ip=$(ifconfig $wifi_iface | grep "inet " | awk '{print $2}');
+      # echo " eth0  Interface Connection : http://$eth_ip";
+      echo " wlan0 Interface Connection : http://$wlan_ip";
+      br;
+    # else
+    #   echo " eth0  Interface Connection : http://$eth_ip" && br;
+    # fi
+  else
+    c && br && echo " Apache Server is Off" && br;
+  fi
+}
+
+# this alias to start the apache2 service
+alias apon="apon"
+
+# this function for apch alias
+function apon(){
+  allow_sudo;
+  cd /var/www/html;
+  sudo service apache2 start;
+  stap;
+}
+
+# this alias to stop the apache2 service
+alias apoff="apoff"
+
+# this function for apch alias
+function apoff(){
+  allow_sudo;
+  sudo service apache2 stop;
+  stap;
+}
+
+# this alias to open the
+# Apache2 server directory
+alias apd="apd"
+
+# this function for apd alias
+function apd(){
+  op /var/www/html
+}
+
+# this alias to start the sql service
+alias sqlon="sqlon"
+
+# this function for sqlon alias
+function sqlon(){
+  allow_sudo;
+  sudo service mariadb start;
+  sqls;
+}
+
+# this alias to stop the sql service
+alias sqloff="sqloff"
+
+# this function for sqloff alias
+function sqloff(){
+  allow_sudo;
+  sudo service mariadb stop;
+  sqls;
+}
+
+# this alias to view the sql service
+alias sqls="sqls"
+
+# this function for sqloff alias
+function sqls(){
+  allow_sudo;
+  # br;
+  # echo "  MySQL server status "
+  br;
+  if [[ $(pgrep mariadb) ]]; then
+    echo " MySQL server is Active"
+  else
+    echo "MySQL Server is Down"
+  fi
+}
+
+# this alias to start the sql cli
+alias rdb="rdb"
+
+# this function for rdb alias
+function rdb(){
+  allow_sudo;
+  if ! pgrep mariadb > /dev/null; then
+    sudo service mariadb start &>/dev/null
+  fi
+  c && br
+  echo "${BOLD}MySQL Server Active [${GREEN}✓${WHITE}]"
+  echo "${BOLD}User : $user"
+  br
+  local user=${1:-root}
+  local is_root='[[ "$user" == "root" ]]';
+  local flag=$(eval "$is_root" && echo "" || echo "-p");
+  sudo mysql -u $user $flag;
+  br
+  function check_mysql_server(){
+    echo -ne "${BOLD}${WHITE}[${GREEN}?${WHITE}]${WHITE} ${GREEN}Stop ${WHITE}MySQL Server ? (y/n) ";
+    read server
+    if [ "$server" = "y" ]; then
+      # echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping ${GREEN}MySQL ${WHITE}Server  ";
+      echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping MySQL Server ... "
+      sudo service mariadb stop &>/dev/null
+      echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} MySQL Server Stopped  ... ${GREEN}✓"
+    elif [ "$server" = "n" ];then
+      echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Keeping ${GREEN}MySQL ${WHITE}Server ${GREEN}On";
+    else
+      check_mysql_server
+    fi
+  }
+  check_mysql_server
 }
 
 # this function to check if pfsense is reachable
@@ -1614,4 +1763,4 @@ bindkey "²²" kill-line
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-eval $(thefuck --alias)
+# eval $(thefuck --alias)
