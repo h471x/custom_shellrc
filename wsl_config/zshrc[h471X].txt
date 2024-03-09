@@ -1213,6 +1213,7 @@ function sth(){
     br;
     local wifi_iface="wifi0"
     local wifi_ip=$(ifconfig $wifi_iface | grep inet | awk '{print $2}');
+    # echo " Connect Via  ==>  ssh $USER@$ip";
     echo "Ssh Connection via $wifi_iface Interface : ${BLUE}ssh $USER@$wifi_ip${WHITE}";
   else
     echo "${BOLD}Ssh Server Off [${RED}x${WHITE}]"
@@ -1321,7 +1322,7 @@ function sqloff(){
 # this alias to view the sql service
 alias sqls="sqls"
 
-# this function for sqls alias
+# this function for sqloff alias
 function sqls(){
   allow_sudo;
   # br;
@@ -1524,24 +1525,14 @@ function gcm(){
 #this alias to view all repos in the GitHub
 alias ghls="gh repo list"
 
-# this function to declare default git
-# based branch aliases variables
-# today 2024-03-09 20:38
-# function init_git_variables(){
-#   is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
-#   default_branch=$(basename $(git symbolic-ref refs/remotes/origin/HEAD))
-#   current_branch=$(git rev-parse --abbrev-ref HEAD)
-# }
-
 #this alias to rename a git branch
 alias gnm="gnm"
 
 #this function for gnm alias
 function gnm(){
-  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+  if [[ -d ./.git ]]; then
+    local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
 
-  if [[ "$is_a_git_repo" == "true" ]]; then
-    local current_branch=$(git rev-parse --abbrev-ref HEAD)
     if [[ $# -eq 1 ]]; then
       git branch -M $current_branch "$1";
       cv;
@@ -1567,19 +1558,33 @@ function gck(){
     local current_branch=$(git rev-parse --abbrev-ref HEAD)
 
     if [[ $# -eq 0 ]]; then
-      if [[ "$current_branch" != "$default_branch" ]]; then
+      # local default_branch=$(grep default ~/.gitconfig | awk '{print $3}');
+      # git checkout $default_branch;
+      # nice but I can't loop over branches
+      # so I update the code today 02/04/2024
+      local default_branch=$(git config --get init.defaultBranch)
+      # local current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+      # if [[ "$current_branch" != "$default_branch" ]]; then
         git checkout "$default_branch"
-      fi
+      # else
+      #   local branches=($(git for-each-ref --format='%(refname:short)' refs/heads/))
+      #   local current_index=0
+      #
+      #   for ((i=0; i<${#branches[@]}; i++)); do
+      #     if [[ "${branches[$i]}" == "$current_branch" ]]; then
+      #       current_index=$i
+      #       break
+      #     fi
+      #   done
+      #
+      #   current_index=$(( (current_index + 1) % ${#branches[@]} ))
+      #   git checkout "${branches[$current_index]}"
+      # fi
     elif [[ $# -eq 1 ]]; then
-      # check if the branch doesn't exist yet
-      if ! git rev-parse --verify "$1" >/dev/null 2>&1; then
-        git checkout -b "$1";
-      else
-        git checkout "$1";
-      fi
+      git checkout "$1";
     else
-      echo " gck        ==> switch to the default branch";
-      echo " gck branch ==> swith to the specified branch" && br;
+      echo " ■■▶ Usage : gck branch_to_switch" && br;
     fi
   else
     echo " ■■▶ This won't work, you are not in a git repo !" && br;
@@ -1615,6 +1620,7 @@ function gbr(){
     if [[ $# -eq 1 ]]; then
       git checkout -b "$1";
     elif [[ $# -eq 0 ]]; then
+      # echo " ■■▶ Please pass the name of the new branch as argument " && br;
       git branch -a;
     else
       echo " ■■▶ Usage : gbr new_branch" && br;
@@ -1636,28 +1642,20 @@ function gbd(){
     local current_branch=$(git rev-parse --abbrev-ref HEAD)
 
     if [[ $# -eq 1 ]]; then
-      # check if the branch doesn't exist
-      if ! git rev-parse --verify "$1" >/dev/null 2>&1; then
-        echo " ■■▶ Fatal ! $1 is a Non Existing branch " && br;
-      else
-        if [[ "$current_branch" == "$default_branch" ]]; then
-          echo " ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
-        else
-          git checkout $default_branch;
-          git branch -D "$1";
-        fi
+      # local default_branch=$(grep default ~/.gitconfig | awk '{print $3}');
+      local default_branch=$(git config --get init.defaultBranch)
+      local current_branch=$(git rev-parse --abbrev-ref HEAD)
+      # if [[ "$1" != "$default_branch" ]]; then
+        # gck;
+      # fi
+      if [[ "$current_branch" != "$default_branch" ]]; then
+        git checkout $default_branch;
       fi
+      git branch -D "$1";
     elif [[ $# -eq 0 ]]; then
-      if [[ "$current_branch" == "$default_branch" ]]; then
-        echo " ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
-      else
-        git checkout "$default_branch";
-        git branch -D "$current_branch";
-      fi
+      echo " ■■▶ Please pass the name of the branch to delete as argument " && br;
     else
-      br
-      echo " gbd        --> Delete the current branch";
-      echo " gbd branch --> Delete the specified branch" && br;
+      echo " ■■▶ Usage : gbd branch_to_delete" && br;
     fi
   else
     echo " ■■▶ This won't work, you are not in a git repo !" && br;
