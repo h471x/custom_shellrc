@@ -75,6 +75,7 @@ GREEN="$(printf '\033[32m')"
 ORANGE="$(printf '\033[33m')"
 YELLOW="$(printf '\033[33m')"
 BLUE="$(printf '\033[34m')"
+BRIGHT_BLUE="$(printf '\033[94m')"
 MAGENTA="$(printf '\033[35m')"
 CYAN="$(printf '\033[36m')"
 #WHITE="$(printf '\033[37m')"
@@ -1098,6 +1099,9 @@ alias setup="op /mnt/d/NTSOA/SETUP"
 # this alias to open FL Studio
 alias fl="FL64.exe; cv"
 
+# this alias to open apple music
+alias music="AppleMusic.exe; cv"
+
 # this alias to open VirtualBox
 alias vm="VirtualBox.exe"
 
@@ -1198,17 +1202,21 @@ alias sth="sth"
 
 # this function for sth alias
 function sth(){
-  # c && br;
+  c && br;
   # sudo clear;
   # br;
   # sudo /etc/init.d/ssh status;
   # br;
   if [[ $(pgrep sshd) ]]; then
-    br && echo " ssh server is active" && br;
-    local ip=$(ifconfig wifi0 | grep inet | awk '{print $2}');
-    echo " Connect Via  ==>  ssh $USER@$ip";
+    c && br;
+    echo "${BOLD}Ssh Server Active [${GREEN}✓${WHITE}]"
+    br;
+    local wifi_iface="wifi0"
+    local wifi_ip=$(ifconfig $wifi_iface | grep inet | awk '{print $2}');
+    # echo " Connect Via  ==>  ssh $USER@$ip";
+    echo "Ssh Connection via $wifi_iface Interface : ${BLUE}ssh $USER@$wifi_ip${WHITE}";
   else
-    echo " ssh server is off";
+    echo "${BOLD}Ssh Server Off [${RED}x${WHITE}]"
   fi
 }
 
@@ -1239,23 +1247,23 @@ function sshoff(){
 # service, its status
 function stap(){
   if [[ $(pgrep apache2) ]]; then
-    c && br && echo " Apache Server is Active" && br;
+    c && br;
+    echo "${BOLD}Apache Server Active [${GREEN}✓${WHITE}]"
+    br;
 
     local eth_iface="eth0"
     local wifi_iface="wifi0"
+    local loopback_iface="lo"
+    local wlan_ip=$(ifconfig $wifi_iface | grep "inet " | awk '{print $2}');
+    local loopback_ip=$(ifconfig $loopback_iface | grep "inet " | awk '{print $2}');
 
-    # local eth_ip=$(ifconfig $eth_iface | grep "inet " | awk '{print $2}');
-
-    # if [ -d /sys/class/net/wlan0 ]; then
-      local wlan_ip=$(ifconfig $wifi_iface | grep "inet " | awk '{print $2}');
-      # echo " eth0  Interface Connection : http://$eth_ip";
-      echo " wlan0 Interface Connection : http://$wlan_ip";
-      br;
-    # else
-    #   echo " eth0  Interface Connection : http://$eth_ip" && br;
-    # fi
+    echo "$wifi_iface Interface Connection (Public)  : ${BRIGHT_BLUE}http://$wlan_ip${WHITE}";
+    echo "$loopback_iface    Interface Connection (Private) : ${BRIGHT_BLUE}http://$loopback_ip ${WHITE}";
+    br;
   else
-    c && br && echo " Apache Server is Off" && br;
+    c && br;
+    echo "${BOLD}Apache Server Off [${RED}x${WHITE}]"
+    br
   fi
 }
 
@@ -1295,7 +1303,9 @@ alias sqlon="sqlon"
 # this function for sqlon alias
 function sqlon(){
   allow_sudo;
+  br
   sudo service mariadb start;
+  br
   sqls;
 }
 
@@ -1319,9 +1329,9 @@ function sqls(){
   # echo "  MySQL server status "
   br;
   if [[ $(pgrep mariadb) ]]; then
-    echo " MySQL server is Active"
+    echo "${BOLD}MySQL Server Active [${GREEN}✓${WHITE}]"
   else
-    echo "MySQL Server is Down"
+    echo "${BOLD}MySQL Server Down [${RED}x${WHITE}]"
   fi
 }
 
@@ -1335,10 +1345,9 @@ function rdb(){
     sudo service mariadb start &>/dev/null
   fi
   c && br
+  local user=${1:-root}
   echo "${BOLD}MySQL Server Active [${GREEN}✓${WHITE}]"
   echo "${BOLD}User : $user"
-  br
-  local user=${1:-root}
   local is_root='[[ "$user" == "root" ]]';
   local flag=$(eval "$is_root" && echo "" || echo "-p");
   sudo mysql -u $user $flag;
@@ -1646,6 +1655,9 @@ function gbd(){
     echo " ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
+
+# this alias to revert back to last commit
+alias grst="git checkout -- ."
 
 #this alias to switch to windows terminal
 alias wds="wds"
