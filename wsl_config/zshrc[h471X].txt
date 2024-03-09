@@ -1533,14 +1533,12 @@ function init_git_variables(){
   current_branch=$(git rev-parse --abbrev-ref HEAD)
 }
 
-# here to call those variables
-init_git_variables
-
 #this alias to rename a git branch
 alias gnm="gnm"
 
 #this function for gnm alias
 function gnm(){
+  init_git_variables
   if [[ "$is_a_git_repo" == "true" ]]; then
     if [[ $# -eq 1 ]]; then
       git branch -M $current_branch "$1";
@@ -1560,6 +1558,7 @@ alias gck="gck";
 
 #this function for gck alias
 function gck(){
+  init_git_variables
   if [[ "$is_a_git_repo" == "true" ]]; then
     if [[ $# -eq 0 ]]; then
       if [[ "$current_branch" != "$default_branch" ]]; then
@@ -1586,6 +1585,7 @@ alias gcb="gcb";
 
 #this function for gcb alias
 function gcb(){
+  init_git_variables
   if [[ "$is_a_git_repo" == "true" ]]; then
     if [[ $# -eq 0 ]]; then
       git checkout -;
@@ -1602,6 +1602,7 @@ alias gbr="gbr"
 
 #this function for gbr alias
 function gbr(){
+  init_git_variables
   if [[ "$is_a_git_repo" == "true" ]]; then
     if [[ $# -eq 1 ]]; then
       git checkout -b "$1";
@@ -1620,6 +1621,7 @@ alias gbd="gbd"
 
 #this function for gbd alias
 function gbd(){
+  init_git_variables
   if [[ "$is_a_git_repo" == "true" ]]; then
     if [[ $# -eq 1 ]]; then
       # check if the branch doesn't exist
