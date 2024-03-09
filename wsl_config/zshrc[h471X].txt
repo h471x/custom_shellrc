@@ -1527,19 +1527,21 @@ alias ghls="gh repo list"
 # this function to declare default git
 # based branch aliases variables
 # today 2024-03-09 20:38
-function init_git_variables(){
-  is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
-  default_branch=$(basename $(git symbolic-ref refs/remotes/origin/HEAD))
-  current_branch=$(git rev-parse --abbrev-ref HEAD)
-}
+# function init_git_variables(){
+#   is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+#   default_branch=$(basename $(git symbolic-ref refs/remotes/origin/HEAD))
+#   current_branch=$(git rev-parse --abbrev-ref HEAD)
+# }
 
 #this alias to rename a git branch
 alias gnm="gnm"
 
 #this function for gnm alias
 function gnm(){
-  init_git_variables
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
   if [[ "$is_a_git_repo" == "true" ]]; then
+    local current_branch=$(git rev-parse --abbrev-ref HEAD)
     if [[ $# -eq 1 ]]; then
       git branch -M $current_branch "$1";
       cv;
@@ -1558,8 +1560,12 @@ alias gck="gck";
 
 #this function for gck alias
 function gck(){
-  init_git_variables
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
   if [[ "$is_a_git_repo" == "true" ]]; then
+    local default_branch=$(basename $(git symbolic-ref refs/remotes/origin/HEAD))
+    local current_branch=$(git rev-parse --abbrev-ref HEAD)
+
     if [[ $# -eq 0 ]]; then
       if [[ "$current_branch" != "$default_branch" ]]; then
         git checkout "$default_branch"
@@ -1585,7 +1591,8 @@ alias gcb="gcb";
 
 #this function for gcb alias
 function gcb(){
-  init_git_variables
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
   if [[ "$is_a_git_repo" == "true" ]]; then
     if [[ $# -eq 0 ]]; then
       git checkout -;
@@ -1602,7 +1609,8 @@ alias gbr="gbr"
 
 #this function for gbr alias
 function gbr(){
-  init_git_variables
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
   if [[ "$is_a_git_repo" == "true" ]]; then
     if [[ $# -eq 1 ]]; then
       git checkout -b "$1";
@@ -1621,8 +1629,12 @@ alias gbd="gbd"
 
 #this function for gbd alias
 function gbd(){
-  init_git_variables
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
   if [[ "$is_a_git_repo" == "true" ]]; then
+    local default_branch=$(basename $(git symbolic-ref refs/remotes/origin/HEAD))
+    local current_branch=$(git rev-parse --abbrev-ref HEAD)
+
     if [[ $# -eq 1 ]]; then
       # check if the branch doesn't exist
       if ! git rev-parse --verify "$1" >/dev/null 2>&1; then
