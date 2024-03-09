@@ -1120,7 +1120,7 @@ alias eni="op /home/h471x/NTSOA/COURSE/ENI"
 alias dtp="op /home/h471x/Desktop"
 
 #this alias to go to the to dev
-alias dev="op /home/h471x/NTSOA/dev"
+alias dev="op /home/h471x/Desktop/dev"
 
 #this alias to open the text notes
 alias nt="op /home/h471x/NTSOA/notes"
@@ -1599,6 +1599,7 @@ GREEN="$(printf '\033[32m')"
 ORANGE="$(printf '\033[33m')"
 YELLOW="$(printf '\033[33m')"
 BLUE="$(printf '\033[34m')"
+BRIGHT_BLUE="$(printf '\033[94m')"
 MAGENTA="$(printf '\033[35m')"
 CYAN="$(printf '\033[36m')"
 #WHITE="$(printf '\033[37m')"
@@ -1796,20 +1797,30 @@ function cupp(){
 # service, its status
 function stap(){
   if [[ $(pgrep apache2) ]]; then
-    c && br && echo " Apache Server is Active" && br;
+    c && br;
+    echo "${BOLD}Apache Server Active [${GREEN}✓${WHITE}]"
+    br;
 
-    local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
+    local eth_iface="eth0"
+    local wifi_iface="wlan0"
+    local loopback_iface="lo"
+
+    local eth_ip=$(ifconfig $eth_iface | grep "inet " | awk '{print $2}');
 
     if [ -d /sys/class/net/wlan0 ]; then
-      local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
-      echo " eth0  Interface Connection : http://$eth_ip";
-      echo " wlan0 Interface Connection : http://$wlan_ip";
+      local wlan_ip=$(ifconfig $wifi_iface | grep "inet " | awk '{print $2}');
+      echo "$eth_iface Interface Connection (Public) : ${BRIGHT_BLUE}http://$eth_ip"
+      echo "$wifi_iface Interface Connection (Public)  : ${BRIGHT_BLUE}http://$wlan_ip${WHITE}";
+      echo "$loopback_iface    Interface Connection (Private) : ${BRIGHT_BLUE}http://$loopback_ip ${WHITE}";
       br;
     else
-      echo " eth0  Interface Connection : http://$eth_ip" && br;
+      echo "$eth_iface Interface Connection (Public) : ${BRIGHT_BLUE}http://$eth_ip"
+      br
     fi
   else
-    c && br && echo " Apache Server is Off" && br;
+    c && br;
+    echo "${BOLD}Apache Server Off [${RED}x${WHITE}]"
+    br
   fi
 }
 
@@ -1889,25 +1900,28 @@ alias sth="sth"
 
 # this function for sth alias
 function sth(){
+  c && br;
   # this is the raw old method
   # sudo systemctl status ssh;
   # updated today 10 november 2023
 
   if [[ $(pgrep sshd) ]]; then
-    c && br && echo " ssh server is active" && br;
+    c && br;
+    echo "${BOLD}Ssh Server Active [${GREEN}✓${WHITE}]"
+    br;
 
     local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
 
     if [ -d /sys/class/net/wlan0 ]; then
       local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
-      echo " eth0  Connection ==> ssh $USER@$eth_ip";
-      echo " wlan0 Connection ==> ssh $USER@$wlan_ip";
+      echo "${BOLD}eth0  Connection ==> ssh $USER@$eth_ip";
+      echo "${BOLD}wlan0 Connection ==> ssh $USER@$wlan_ip";
       br;
     else
-      echo " eth0  Connection ==> ssh $USER@$eth_ip" && br;
+      echo "${BOLD}eth0  Connection ==> ssh $USER@$eth_ip" && br;
     fi
   else
-    c && br && echo " ssh server is off" && br;
+    echo "${BOLD}Ssh Server Off [${RED}x${WHITE}]"
   fi
 }
 
@@ -2079,13 +2093,17 @@ function sqloff(){
 # this alias to view the sql service
 alias sqls="sqls"
 
-# this function for sqloff alias
+# this function for sqls alias
 function sqls(){
-  clear && br 2 && sudo clear;
+  allow_sudo;
+  # br;
+  # echo "  MySQL server status "
   br;
-  echo "  MySQL server status "
-  br;
-  sudo systemctl status mysql;
+  if [[ $(pgrep mariadb) ]]; then
+    echo "${BOLD}MySQL Server Active [${GREEN}✓${WHITE}]"
+  else
+    echo "${BOLD}MySQL Server Down [${RED}x${WHITE}]"
+  fi
 }
 
 # this alias to start the postgresql service
@@ -2144,23 +2162,32 @@ alias rdb="rdb"
 # this function for rdb alias
 function rdb(){
   allow_sudo;
+  if ! pgrep mariadb > /dev/null; then
+    sudo systemctl start mysql &>/dev/null
+  fi
+  c && br
   local user=${1:-root}
-  sudo systemctl start mysql;
-  echo "MySQL Server Active [${GREEN}$CHECKMARK${WHITE}]"
-  echo "User : $user"
+  echo "${BOLD}MySQL Server Active [${GREEN}✓${WHITE}]"
+  echo "${BOLD}User : $user"
   local is_root='[[ "$user" == "root" ]]';
   local flag=$(eval "$is_root" && echo "" || echo "-p");
-  sudo mysql -u $user $flag;
-  echo -ne " ${WHITE}[${GREEN}?${WHITE}]${WHITE} ${GREEN}Stop ${WHITE}MySQL Server ? (y/n) ";
-  read server
-  if [ "$server" = "y" ]; then
-    # echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping ${GREEN}MySQL ${WHITE}Server  ";
-    echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping MySQL Server ... "
-    sudo systemctl stop mysql;
-    echo "${GREEN}$CHECKMARK${WHITE}"
-  elif [ "$server" = "n" ];then
-    echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping ${GREEN}MySQL ${WHITE}Server  ";
-  fi
+  sudo mysql -u $user $flag
+
+  function check_mysql_server(){
+    echo -ne "${BOLD}${WHITE}[${GREEN}?${WHITE}]${WHITE} ${GREEN}Stop ${WHITE}MySQL Server ? (y/n) ";
+    read server
+    if [ "$server" = "y" ]; then
+      # echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping ${GREEN}MySQL ${WHITE}Server  ";
+      echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping MySQL Server ... "
+      sudo systemctl stop mysql &>/dev/null
+      echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} MySQL Server Stopped  ... ${GREEN}✓"
+    elif [ "$server" = "n" ];then
+      echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Keeping ${GREEN}MySQL ${WHITE}Server ${GREEN}On";
+    else
+      check_mysql_server
+    fi
+  }
+  check_mysql_server
 }
 
 # this alias to start the sql cli
