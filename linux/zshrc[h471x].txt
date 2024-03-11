@@ -2141,26 +2141,36 @@ function sqlite(){
 # this alias to start the sql cli
 alias rdb="rdb"
 
+
 # this function for rdb alias
 function rdb(){
   allow_sudo;
+  if ! pgrep mysql > /dev/null; then
+    sudo service mariadb start &>/dev/null
+  fi
+  c && br
   local user=${1:-root}
-  sudo systemctl start mysql;
-  echo "MySQL Server Active [${GREEN}$CHECKMARK${WHITE}]"
-  echo "User : $user"
+  echo "${BOLD}MySQL Server Active [${GREEN}✓${WHITE}]"
+  echo "${BOLD}User : $user"
   local is_root='[[ "$user" == "root" ]]';
   local flag=$(eval "$is_root" && echo "" || echo "-p");
   sudo mysql -u $user $flag;
-  echo -ne " ${WHITE}[${GREEN}?${WHITE}]${WHITE} ${GREEN}Stop ${WHITE}MySQL Server ? (y/n) ";
-  read server
-  if [ "$server" = "y" ]; then
-    # echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping ${GREEN}MySQL ${WHITE}Server  ";
-    echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping MySQL Server ... "
-    sudo systemctl stop mysql;
-    echo "${GREEN}$CHECKMARK${WHITE}"
-  elif [ "$server" = "n" ];then
-    echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping ${GREEN}MySQL ${WHITE}Server  ";
-  fi
+  br
+  function check_mysql_server(){
+    echo -ne "${BOLD}${WHITE}[${GREEN}?${WHITE}]${WHITE} ${GREEN}Stop ${WHITE}MySQL Server ? (y/n) ";
+    read server
+    if [ "$server" = "y" ]; then
+      # echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping ${GREEN}MySQL ${WHITE}Server  ";
+      echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping MySQL Server ... "
+      sudo service mariadb stop &>/dev/null
+      echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} MySQL Server Stopped  ... ${GREEN}✓"
+    elif [ "$server" = "n" ];then
+      echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Keeping ${GREEN}MySQL ${WHITE}Server ${GREEN}On";
+    else
+      check_mysql_server
+    fi
+  }
+  check_mysql_server
 }
 
 # this alias to start the sql cli
