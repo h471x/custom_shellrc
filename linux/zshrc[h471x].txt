@@ -1896,25 +1896,22 @@ alias sth="sth"
 
 # this function for sth alias
 function sth(){
-  # this is the raw old method
-  # sudo systemctl status ssh;
-  # updated today 10 november 2023
-
+  c && br;
   if [[ $(pgrep sshd) ]]; then
-    c && br && echo " ssh server is active" && br;
-
-    local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
-
+    c && br;
+    echo "${BOLD}Ssh Server Active [${GREEN}✓${WHITE}]"
+    br;
     if [ -d /sys/class/net/wlan0 ]; then
-      local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
-      echo " eth0  Connection ==> ssh $USER@$eth_ip";
-      echo " wlan0 Connection ==> ssh $USER@$wlan_ip";
-      br;
-    else
-      echo " eth0  Connection ==> ssh $USER@$eth_ip" && br;
+      local wifi_iface="wlan0"
+      local wifi_ip=$(ifconfig $wifi_iface | grep "inet " | awk '{print $2}');
+      echo "Ssh Connection via $wifi_iface Interface : ${BLUE}ssh $USER@$wifi_ip${WHITE}";
     fi
+
+    local eth_iface="eth0"
+    local eth_ip=$(ifconfig $eth_iface | grep "inet " | awk '{print $2}');
+    echo "Ssh Connection via $eth_iface Interface : ${BLUE}ssh $USER@$eth_ip${WHITE}";
   else
-    c && br && echo " ssh server is off" && br;
+    echo "${BOLD}Ssh Server Off [${RED}x${WHITE}]"
   fi
 }
 
