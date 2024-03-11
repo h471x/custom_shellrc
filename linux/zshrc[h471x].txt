@@ -1599,6 +1599,7 @@ GREEN="$(printf '\033[32m')"
 ORANGE="$(printf '\033[33m')"
 YELLOW="$(printf '\033[33m')"
 BLUE="$(printf '\033[34m')"
+BRIGHT_BLUE="$(printf '\033[94m')"
 MAGENTA="$(printf '\033[35m')"
 CYAN="$(printf '\033[36m')"
 #WHITE="$(printf '\033[37m')"
@@ -1796,20 +1797,26 @@ function cupp(){
 # service, its status
 function stap(){
   if [[ $(pgrep apache2) ]]; then
-    c && br && echo " Apache Server is Active" && br;
+    c && br;
+    echo "${BOLD}Apache Server Active [${GREEN}✓${WHITE}]"
+    br;
 
-    local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
-
+    local eth_iface="eth0"
+    local wifi_iface="wlan0"
+    local loopback_iface="lo"
     if [ -d /sys/class/net/wlan0 ]; then
-      local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
-      echo " eth0  Interface Connection : http://$eth_ip";
-      echo " wlan0 Interface Connection : http://$wlan_ip";
-      br;
-    else
-      echo " eth0  Interface Connection : http://$eth_ip" && br;
+      local wlan_ip=$(ifconfig $wifi_iface | grep "inet " | awk '{print $2}');
+      echo "$wifi_iface Interface Connection (Public)  : ${BRIGHT_BLUE}http://$wlan_ip${WHITE}";
     fi
+    local loopback_ip=$(ifconfig $loopback_iface | grep "inet " | awk '{print $2}');
+
+    echo "$loopback_iface    Interface Connection (Private) : ${BRIGHT_BLUE}http://$loopback_ip ${WHITE}";
+    echo "$eth_iface    Interface Connection (Private) : ${BRIGHT_BLUE}http://$eth_ip ${WHITE}";
+    br;
   else
-    c && br && echo " Apache Server is Off" && br;
+    c && br;
+    echo "${BOLD}Apache Server Off [${RED}x${WHITE}]"
+    br
   fi
 }
 
