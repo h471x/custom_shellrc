@@ -2068,7 +2068,7 @@ alias sqlon="sqlon"
 
 # this function for sqlon alias
 function sqlon(){
-  clear && br 2 && sudo clear;
+  allow_sudo;
   sudo systemctl start mysql;
   sqls;
 }
@@ -2088,11 +2088,13 @@ alias sqls="sqls"
 
 # this function for sqloff alias
 function sqls(){
-  clear && br 2 && sudo clear;
+  allow_sudo;
   br;
-  echo "  MySQL server status "
-  br;
-  sudo systemctl status mysql;
+  if [[ $(pgrep mariadb) ]]; then
+    echo "${BOLD}MySQL Server Active [${GREEN}✓${WHITE}]"
+  else
+    echo "${BOLD}MySQL Server Down [${RED}x${WHITE}]"
+  fi
 }
 
 # this alias to start the postgresql service
