@@ -982,6 +982,15 @@ fuction cld(){
   open_web_app claude.ai $claude_id ClaudeAI
 }
 
+# this alias to open reddit forum
+alias rdt="rdt"
+
+# this function for rdt alias
+function rdt(){
+  local reddit_id="lgnggepjiihbfdbedefdhcffnmhcahbm"
+  open_web_app reddit.com $reddit_id
+}
+
 # this alias to open the GitHub app
 alias gthb="gthb"
 
@@ -1203,10 +1212,6 @@ alias sth="sth"
 # this function for sth alias
 function sth(){
   c && br;
-  # sudo clear;
-  # br;
-  # sudo /etc/init.d/ssh status;
-  # br;
   if [[ $(pgrep sshd) ]]; then
     c && br;
     echo "${BOLD}Ssh Server Active [${GREEN}✓${WHITE}]"
@@ -1325,8 +1330,6 @@ alias sqls="sqls"
 # this function for sqloff alias
 function sqls(){
   allow_sudo;
-  # br;
-  # echo "  MySQL server status "
   br;
   if [[ $(pgrep mariadb) ]]; then
     echo "${BOLD}MySQL Server Active [${GREEN}✓${WHITE}]"
@@ -1525,12 +1528,69 @@ function gcm(){
 #this alias to view all repos in the GitHub
 alias ghls="gh repo list"
 
+# # this function to check if we are inside a git repo
+# function git_repo() {
+#   # Checking remote repository
+#   local remote_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null && echo "true" || echo "false")
+#
+#   # Checking local repository
+#   local local_repo=$(git rev-parse --git-dir 2>/dev/null && echo "true" || echo "false")
+#
+#   # Condition for repository
+#   local is_a_git_repo=$([[ $remote_repo == "true" || $local_repo == "true" ]])
+#
+#   # Checking repository
+#   if $is_a_git_repo; then
+#     echo -e "true"
+#     echo "remote repo : $remote_repo, local repo : $local_repo "
+#   else
+#     echo "false"
+#   fi
+# }
+#
+# # This function to define the default git branch
+# function init_default_branch(){
+#   # If we clone a repo, this will be its default branch
+#   local default_branch=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null)
+#
+#   # Check if symbolic-ref is empty or not
+#   if [ -z "$default_branch" ]; then
+#     # If symbolic-ref is empty, then it's our own repo, so get default branch locally
+#     default_branch=$(git config --get init.defaultBranch)
+#   else
+#     # Extract branch name from symbolic-ref output
+#     default_branch=$(basename "$default_branch")
+#   fi
+#
+#   echo "$default_branch"
+# }
+#
+# # This function to define the current git branch
+# function init_current_branch(){
+#   # Check if HEAD points to a branch
+#   local current_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+#
+#   # If HEAD is not pointing to a branch, it might be detached, so use rev-parse
+#   if [ -z "$current_branch" ]; then
+#     current_branch=$(git rev-parse --short HEAD 2>/dev/null)
+#   fi
+#
+#   # If it is still empty, it means HEAD is not pointing to a branch or commit
+#   if [ -z "$current_branch" ]; then
+#     echo "Detached"
+#   else
+#     echo "$current_branch"
+#   fi
+# }
+
 #this alias to rename a git branch
 alias gnm="gnm"
 
 #this function for gnm alias
 function gnm(){
-  if [[ -d ./.git ]]; then
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
     local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
 
     if [[ $# -eq 1 ]]; then
@@ -1554,37 +1614,25 @@ function gck(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    local default_branch=$(basename $(git symbolic-ref refs/remotes/origin/HEAD))
-    local current_branch=$(git rev-parse --abbrev-ref HEAD)
+    local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+    local default_branch=$(git rev-parse --abbrev-ref origin/HEAD | cut -c8-)
+    if [ -z "$default_branch" ]; then
+      default_branch=$(git config --get init.defaultBranch)
+    fi
 
     if [[ $# -eq 0 ]]; then
-      # local default_branch=$(grep default ~/.gitconfig | awk '{print $3}');
-      # git checkout $default_branch;
-      # nice but I can't loop over branches
-      # so I update the code today 02/04/2024
-      local default_branch=$(git config --get init.defaultBranch)
-      # local current_branch=$(git rev-parse --abbrev-ref HEAD)
-
-      # if [[ "$current_branch" != "$default_branch" ]]; then
+      if [[ "$current_branch" != "$default_branch" ]]; then
         git checkout "$default_branch"
-      # else
-      #   local branches=($(git for-each-ref --format='%(refname:short)' refs/heads/))
-      #   local current_index=0
-      #
-      #   for ((i=0; i<${#branches[@]}; i++)); do
-      #     if [[ "${branches[$i]}" == "$current_branch" ]]; then
-      #       current_index=$i
-      #       break
-      #     fi
-      #   done
-      #
-      #   current_index=$(( (current_index + 1) % ${#branches[@]} ))
-      #   git checkout "${branches[$current_index]}"
-      # fi
+      fi
     elif [[ $# -eq 1 ]]; then
-      git checkout "$1";
+      # check if the branch doesn't exist yet
+      if ! git rev-parse --verify "$1" >/dev/null 2>&1; then
+        git checkout -b "$1";
+      else
+        git checkout "$1";
+      fi
     else
-      echo " ■■▶ Usage : gck branch_to_switch" && br;
+      echo " ■■▶ Usage : gck branch or gck (switch default branch)" && br;
     fi
   else
     echo " ■■▶ This won't work, you are not in a git repo !" && br;
@@ -1620,7 +1668,6 @@ function gbr(){
     if [[ $# -eq 1 ]]; then
       git checkout -b "$1";
     elif [[ $# -eq 0 ]]; then
-      # echo " ■■▶ Please pass the name of the new branch as argument " && br;
       git branch -a;
     else
       echo " ■■▶ Usage : gbr new_branch" && br;
@@ -1636,24 +1683,27 @@ alias gbd="gbd"
 #this function for gbd alias
 function gbd(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+  local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+  # local default_branch=$(git rev-parse --abbrev-ref origin/HEAD | cut -c8-)
+  # if [ -z "$default_branch" ]; then
+  #   default_branch=$(git config --get init.defaultBranch)
+  # fi
+  local default_branch=$(git rev-parse --abbrev-ref origin/HEAD | cut -c8- 2>/dev/null || git config --get init.defaultBranch)
 
-  if [[ "$is_a_git_repo" == "true" ]]; then
-    local default_branch=$(basename $(git symbolic-ref refs/remotes/origin/HEAD))
-    local current_branch=$(git rev-parse --abbrev-ref HEAD)
-
+  if [[ "$is_a_git_repo" == "true" ]]; then 
     if [[ $# -eq 1 ]]; then
-      # local default_branch=$(grep default ~/.gitconfig | awk '{print $3}');
-      local default_branch=$(git config --get init.defaultBranch)
-      local current_branch=$(git rev-parse --abbrev-ref HEAD)
-      # if [[ "$1" != "$default_branch" ]]; then
-        # gck;
-      # fi
-      if [[ "$current_branch" != "$default_branch" ]]; then
-        git checkout $default_branch;
+      if [[ "$1" == "$default_branch" ]]; then
+        echo " ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+      else
+        git branch -D "$1";
       fi
-      git branch -D "$1";
     elif [[ $# -eq 0 ]]; then
-      echo " ■■▶ Please pass the name of the branch to delete as argument " && br;
+      if [[ "$current_branch" == "$default_branch" ]]; then
+        echo " ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+      else
+        git checkout "$default_branch";
+        git branch -D "$current_branch";
+      fi
     else
       echo " ■■▶ Usage : gbd branch_to_delete" && br;
     fi
@@ -1661,7 +1711,6 @@ function gbd(){
     echo " ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
-
 # this alias to revert back to last commit
 alias grst="git checkout -- ."
 
