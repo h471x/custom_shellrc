@@ -24,7 +24,8 @@ SQLITE_PATH=/mnt/c/Program\ Files/sqlite
 QT_PATH=/mnt/d/NTSOA/INSTALLED/QT/Tools/QtCreator/bin
 PYTHON_PATH=/mnt/d/NTSOA/INSTALLED/PYTHON
 VIRTUAL_BOX_PATH=/mnt/c/Virtual\ Box
-BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$VIRTUAL_BOX_PATH:$PYTHON_PATH
+WIRESHARK_PATH=/mnt/c/Program\ Files/Wireshark
+BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$VIRTUAL_BOX_PATH:$WIRESHARK_PATH:$PYTHON_PATH
 
 # Browsers
 CHROME_PATH=/mnt/c/Program\ Files/Google/chrome/Application/
@@ -1113,6 +1114,9 @@ alias music="AppleMusic.exe; cv"
 
 # this alias to open VirtualBox
 alias vm="VirtualBox.exe"
+
+# this alias to open wireshark
+alias wsh="wireshark.exe"
 
 # this alias to open the state drive
 alias sd="op /mnt/d"
