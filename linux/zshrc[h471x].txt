@@ -1924,6 +1924,7 @@ function sth(){
   else
     echo "${BOLD}Ssh Server Off [${RED}x${WHITE}]"
   fi
+  br
 }
 
 # this alias to enable the ssh server
@@ -2110,7 +2111,9 @@ function svc_show_stat(){
   local service_name="$1";
   local check_command="$2";
 
-  if [[ "$check_command" ]]; then
+  if [[ "$check_command" == *"Active: active"* ]]; then
+    echo "${BOLD}$service_name Active [${GREEN}✓${WHITE}]";
+  elif [[ "$check_command" =~ ^[0-9]+$ ]]; then
     echo "${BOLD}$service_name Active [${GREEN}✓${WHITE}]";
   else
     echo "${BOLD}$service_name Off [${RED}x${WHITE}]";
@@ -2144,7 +2147,12 @@ alias sqls="sqls"
 function sqls(){
   local name="MySQL Server"
   local cmd="$(pgrep mariadb)"
-  svc_show_stat $name $cmd;
+  
+  if [[ -z "$cmd" ]]; then
+    svc_show_stat "$name" "Active: inactive";
+  else
+    svc_show_stat "$name" "Active: active";
+  fi
 }
 
 # this alias to check sendmail process
@@ -2153,8 +2161,8 @@ alias mails="mails"
 # this function for mails alias
 function mails(){
   local name="Mail Server"
-  local cmd="$(sudo systemctl status postfix &>/dev/null)"
-  svc_show_stat $name $cmd;
+  local cmd="$(sudo systemctl status postfix)"
+  svc_show_stat "$name" "$cmd"
 }
 
 # this alias to start sendmail service
