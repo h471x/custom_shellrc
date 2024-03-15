@@ -897,14 +897,15 @@ alias vf="vf"
 # update 09/14/2023
 function vf() {
   local file="$1"
-  xdg-open $file;
-  # local extension="${file##*.}"
+  # xdg-open $file;
+  local extension="${file##*.}"
   #
   # # here if you don't know the default app,
   # # use xdg-open instead of those cmd
   #
-  # case "$extension" in
-  #   jpg|jpeg|ico|png)
+  case "$extension" in
+
+  # jpg|jpeg|ico|png)
   #     cmd="eog";;
   #   pdf)
   #     cmd="evince";;
@@ -918,14 +919,14 @@ function vf() {
   #     cmd="engrampa";;
   #   html|c|cpp|tf|py|java|js|css|json)
   #     cmd="code";;
-  #   mcd)
-  #     cmd="katyushamcd";;
-  #   *)
-  #     cmd="nvim";;
-  # esac
+    mcd)
+      cmd="katyushamcd";;
+    *)
+      cmd="xdg-open";;
+  esac
   #
   # if [[ -f "$file" ]]; then
-  #   "$cmd" "$file" && cv
+    "$cmd" "$file" && cv
   # elif [[ -d "$file" ]]; then
   #   op "$file" && cv
   # fi
@@ -1025,6 +1026,16 @@ function nvm(){
   cv;
   #if we have one argument then nvim will be launched with it,
   #otherwise open the current directory if there is no argument
+}
+
+# this alias to open nvim as root
+alias nvmr="nvmr"
+
+# this function for nvmr alias
+function nvmr(){
+  allow_sudo;
+  sudo nvim "${1:-.}"
+  cv
 }
 
 #this alias is the same as ed but it uses nano instead of nvim
@@ -2060,13 +2071,60 @@ function pfsoff(){
   clear && pfst;
 }
 
+# this alias to start systemctl based services
+alias svc_on="svc_on"
+
+# this function for svc_on alias
+function svc_on(){
+  allow_sudo;
+  sudo systemctl start "$1";
+}
+
+# this alias to stop systemctl based services
+alias svc_off="svc_off"
+
+# this function for svc_off alias
+function svc_off(){
+  allow_sudo;
+  sudo systemctl stop "$1";
+}
+
+# this alias to view systemctl
+# based services status
+alias svc_stat="svc_stat"
+
+# this function for svc_stat alias
+function svc_stat(){
+  allow_sudo;
+  sudo systemctl status "$1";
+}
+
+# this alias to show if a service if on or off
+alias svc_show_stat="svc_show_stat"
+
+# this function for svc_show_stat alias
+function svc_show_stat(){
+  allow_sudo;
+  br;
+
+  local service_name="$1";
+  local check_command="$2";
+
+  if [[ "$check_command" ]]; then
+    echo "${BOLD}$service_name Active [${GREEN}✓${WHITE}]";
+  else
+    echo "${BOLD}$service_name Off [${RED}x${WHITE}]";
+  fi
+
+  br;
+}
+
 # this alias to start the sql service
 alias sqlon="sqlon"
 
 # this function for sqlon alias
 function sqlon(){
-  allow_sudo;
-  sudo systemctl start mysql;
+  svc_on mysql;
   sqls;
 }
 
@@ -2075,8 +2133,7 @@ alias sqloff="sqloff"
 
 # this function for sqloff alias
 function sqloff(){
-  clear && br 2 && sudo clear;
-  sudo systemctl stop mysql;
+  svc_off mysql;
   sqls;
 }
 
@@ -2085,22 +2142,73 @@ alias sqls="sqls"
 
 # this function for sqloff alias
 function sqls(){
-  allow_sudo;
-  br;
-  if [[ $(pgrep mariadb) ]]; then
-    echo "${BOLD}MySQL Server Active [${GREEN}✓${WHITE}]"
-  else
-    echo "${BOLD}MySQL Server Down [${RED}x${WHITE}]"
-  fi
+  local name="MySQL Server"
+  local cmd="$(pgrep mariadb)"
+  svc_show_stat $name $cmd;
+}
+
+# this alias to check sendmail process
+alias mails="mails"
+
+# this function for mails alias
+function mails(){
+  local name="Mail Server"
+  local cmd="$(sudo systemctl status postfix &>/dev/null)"
+  svc_show_stat $name $cmd;
+}
+
+# this alias to start sendmail service
+alias mailon="mailon"
+
+# this function for mailon alias
+function mailon(){
+  svc_on postfix;
+  mails;
+}
+
+# this alias to stop sendmail service
+alias mailoff="mailoff"
+
+# this function for mailon alias
+function mailoff(){
+  svc_off postfix;
+  mails;
+}
+
+# this alias to check snmp service
+alias snmps="snmps"
+
+# this function for snmps alias
+function snmps(){
+  local name="SNMP Server";
+  local cmd="$(pgrep snmpd)";
+  svc_show_stat $name $cmd;
+}
+
+# this function to start snmpd service
+alias snmpon="snmpon"
+
+# this function for snmpon alias
+function snmpon(){
+  svc_on snmpd;
+  snmps;
+}
+
+# this alias to stop the snmp service
+alias snmpoff="snmpoff"
+
+# this function for snmpoff alias
+function snmpoff(){
+  svc_off snmpd;
+  snmps;
 }
 
 # this alias to start the postgresql service
 alias psqlon="psqlon"
 
 # this function for sqlon alias
-function psqlon(){  
-  clear && br 2 && sudo clear;
-  sudo systemctl start psql;
+function psqlon(){
+  svc_on psql;
   sqls;
 }
 
@@ -2109,8 +2217,7 @@ alias psqloff="psqloff"
 
 # this function for sqloff alias
 function psqloff(){
-  clear && br 2 && sudo clear;
-  sudo systemctl stop psql;
+  svc_off psql;
   sqls;
 }
 
@@ -2119,11 +2226,9 @@ alias psqls="psqls"
 
 # this function for psqls alias
 function psqls(){
-  clear && br 2 && sudo clear;
-  br;
-  echo "  PostGreSQL server status "
-  br;
-  sudo systemctl status psql;
+  local name="PostgreSQL Server"
+  local cmd="$(pgrep psql)"
+  svc_show_stat $name $cmd;
 }
 
 # this alias to call the sqlite3.Exe file
@@ -2146,7 +2251,6 @@ function sqlite(){
 
 # this alias to start the sql cli
 alias rdb="rdb"
-
 
 # this function for rdb alias
 function rdb(){
