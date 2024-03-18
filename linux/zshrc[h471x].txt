@@ -618,7 +618,7 @@ function pct(){
 }
 
 #this line to directly go to JPG version of the time schedule
-alias ej="c && op /home/h471x/NTSOA/'EDT ENI'/JPG"
+alias ej="c && op /home/h471x/NTSOA/EDT\ ENI/JPG/L2\ 2024"
 
 #commented for I don't use it 09/14/2023 
 
@@ -647,11 +647,33 @@ alias ei="ei"
 
 #this function for ei alias
 function ei(){
-  convert -density 500 "$1" "$(basename "$1" .pdf).jpg";
-  all "$1";
-  mv "$(basename "$1" .pdf).jpg" /home/h471x/NTSOA/EDT\ ENI/JPG;
-  ej;
-  all "$(basename "$1" .pdf).jpg";
+  # useful variables
+  local input_pdf="$1"
+  local output_image="$(basename "$input_pdf" .pdf).jpg";
+  local kali_edt_path=/home/h471x/NTSOA/EDT\ ENI/JPG/L2\ 2024;
+  local windows_edt_path=/media/sf_ENI/ENI\ 2024/0\ EDT/L2\ 2024
+
+  # convert pdf to jpg using imagemagick convert
+  convert -density 500 "$input_pdf" "$output_image";
+
+  # full access to the files
+  all "$input_pdf";
+  all "$output_image";
+
+  # moving to the right directories
+  cp "$output_image" $windows_edt_path;
+  mv "$output_image" $kali_edt_path;
+
+  # Success message
+  c && br 2;
+  echo "${GREEN}${BOLD} ==> SUCCESS ${WHITE}"
+  br;
+  echo "${BOLD} $input_pdf -> $output_image ${RESET}";
+  br;
+  sleep 3;
+
+  # open the edt list
+  op $windows_edt_path;
 }
 
 #this alias to edit the time schedule
@@ -1932,8 +1954,7 @@ alias sshon="sshon"
 
 # this function for sshon alias
 function sshon(){
-  clear && br 2 && sudo clear;
-  sudo systemctl start ssh;
+  svc_on ssh;
   sth;
 }
 
@@ -1942,7 +1963,7 @@ alias sshoff="sshoff"
 
 # this function for sshoff alias
 function sshoff(){
-  clear && br 2 && sudo clear;
+  allow_sudo;
   # sudo kill $(sudo lsof -t -i:22);
   # or use this in termux
   if [[ $(pgrep sshd) ]]; then
@@ -2216,8 +2237,8 @@ alias psqlon="psqlon"
 
 # this function for sqlon alias
 function psqlon(){
-  svc_on psql;
-  sqls;
+  sudo service postgresql start;
+  psqls;
 }
 
 # this alias to stop the postgresql service
@@ -2225,8 +2246,8 @@ alias psqloff="psqloff"
 
 # this function for sqloff alias
 function psqloff(){
-  svc_off psql;
-  sqls;
+  sudo service postgresql stop;
+  psqls;
 }
 
 # this alias to view the postgresql service
@@ -2235,7 +2256,7 @@ alias psqls="psqls"
 # this function for psqls alias
 function psqls(){
   local name="PostgreSQL Server"
-  local cmd="$(pgrep psql)"
+  local cmd="$(sudo service postgresql status)"
   svc_show_stat $name $cmd;
 }
 
