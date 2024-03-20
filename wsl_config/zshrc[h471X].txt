@@ -25,7 +25,10 @@ QT_PATH=/mnt/d/NTSOA/INSTALLED/QT/Tools/QtCreator/bin
 PYTHON_PATH=/mnt/d/NTSOA/INSTALLED/PYTHON
 VIRTUAL_BOX_PATH=/mnt/c/Virtual\ Box
 WIRESHARK_PATH=/mnt/c/Program\ Files/Wireshark
-BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$VIRTUAL_BOX_PATH:$WIRESHARK_PATH:$PYTHON_PATH
+# OBS_STUDIO_PATH=/mnt/d/NTSOA/INSTALLED/OBS\ STUDIO/obs-studio/bin/64bit
+# GNS3_PATH=/mnt/d/NTSOA/INSTALLED/GNS3
+WINDOWS_APP_PATH=$VIRTUAL_BOX_PATH:$WIRESHARK_PATH
+BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$WINDOWS_APP_PATH:$PYTHON_PATH
 
 # Browsers
 CHROME_PATH=/mnt/c/Program\ Files/Google/chrome/Application/
@@ -219,6 +222,16 @@ function nvm(){
   cv;
   # if we have one argument then nvim will be launched with it,
   # otherwise open the current directory if there is no argument
+}
+
+# this alias to open nvim as root
+alias nvmr="nvmr"
+
+# this function for nvmr alias
+function nvmr(){
+  allow_sudo;
+  sudo nvim "${1:-.}";
+  cv
 }
 
 # this alias to open the current directory in windows explorer
@@ -1065,6 +1078,24 @@ function lnk(){
   open_web_app linkedin.com $linkedin_id LinkedIn
 }
 
+# this alias to open netlify web app
+alias ntlf="ntlf"
+
+# this function for ntlf alias
+function ntlf(){
+  local netlify_id="dlbhokdiippnblopfealccihgfhaofkb"
+  open_web_app netlify.com $netlify_id NetLify
+}
+
+# this alias to open dev.to web app
+alias devto="devto"
+
+# this function for devto alias
+function devto(){
+  local devto_id="ecapchmcnohmakooheeinoaidebbiacm"
+  open_web_app dev.to $devto_id DevTo
+}
+
 # this alias to recharge the router
 alias rtr="rtr"
 
@@ -1116,7 +1147,13 @@ alias music="AppleMusic.exe; cv"
 alias vm="VirtualBox.exe"
 
 # this alias to open wireshark
-alias wsh="wireshark.exe"
+alias wsh="wireshark.exe && cv"
+
+# this alias to open obs Studio
+# alias obs="obs64.exe && cv"
+
+# this alias to open gns3
+# alias gns="gns3.exe"
 
 # this alias to open the state drive
 alias sd="op /mnt/d"
@@ -1342,6 +1379,71 @@ function sqls(){
   fi
 }
 
+# this alias to start the web servers
+alias webon="webon"
+
+# this function for webon alias
+function webon(){
+  allow_sudo; br;
+  echo "${BOLD} Starting Web Servers"; br;
+
+  # Apache Server
+  echo -ne "${BOLD} ==> Starting ${GREEN}Apache ${WHITE}Server ..."
+  sudo service apache2 start &>/dev/null;
+  echo -e "[${GREEN}✓${WHITE}]";
+
+  # MySQL Server
+  echo -ne "${BOLD} ==> Starting ${GREEN}MySQL ${WHITE} Server ..."
+  sudo service mariadb start &>/dev/null;
+  echo -e "[${GREEN}✓${WHITE}]";
+
+  # Postfix Server
+  echo -ne "${BOLD} ==> Starting ${GREEN}Mail ${WHITE}  Server ..."
+  sudo service postfix start &>/dev/null;
+  echo -e "[${GREEN}✓${WHITE}]";
+
+  # Status
+  br;
+  local eth_iface="eth0"
+  local wifi_iface="wifi0"
+  local loopback_iface="lo"
+  local wlan_ip=$(ifconfig $wifi_iface | grep "inet " | awk '{print $2}');
+  local loopback_ip=$(ifconfig $loopback_iface | grep "inet " | awk '{print $2}');
+
+  echo "${BOLD} Access the Server"; br;
+  echo " ==> WAN : ${BRIGHT_BLUE}http://$wlan_ip${WHITE}";
+  echo " ==> LAN : ${BRIGHT_BLUE}http://$loopback_ip ${WHITE}";
+  br;
+}
+
+# this alias to stop the web servers
+alias weboff="weboff"
+
+# this function for weboff alias
+function weboff(){
+  allow_sudo; br;
+  echo "${BOLD} Stopping Web Servers"; br;
+
+  # Apache Server
+  echo -ne "${BOLD} ==> Stopping ${RED}Apache ${WHITE}Server ..."
+  sudo service apache2 stop &>/dev/null;
+  echo -e "[${RED}x${WHITE}]";
+
+  # MySQL Server
+  echo -ne "${BOLD} ==> Stopping ${RED}MySQL ${WHITE} Server ..."
+  sudo service mariadb stop &>/dev/null;
+  echo -e "[${RED}x${WHITE}]";
+
+  # Postfix Server
+  echo -ne "${BOLD} ==> Stopping ${RED}Mail ${WHITE}  Server ..."
+  sudo service postfix stop &>/dev/null;
+  echo -e "[${RED}x${WHITE}]";
+
+  # Status
+  br;
+  echo "${BOLD} Web Servers ${RED}Turned Off ${RESET}"; br;
+}
+
 # this alias to start the sql cli
 alias rdb="rdb"
 
@@ -1375,6 +1477,45 @@ function rdb(){
   }
   check_mysql_server
 }
+
+# this alias to check sendmail process
+alias mails="mails"
+
+# this function for mails alias
+function mails(){
+  allow_sudo;
+  br;
+  if sudo service postfix status &>/dev/null; then
+    echo "${BOLD}Mail Server Active [${GREEN}✓${WHITE}]"
+  else
+    echo "${BOLD}Mail Server Down [${RED}x${WHITE}]"
+  fi
+}
+
+# this alias to start sendmail service
+alias mailon="mailon"
+
+# this function for mailon alias
+function mailon(){
+  allow_sudo
+  br
+  sudo service postfix start
+  br
+  mails
+}
+
+# this alias to stop sendmail service
+alias mailoff="mailoff"
+
+# this function for mailon alias
+function mailoff(){
+  allow_sudo
+  br
+  sudo service postfix stop
+  br
+  mails
+}
+
 
 # this function to check if pfsense is reachable
 # coded 01/29/2024
@@ -1610,10 +1751,10 @@ function gnm(){
   fi
 }
 
-#this alias to switch to the last git branch
+# this alias to switch to the last git branch
 alias gck="gck";
 
-#this function for gck alias
+# this function for gck alias
 function gck(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
@@ -1643,10 +1784,10 @@ function gck(){
   fi
 }
 
-#this alias to switch to the last git branch
+# this alias to switch to the last git branch
 alias gcb="gcb";
 
-#this function for gcb alias
+# this function for gcb alias
 function gcb(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
@@ -1661,10 +1802,10 @@ function gcb(){
   fi
 }
 
-#this alias to create a new branch and switch to it
+# this alias to create a new branch and switch to it
 alias gbr="gbr"
 
-#this function for gbr alias
+# this function for gbr alias
 function gbr(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
@@ -1681,10 +1822,10 @@ function gbr(){
   fi
 }
 
-#this alias to delete a branch
+# this alias to delete a branch
 alias gbd="gbd"
 
-#this function for gbd alias
+# this function for gbd alias
 function gbd(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
   local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
@@ -1718,30 +1859,30 @@ function gbd(){
 # this alias to revert back to last commit
 alias grst="git checkout -- ."
 
-#this alias to switch to windows terminal
+# this alias to switch to windows terminal
 alias wds="wds"
 
-#this function for wds alias
+# this function for wds alias
 function wds(){
   c && br 2;
   cmd.exe;
   cv;
 }
 
-#this alias to switch to powershell terminal
+# this alias to switch to powershell terminal
 alias pws="pws"
 
-#this function for pws alias
+# this function for pws alias
 function pws(){
   c && br 2;
   powershell.exe;
   cv;
 }
 
-#this alias to enter cmd as admin
+# this alias to enter cmd as admin
 alias cmd="cmd"
 
-#this function for cmd alias
+# this function for cmd alias
 function cmd(){
   powershell.exe -command "Start-Process cmd -Verb RunAs";
   x;
@@ -1755,10 +1896,10 @@ function thm(){
   powershell.exe -command "Start-Process D:\NTSOA\INSTALLED\THEME_TOOL\ThemeTool.exe -Verb RunAs"
 }
 
-#this alias to call the sqlite3.Exe file
+# this alias to call the sqlite3.Exe file
 alias sqlite="sqlite"
 
-#this function for ssqlite alias
+# this function for ssqlite alias
 function sqlite(){
   if [[ $# -eq 0 ]]; then
     echo "■■▶ Please specify a file.db  ";  
@@ -1804,18 +1945,18 @@ alias py="python.exe"
 # this alias to run npm
 alias np="/mnt/d/NTSOA/INSTALLED/NODEJS/npm"
 
-#this alias to call the windows nodeJS Program
+# this alias to call the windows nodeJS Program
 alias node="node"
 
-#this function for node alias
+# this function for node alias
 function node(){
   node.exe $@;
 }
 
-#this alias to run the windows mysql command
+# this alias to run the windows mysql command
 alias mysql="mysql"
 
-#this function for mysql alias
+# this function for mysql alias
 function mysql(){
   mysql.exe $@;
 }
