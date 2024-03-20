@@ -1441,7 +1441,37 @@ function weboff(){
 
   # Status
   br;
-  echo "${BOLD} Web Servers ${RED}Turned Off ${RESET}"; br;
+}
+
+# this alias to view the web servers status
+alias webs="webs"
+
+# this function for webs alias
+function webs(){
+  allow_sudo; br;
+  echo "${BOLD} Web Servers Status"; br;
+
+  function check_web(){
+    local server_name="$1";
+    local app_service="$2";
+    local color;
+    local sign;
+
+    if sudo service $app_service status &>/dev/null; then
+      color="${GREEN}";
+      sign="✓";
+    else
+      color="${RED}";
+      sign="x";
+    fi
+
+    echo "${BOLD} ==> $server_name Server $color$switch${WHITE}... [$color$sign${WHITE}]";
+  }
+
+  # Check apache server
+  check_web "Apache" apache2
+  check_web "MySQL " mariadb
+  check_web "Mail  " postfix
 }
 
 # this alias to start the sql cli
