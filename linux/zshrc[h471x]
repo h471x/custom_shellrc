@@ -406,8 +406,9 @@ alias rld="rld"
 function rld(){
   clear;
   source ~/.$(basename $SHELL)rc;
-  cat ~/.zshrc > ~/NTSOA/zsh_config/linux/"zshrc[$USER].txt";
-  all ~/NTSOA/zsh_config/linux/"zshrc[$USER].txt";
+  local saved_file="zshrc[$USER]"
+  cat ~/.zshrc > ~/NTSOA/zsh_config/linux/$saved_file;
+  all ~/NTSOA/zsh_config/linux/$saved_file;
   c && br;
   echo "z s h    s a v e d " | figlet -t -c;
   # tlk "saved";
@@ -1691,7 +1692,7 @@ function whk(){
     hack_wifi
   else
     br
-    echo "  ${WHITE}[${RED}x${WHITE}]${WHITE} No ${RED}Wireless Card ${WHITE}Available"
+    echo "  ${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} No ${RED}Wireless Card ${WHITE}Available"
     br
   fi
 }
@@ -2237,6 +2238,7 @@ alias psqlon="psqlon"
 
 # this function for sqlon alias
 function psqlon(){
+  allow_sudo;
   sudo service postgresql start;
   psqls;
 }
@@ -2246,6 +2248,7 @@ alias psqloff="psqloff"
 
 # this function for sqloff alias
 function psqloff(){
+  allow_sudo;
   sudo service postgresql stop;
   psqls;
 }
