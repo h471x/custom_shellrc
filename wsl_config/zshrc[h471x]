@@ -195,8 +195,9 @@ alias rld="rld"
 function rld(){
   clear;
   source ~/.zshrc;
-  sv ~/.zshrc ~/NTSOA/zsh_config/wsl_config/"zshrc[h471X].txt";
-  all ~/NTSOA/zsh_config/wsl_config/"zshrc[h471X].txt";
+  local backup_file="zshrc[$USER]"
+  sv ~/.zshrc ~/NTSOA/zsh_config/wsl_config/$backup_file;
+  all ~/NTSOA/zsh_config/wsl_config/$backup_file;
   c && br;
   local saved_message="z s h    s a v e d"
   echo "$saved_message" | figlet -t -c;
@@ -1385,10 +1386,10 @@ alias webon="webon"
 # this function for webon alias
 function webon(){
   allow_sudo; br;
-  echo "${BOLD} Starting Web Servers"; br;
+  echo "${BOLD}${WHITE} Starting Web Servers"; br;
 
   # Apache Server
-  echo -ne "${BOLD} ==> Starting ${GREEN}Apache ${WHITE}Server ..."
+  echo -ne "${BOLD}${WHITE} ==> Starting ${GREEN}Apache ${WHITE}Server ..."
   sudo service apache2 start &>/dev/null;
   echo -e "[${GREEN}✓${WHITE}]";
 
@@ -1422,10 +1423,10 @@ alias weboff="weboff"
 # this function for weboff alias
 function weboff(){
   allow_sudo; br;
-  echo "${BOLD} Stopping Web Servers"; br;
+  echo "${BOLD}${WHITE} Stopping Web Servers"; br;
 
   # Apache Server
-  echo -ne "${BOLD} ==> Stopping ${RED}Apache ${WHITE}Server ..."
+  echo -ne "${BOLD}${WHITE} ==> Stopping ${RED}Apache ${WHITE}Server ..."
   sudo service apache2 stop &>/dev/null;
   echo -e "[${RED}x${WHITE}]";
 
