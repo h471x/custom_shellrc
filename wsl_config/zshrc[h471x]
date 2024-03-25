@@ -25,9 +25,10 @@ QT_PATH=/mnt/d/NTSOA/INSTALLED/QT/Tools/QtCreator/bin
 PYTHON_PATH=/mnt/d/NTSOA/INSTALLED/PYTHON
 VIRTUAL_BOX_PATH=/mnt/c/Virtual\ Box
 WIRESHARK_PATH=/mnt/c/Program\ Files/Wireshark
+TOTAL_CMD_PATH=/mnt/c/Program\ Files/totalcmd
 # OBS_STUDIO_PATH=/mnt/d/NTSOA/INSTALLED/OBS\ STUDIO/obs-studio/bin/64bit
 # GNS3_PATH=/mnt/d/NTSOA/INSTALLED/GNS3
-WINDOWS_APP_PATH=$VIRTUAL_BOX_PATH:$WIRESHARK_PATH
+WINDOWS_APP_PATH=$VIRTUAL_BOX_PATH:$WIRESHARK_PATH:$TOTAL_CMD_PATH
 BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$WINDOWS_APP_PATH:$PYTHON_PATH
 
 # Browsers
@@ -1149,6 +1150,9 @@ alias vm="VirtualBox.exe"
 
 # this alias to open wireshark
 alias wsh="wireshark.exe && cv"
+
+# this alias to open total commander
+alias tcmd="TOTALCMD64.exe && cv"
 
 # this alias to open obs Studio
 # alias obs="obs64.exe && cv"
