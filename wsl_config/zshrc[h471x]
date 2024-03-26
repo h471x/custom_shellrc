@@ -1098,6 +1098,15 @@ function devto(){
   open_web_app dev.to $devto_id DevTo
 }
 
+# this alias to open compiler explorer
+alias cmplr="cmplr"
+
+# this function for cmplr alias
+function cmplr(){
+  local compiler_explorer_link="chjjlngghpbmipjipdfdjhcndbiklfje"
+  open_web_app godbolt.org $compiler_explorer_link "Compiler Explorer"
+}
+
 # this alias to recharge the router
 alias rtr="rtr"
 
