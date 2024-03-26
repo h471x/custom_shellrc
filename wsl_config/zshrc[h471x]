@@ -1486,6 +1486,20 @@ function webs(){
   check_web "Apache" apache2
   check_web "MySQL " mariadb
   check_web "Mail  " postfix
+
+  if sudo service apache2 status &>/dev/null; then
+    br;
+    local eth_iface="eth0"
+    local wifi_iface="wifi0"
+    local loopback_iface="lo"
+    local wlan_ip=$(ifconfig $wifi_iface | grep "inet " | awk '{print $2}');
+    local loopback_ip=$(ifconfig $loopback_iface | grep "inet " | awk '{print $2}');
+
+    echo "${BOLD} Access the Server"; br;
+    echo " ==> WAN : ${BRIGHT_BLUE}http://$wlan_ip${WHITE}";
+    echo " ==> LAN : ${BRIGHT_BLUE}http://$loopback_ip ${WHITE}";
+    br;
+  fi
 }
 
 # this alias to start the sql cli
