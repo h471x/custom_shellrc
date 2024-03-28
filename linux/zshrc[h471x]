@@ -2585,6 +2585,15 @@ function gbd(){
 # this alias to revert back to last commit
 alias grst="git checkout -- ."
 
+# this alias to push changes on current repo to remote repo
+alias gpsh="gpsh"
+
+# this function for gpsh alias
+function gpsh(){
+  local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+  git push origin $current_branch;
+}
+
 #this function to bring a connection interface down 
 function downnet(){
   sudo ifconfig "$1" down;
