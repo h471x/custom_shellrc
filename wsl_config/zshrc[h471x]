@@ -1918,6 +1918,15 @@ function gpsh(){
   git push origin $current_branch;
 }
 
+# this alias to pull changes from remote repo
+alias gpl="gpl"
+
+# this function for gpsh alias
+function gpl(){
+  local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+  git pull origin $current_branch;
+}
+
 # this alias to switch to windows terminal
 alias wds="wds"
 
