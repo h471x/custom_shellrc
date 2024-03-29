@@ -1914,8 +1914,14 @@ alias gpsh="gpsh"
 
 # this function for gpsh alias
 function gpsh(){
-  local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
-  git push origin $current_branch;
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+    git push origin $current_branch;
+  else
+    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+  fi
 }
 
 # this alias to pull changes from remote repo
@@ -1923,8 +1929,36 @@ alias gpl="gpl"
 
 # this function for gpsh alias
 function gpl(){
-  local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
-  git pull origin $current_branch;
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+    git pull origin $current_branch;
+  else
+    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+  fi
+}
+
+# this alias to view the git log commits number
+alias glc="glc"
+
+# this function for glc alias
+function glc(){
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+    local commits_num=$(git log --oneline | wc -l);
+    local last_commit=$(git log --format="%H" -n 1);
+    local last_commit_message=$(git show --format=%B -s "$last_commit" | tr '\n' ' ');
+    local last_commit_author=$(git log --format='%an' -n 1)
+
+    echo "${BOLD}${GREEN} $last_commit_author ${WHITE}has ${BRIGHT_BLUE}$commits_num commits";
+    echo "${BOLD}${WHITE} Last Commit on ${GREEN}$current_branch ${WHITE}: $last_commit_message";
+    br;
+  else
+    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+  fi
 }
 
 # this alias to switch to windows terminal
