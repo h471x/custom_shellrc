@@ -778,29 +778,25 @@ function srv(){
 }
 
 #this alias to update the package
-alias upd="upd"
+alias upd="allow_sudo && upd"
 
 #this function for up alias
 function upd(){
-  c && br 2;
-  sudo clear && br 2;
   echo "u p d a t i n g .  .  ." | figlet -t -c;
   br && sudo apt update && br;
 }
 
 #this alia to update the package
-alias upg="upg"
+alias upg="allow_sudo && upg"
 
 #this function for up alias
 function upg(){
-  c && br 2;
-  sudo clear && br 2;
   echo "u p g r a d i n g . . ." | figlet | lolcat;
   br && sudo apt upgrade && br;
 }
 
 #this alias to install package
-alias ist="ist"
+alias ist="allow_sudo && ist"
 
 #this function for ist alias
 function ist(){
@@ -814,8 +810,6 @@ function ist(){
       git clone "$1";
       br;;
     deb)
-      c && br 2;
-      sudo clear;
       br 2;
       echo "   I n s t a l l i n g .  .  . " | figlet;
       br;
@@ -837,13 +831,12 @@ function ist(){
 }
 
 #this alias to install package
-alias rmv="rmv"
+alias rmv="allow_sudo && rmv"
 
 #this function for ist alias
 function rmv(){
   case "${1##*.}" in
     deb)
-      c && br 2 && sudo clear && br 2;
       echo "   r e m o v i n g .  .  . " | figlet | lolcat;
       br;
       echo "Package =======> "${1%.*}" ";
@@ -852,7 +845,6 @@ function rmv(){
       br;
       ;;
     *)
-      c && br 2 && sudo clear;
       br 2;
       echo "   r e m o v  i n g .  .  . " | figlet | lolcat;
       br;
