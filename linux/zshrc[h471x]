@@ -41,6 +41,12 @@ bindkey ' ' magic-space #do history expansion on space
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH:/home/h471x/Qt5.7.0/Tools/QtCreator/bin:/home/h471x/NTSOA/HACK/cupp
 
+# Binary
+CUPP_PATH=/usr/share/cupp
+HOME_PATH=$HOME/bin
+
+PATH=$CUPP_PATH:$HOME_PATH:$PATH
+
 fastfile_var_prefix='$'
 
 # Path to your oh-my-zsh installation.
@@ -209,16 +215,18 @@ alias allow_sudo="allow_sudo"
 function allow_sudo(){
   # A simple trick is just to clear
   # the screen, clever ain't it ?
-  c && br;
-  sudo clear
+  c && br 2
+  sudo clear && return 0 || return 1
+  # In case of wrong sudo password
+  # Don't execute the following command
 }
+
+# this alias to ping a network
+alias reach="allow_sudo && reach"
 
 #this function to check if pfsense is reachable
 # coded 01/29/2024
 function reach(){
-  c && br;
-  allow_sudo;
-
   local target_IP="$1"
   local check_message="Checking $target_IP reachability..."
   local check_IP="sudo ping -c 1 -W 5 "
@@ -400,8 +408,9 @@ alias rld="rld"
 function rld(){
   clear;
   source ~/.$(basename $SHELL)rc;
-  cat ~/.zshrc > ~/NTSOA/zsh_config/linux/"zshrc[$USER].txt";
-  all ~/NTSOA/zsh_config/linux/"zshrc[$USER].txt";
+  local saved_file="zshrc[$USER]"
+  cat ~/.zshrc > ~/NTSOA/zsh_config/linux/$saved_file;
+  all ~/NTSOA/zsh_config/linux/$saved_file;
   c && br;
   echo "z s h    s a v e d " | figlet -t -c;
   # tlk "saved";
@@ -444,7 +453,10 @@ command_not_found_handler() {
   if [[ $command_found -eq 0 ]]; then
     # c && br && echo "n o t     f o u n d " | figlet -t -c | lolcat;
     # br && sleep 0.5 && cv;
-    cv;
+    # cv;
+    # echo "fuck, wrong command"
+    echo "${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Command Not Found "
+    # fuck
   fi
 }
 
@@ -497,7 +509,7 @@ function exop(){
 
 
 #this alias to enter the zshrc file
-alias ct='nano ~/.zshrc; cv;'
+alias ct='nvim ~/.zshrc; cv;'
 
 # this alias to count the number of file/directory
 # inside a directory
@@ -609,7 +621,7 @@ function pct(){
 }
 
 #this line to directly go to JPG version of the time schedule
-alias ej="c && op /home/h471x/NTSOA/'EDT ENI'/JPG"
+alias ej="c && op /home/h471x/NTSOA/EDT\ ENI/JPG/L2\ 2024"
 
 #commented for I don't use it 09/14/2023 
 
@@ -638,11 +650,33 @@ alias ei="ei"
 
 #this function for ei alias
 function ei(){
-  convert -density 500 "$1" "$(basename "$1" .pdf).jpg";
-  all "$1";
-  mv "$(basename "$1" .pdf).jpg" /home/h471x/NTSOA/EDT\ ENI/JPG;
-  ej;
-  all "$(basename "$1" .pdf).jpg";
+  # useful variables
+  local input_pdf="$1"
+  local output_image="$(basename "$input_pdf" .pdf).jpg";
+  local kali_edt_path=/home/h471x/NTSOA/EDT\ ENI/JPG/L2\ 2024;
+  local windows_edt_path=/media/sf_ENI/ENI\ 2024/0\ EDT/L2\ 2024
+
+  # convert pdf to jpg using imagemagick convert
+  convert -density 500 "$input_pdf" "$output_image";
+
+  # full access to the files
+  all "$input_pdf";
+  all "$output_image";
+
+  # moving to the right directories
+  cp "$output_image" $windows_edt_path;
+  mv "$output_image" $kali_edt_path;
+
+  # Success message
+  c && br 2;
+  echo "${GREEN}${BOLD} ==> SUCCESS ${WHITE}"
+  br;
+  echo "${BOLD} $input_pdf -> $output_image ${RESET}";
+  br;
+  sleep 3;
+
+  # open the edt list
+  op $windows_edt_path;
 }
 
 #this alias to edit the time schedule
@@ -650,7 +684,8 @@ alias edt="edt"
 
 #this function for edt alias
 function edt(){
-  vf /home/h471x/NTSOA/'EDT ENI'/ODS/"EDT ENI L1 2023.ods";
+  cd /home/h471x/NTSOA/'EDT ENI'/ODS;
+  op "EDT ENI L2 2024.ods"
   op /home/h471x/NTSOA/'EDT ENI'/PDF;
 }
 
@@ -659,7 +694,7 @@ alias edt="edtv"
 
 #this function for edt alias
 function edtv(){
-  vf /home/h471x/NTSOA/'EDT ENI';
+  op /home/h471x/NTSOA/'EDT ENI';
 }
 
 #this alias to open a directory and make it as destination
@@ -723,6 +758,11 @@ function rn(){
       br;;
     html)
       google-chrome "$1" && cv;;
+    asm)
+      nasm -felf64 "$1"
+      ld ${1%.*}.o -o ${1%.*}
+      ./${1%.*}
+      ;;
     *)
       all "$1" && c && ./"$1";;
  esac
@@ -738,29 +778,25 @@ function srv(){
 }
 
 #this alias to update the package
-alias upd="upd"
+alias upd="allow_sudo && upd"
 
 #this function for up alias
 function upd(){
-  c && br 2;
-  sudo clear && br 2;
   echo "u p d a t i n g .  .  ." | figlet -t -c;
   br && sudo apt update && br;
 }
 
 #this alia to update the package
-alias upg="upg"
+alias upg="allow_sudo && upg"
 
 #this function for up alias
 function upg(){
-  c && br 2;
-  sudo clear && br 2;
-  echo "u p g r a d i n g . . ." | figlet | lolcat;
+  echo "u p g r a d i n g . . ." | figlet -t -c;
   br && sudo apt upgrade && br;
 }
 
 #this alias to install package
-alias ist="ist"
+alias ist="allow_sudo && ist"
 
 #this function for ist alias
 function ist(){
@@ -774,8 +810,6 @@ function ist(){
       git clone "$1";
       br;;
     deb)
-      c && br 2;
-      sudo clear;
       br 2;
       echo "   I n s t a l l i n g .  .  . " | figlet;
       br;
@@ -797,13 +831,12 @@ function ist(){
 }
 
 #this alias to install package
-alias rmv="rmv"
+alias rmv="allow_sudo && rmv"
 
 #this function for ist alias
 function rmv(){
   case "${1##*.}" in
     deb)
-      c && br 2 && sudo clear && br 2;
       echo "   r e m o v i n g .  .  . " | figlet | lolcat;
       br;
       echo "Package =======> "${1%.*}" ";
@@ -812,7 +845,6 @@ function rmv(){
       br;
       ;;
     *)
-      c && br 2 && sudo clear;
       br 2;
       echo "   r e m o v  i n g .  .  . " | figlet | lolcat;
       br;
@@ -882,37 +914,39 @@ alias vf="vf"
 # update 09/14/2023
 function vf() {
   local file="$1"
+  # xdg-open $file;
   local extension="${file##*.}"
-
-  # here if you don't know the default app,
-  # use xdg-open instead of those cmd
-
+  #
+  # # here if you don't know the default app,
+  # # use xdg-open instead of those cmd
+  #
   case "$extension" in
-    jpg|jpeg|ico|png)
-      cmd="ristretto";;
-    pdf)
-      cmd="evince";;
-    cap|pcapng)
-      cmd="wireshark";;
-    csv|ods|xlsx)
-      cmd="xdg-open";;
-    mp*)
-      cmd="vlc";;
-    gz|rar)
-      cmd="engrampa";;
-    html|c|cpp|tf|py|java|js|css|json)
-      cmd="code";;
+
+  # jpg|jpeg|ico|png)
+  #     cmd="eog";;
+  #   pdf)
+  #     cmd="evince";;
+  #   cap|pcapng)
+  #     cmd="wireshark";;
+  #   csv|ods|xlsx)
+  #     cmd="xdg-open";;
+  #   mp*)
+  #     cmd="vlc";;
+  #   gz|rar)
+  #     cmd="engrampa";;
+  #   html|c|cpp|tf|py|java|js|css|json)
+  #     cmd="code";;
     mcd)
       cmd="katyushamcd";;
     *)
-      cmd="nvim";;
+      cmd="xdg-open";;
   esac
-
-  if [[ -f "$file" ]]; then
+  #
+  # if [[ -f "$file" ]]; then
     "$cmd" "$file" && cv
-  elif [[ -d "$file" ]]; then
-    op "$file" && cv
-  fi
+  # elif [[ -d "$file" ]]; then
+  #   op "$file" && cv
+  # fi
 }
 
 #this alias to view binary file
@@ -957,7 +991,7 @@ function mns(){
     #here to check if the command exists
     man "$1" | cat > ~/NTSOA/manual/"$1".txt;
     all ~/NTSOA/manual/"$1".txt;
-    vf ~/NTSOA/manual/"$1".txt;
+    nvm ~/NTSOA/manual/"$1".txt;
     cv;
   else
     c && br;
@@ -1009,6 +1043,15 @@ function nvm(){
   cv;
   #if we have one argument then nvim will be launched with it,
   #otherwise open the current directory if there is no argument
+}
+
+# this alias to open nvim as root
+alias nvmr="allow_sudo && nvmr"
+
+# this function for nvmr alias
+function nvmr(){
+  sudo nvim "${1:-.}"
+  cv
 }
 
 #this alias is the same as ed but it uses nano instead of nvim
@@ -1070,9 +1113,7 @@ function hndo(){
 
     if [ "$password" = "$expected_password" ]; then
       c && br
-      #echo Password correct. Executing command: $1"
-      eval "$@"
-      return
+      return 0
     else
       attempts=$((attempts - 1))
       br
@@ -1104,10 +1145,10 @@ alias eni="op /home/h471x/NTSOA/COURSE/ENI"
 alias dtp="op /home/h471x/Desktop"
 
 #this alias to go to the to dev
-alias dev="op /home/h471x/Desktop/dev"
+alias dev="op /home/h471x/NTSOA/dev"
 
 #this alias to open the text notes
-alias nt="op /home/h471x/Desktop/dev/NOTES"
+alias nt="op /home/h471x/NTSOA/notes"
 
 #this alias to open HTX USB
 alias htx="op /media/h471x/HTX\ USB"
@@ -1284,7 +1325,7 @@ alias hn="op ~/NTSOA"
 alias dwl="op /home/h471x/Downloads"
 
 #this alias to open the HACK directory
-alias hack="op /home/h471x/NTSOA/HACK"
+alias hack="op /home/h471x/NTSOA/hack"
 
 #this alias to open the ENI CYBERSECURITY directory
 alias cs="op /home/h471x/NTSOA/ENI\ CYBERSECURITY"
@@ -1292,23 +1333,31 @@ alias cs="op /home/h471x/NTSOA/ENI\ CYBERSECURITY"
 #this alias to view the history
 alias hst="hst"
 
-# this alias to open the shareed folder
-alias kali="op /media/sf_KALI_LINUX"
-
-#this function for hst alias
+# this function for hst alias
 function hst(){
   if [[ $# -eq 0 ]]; then
     history | less && cv
   else
     re='^[0-9]+$'
     if [[ $1 =~ $re ]]; then
-      #check if the argument is an integrer
+      # check if the argument is an integrer
       history | tail -$1 | less && cv
-    else  #else if it's a text to grep
+    else
+      # else if it's a text to grep
       history | grep "$1" | less && cv
     fi
   fi
 }
+
+# this alias to open the shareed folder
+alias kali="op /media/sf_KALI_LINUX"
+
+# this alias to open the books shared folder
+alias books="op /media/sf_BOOKS"
+
+# this alias to open ENI shared folder
+alias eni="op /media/sf_ENI/ENI\ 2024"
+
 
 #this alias to locate packages
 alias lc="lc"
@@ -1393,12 +1442,19 @@ function ipsh(){
   # br;
   local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
 
-  if [ -d /sys/class/net/wlan0 ]; then
-    local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
-    echo " wlan0 ==> $wlan_ip";
-    echo " eth0  ==> $eth_ip" && br;
+  # Add a conditon to make it view
+  # IP from interface passed as argument
+  if [[ $# -eq 1 ]]; then
+    local iface_ip=$(ifconfig "$1" | grep "inet " | awk '{print $2}');
+    echo " $1 ==> $iface_ip";
   else
-    echo " eth0 IP ==> $eth_ip" && br;
+    if [ -d /sys/class/net/wlan0 ]; then
+      local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
+      echo " wlan0 ==> $wlan_ip";
+      echo " eth0  ==> $eth_ip" && br;
+    else
+      echo " eth0 IP ==> $eth_ip" && br;
+    fi
   fi
 
   # ifconfig | awk -F '[ :]+' '/^[a-z]/ {interface=$1} /inet / {print interface " ==> " $3}'
@@ -1559,15 +1615,16 @@ function rst(){
   cv;
 }
 
-# COLOUR VARIABLES
-# they are all ANSI characters
-
-#Text
+# ANSI CODES ARIABLES
+# Text
+RESET="$(printf '\033[0m')"
+BOLD="$(printf '\033[1m')"
 RED="$(printf '\033[31m')"
 GREEN="$(printf '\033[32m')"
 ORANGE="$(printf '\033[33m')"
 YELLOW="$(printf '\033[33m')"
 BLUE="$(printf '\033[34m')"
+BRIGHT_BLUE="$(printf '\033[94m')"
 MAGENTA="$(printf '\033[35m')"
 CYAN="$(printf '\033[36m')"
 #WHITE="$(printf '\033[37m')"
@@ -1590,34 +1647,42 @@ CHECKMARK="$(printf '\xE2\x9C\x94')"
 QUESTION_MARK="$(printf '\xE2\x9D\x93')"
 
 # this alias to run wifite
-alias whk="whk"
+alias whk="allow_sudo && whk"
 
 # this function for whk alias
 function whk(){
-  c && br 2 && sudo clear;
-  sudo wifite --kill;
-  br;
-  #echo -ne " ${WHITE}[${RED}$QUESTION_MARK${WHITE}]${WHITE} Do you want to ${GREEN}restart ${WHITE}the wifi hacking ?  (y/n) ";
-  echo -ne " ${WHITE}[${GREEN}?${WHITE}]${WHITE} ${GREEN}Restart ${WHITE}the wifi hacking ? (y/n) ";
-  read wifi
-  if [ "$wifi" = "y" ]; then
-    whk
-  elif [[ "$wifi" = "n" ]]; then
-    #echo -ne " ${WHITE}[${GREEN}#${WHITE}]${WHITE} Do you want to keep the ${GREEN}monitor ${WHITE}mode ?     (y/n) ";
-    #read ans
-    #if [ "$ans" = "y" ]; then
-     # br && echo " Keeping Monitor Mode  ... "
-    #else
-      echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Switching to ${GREEN}Managed ${WHITE}Mode  ";
-      downnet eth0 && upnet wlan0;
-      wtp wlan0 managed;
-      echo "${GREEN}$CHECKMARK${WHITE}"
-      # echo " ==> wlan0 set to Managed Mode"
-      #br;
-    #fi
-    echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Restarting Network Manager "
-    sudo service NetworkManager restart;
-    echo "${GREEN}$CHECKMARK${WHITE}"
+  function hack_wifi(){
+    sudo wifite --kill;
+    br;
+
+    # this function will ask if the
+    # hacking should restart or not
+    function check_quit(){
+      echo -ne " ${WHITE}[${GREEN}?${WHITE}]${WHITE} ${GREEN}Restart ${WHITE}the wifi hacking ? (y/n) ";
+      read wifi
+      if [ "$wifi" = "y" ]; then
+        whk
+      elif [[ "$wifi" = "n" ]]; then
+        echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Switching to ${GREEN}Managed ${WHITE}Mode  ";
+        downnet eth0 && upnet wlan0;
+        wtp wlan0 managed;
+        echo "${GREEN}$CHECKMARK${WHITE}"
+        echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Restarting Network Manager "
+        sudo service NetworkManager restart;
+        echo "${GREEN}$CHECKMARK${WHITE}"
+      else
+        check_quit
+      fi
+    }
+    check_quit
+  }
+
+  if [ -d /sys/class/net/wlan0 ]; then
+    hack_wifi
+  else
+    br
+    echo "  ${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} No ${RED}Wireless Card ${WHITE}Available"
+    br
   fi
 }
 
@@ -1702,13 +1767,10 @@ function wcnt(){
 }
 
 # this alias to list all the wifi nearby
-alias wls="wls"
+alias wls="allow_sudo && wls"
 
 # this function for wls alias
 function wls(){
-  c && br 2;
-  sudo clear;
-
   if [ -d /sys/class/net/wlan0 ]; then
     downnet eth0 && upnet wlan0;
     c && br 2;
@@ -1732,11 +1794,11 @@ function wchk(){
 }
 
 # this alias to run airgeddon
-alias rhk="rhk"
+alias rhk="allow_sudo && rhk"
 
 # this function for rhk alias
 function rhk(){
-  clear && br 2 && sudo clear && sudo airgeddon
+  sudo airgeddon
 }
 
 # this alias to run the cupp command
@@ -1756,40 +1818,44 @@ function cupp(){
 # service, its status
 function stap(){
   if [[ $(pgrep apache2) ]]; then
-    c && br && echo " Apache Server is Active" && br;
+    c && br;
+    echo "${BOLD}Apache Server Active [${GREEN}✓${WHITE}]"
+    br;
 
-    local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
-
+    local eth_iface="eth0"
+    local wifi_iface="wlan0"
+    local loopback_iface="lo"
     if [ -d /sys/class/net/wlan0 ]; then
-      local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
-      echo " eth0  Interface Connection : http://$eth_ip";
-      echo " wlan0 Interface Connection : http://$wlan_ip";
-      br;
-    else
-      echo " $eth_ip" && br;
+      local wlan_ip=$(ifconfig $wifi_iface | grep "inet " | awk '{print $2}');
+      echo "$wifi_iface Interface Connection (Public)  : ${BRIGHT_BLUE}http://$wlan_ip${WHITE}";
     fi
+    local loopback_ip=$(ifconfig $loopback_iface | grep "inet " | awk '{print $2}');
+
+    echo "$loopback_iface    Interface Connection (Private) : ${BRIGHT_BLUE}http://$loopback_ip ${WHITE}";
+    echo "$eth_iface    Interface Connection (Private) : ${BRIGHT_BLUE}http://$eth_ip ${WHITE}";
+    br;
   else
-    c && br && echo " Apache Server is Off" && br;
+    c && br;
+    echo "${BOLD}Apache Server Off [${RED}x${WHITE}]"
+    br
   fi
 }
 
 # this alias to start the apache2 service
-alias apon="apon"
+alias apon="allow_sudo && apon"
 
 # this function for apch alias
 function apon(){
-  allow_sudo;
   cd /var/www/html;
   sudo systemctl start apache2;
   stap;
 }
 
 # this alias to stop the apache2 service
-alias apoff="apoff"
+alias apoff="allow_sudo && apoff"
 
 # this function for apch alias
 function apoff(){
-  allow_sudo;
   sudo systemctl stop apache2;
   stap;
 }
@@ -1803,72 +1869,70 @@ function apd(){
   op /var/www/html
 }
 
-# this function to view the current mongodb
-# service, its status
-function mgst(){
-  if [[ $(pgrep mongod) ]]; then
-    c && br && echo " MongoDb Server is Active" && br;
+# # this function to view the current mongodb
+# # service, its status
+# function mgst(){
+#   if [[ $(pgrep mongod) ]]; then
+#     c && br && echo " MongoDb Server is Active" && br;
+#
+#     local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
+#
+#     if [ -d /sys/class/net/wlan0 ]; then
+#       local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
+#       echo " eth0  Interface Connection : http://$eth_ip";
+#       echo " wlan0 Interface Connection : http://$wlan_ip";
+#       br;
+#     else
+#       echo " $eth_ip" && br;
+#     fi
+#   else
+#     c && br && echo " MongoDb Server is Off" && br;
+#   fi
+# }
 
-    local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
-
-    if [ -d /sys/class/net/wlan0 ]; then
-      local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
-      echo " eth0  Interface Connection : http://$eth_ip";
-      echo " wlan0 Interface Connection : http://$wlan_ip";
-      br;
-    else
-      echo " $eth_ip" && br;
-    fi
-  else
-    c && br && echo " MongoDb Server is Off" && br;
-  fi
-}
-
-# this alias to start the mongod service
-alias mongon="mongon"
-
-# this function for mongon alias
-function mongon(){
-  allow_sudo;
-  sudo systemctl start mongod;
-  mgst;
-}
-
-# this alias to stop the mongod service
-alias mongoff="mongoff"
-
-# this function for mongoff alias
-function mongoff(){
-  allow_sudo;
-  sudo systemctl stop mongod;
-  mgst;
-}
+# # this alias to start the mongod service
+# alias mongon="mongon"
+#
+# # this function for mongon alias
+# function mongon(){
+#   allow_sudo;
+#   sudo systemctl start mongod;
+#   mgst;
+# }
+#
+# # this alias to stop the mongod service
+# alias mongoff="mongoff"
+#
+# # this function for mongoff alias
+# function mongoff(){
+#   allow_sudo;
+#   sudo systemctl stop mongod;
+#   mgst;
+# }
 
 # here to view the ssh status
 alias sth="sth"
 
 # this function for sth alias
 function sth(){
-  # this is the raw old method
-  # sudo systemctl status ssh;
-  # updated today 10 november 2023
-
+  c && br;
   if [[ $(pgrep sshd) ]]; then
-    c && br && echo " ssh server is active" && br;
-
-    local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
-
+    c && br;
+    echo "${BOLD}Ssh Server Active [${GREEN}✓${WHITE}]"
+    br;
     if [ -d /sys/class/net/wlan0 ]; then
-      local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
-      echo " eth0  Connection ==> ssh $USER@$eth_ip";
-      echo " wlan0 Connection ==> ssh $USER@$wlan_ip";
-      br;
-    else
-      echo " eth0  Connection ==> ssh $USER@$eth_ip" && br;
+      local wifi_iface="wlan0"
+      local wifi_ip=$(ifconfig $wifi_iface | grep "inet " | awk '{print $2}');
+      echo "Ssh Connection via $wifi_iface Interface : ${BLUE}ssh $USER@$wifi_ip${WHITE}";
     fi
+
+    local eth_iface="eth0"
+    local eth_ip=$(ifconfig $eth_iface | grep "inet " | awk '{print $2}');
+    echo "Ssh Connection via $eth_iface Interface : ${BLUE}ssh $USER@$eth_ip${WHITE}";
   else
-    c && br && echo " ssh server is off" && br;
+    echo "${BOLD}Ssh Server Off [${RED}x${WHITE}]"
   fi
+  br
 }
 
 # this alias to enable the ssh server
@@ -1876,17 +1940,15 @@ alias sshon="sshon"
 
 # this function for sshon alias
 function sshon(){
-  clear && br 2 && sudo clear;
-  sudo systemctl start ssh;
+  svc_on ssh;
   sth;
 }
 
 # this alias to kill the ssh server process
-alias sshoff="sshoff"
+alias sshoff="allow_sudo && sshoff"
 
 # this function for sshoff alias
 function sshoff(){
-  clear && br 2 && sudo clear;
   # sudo kill $(sudo lsof -t -i:22);
   # or use this in termux
   if [[ $(pgrep sshd) ]]; then
@@ -1965,6 +2027,7 @@ function pfsense_connect(){
   # as a background process so
   # the terminal won't be filled with logs
   $browser $pfsense_IP &> /dev/null &;
+  # xdg-open http://$pfsense_IP
 
   # here to store the pfsense PID
   # used to kill its process after
@@ -1973,116 +2036,200 @@ function pfsense_connect(){
 
 # this alias to start the pfsense GUI
 # 01/29/2024
-alias pfson="pfson"
+alias pfson="allow_sudo && pfson"
 
-#this function for pfsense alias
+# this function for pfsense alias
 function pfson(){
-  #we will need permission
-  allow_sudo;
-
-  # echo "pfsense" | figlet;
-  #check if we can reach the PfSense server
-  #before calling the connect function
   reaching_check pfsense_connect;
-
-  #Feedback status
   pfst;
 }
 
-#this alias to close the pfsense GUI
+# this alias to close the pfsense GUI
 # 01/29/2024
-alias pfsoff="pfsoff"
+alias pfsoff="allow_sudo && pfsoff"
 
-#this function for pfsoff alias
+# this function for pfsoff alias
 function pfsoff(){
-  #we will need permission
-  #for the following operations
-  allow_sudo;
-
-  #Kill the PfSense process
-  #based on its PID on pfson
   sudo kill $PFSENSE_PID;
-
-  #here to restart eth0 (bridged adapter)
-  #since eth0 is down when pfsense ran
+  # here to restart eth0 (bridged adapter)
+  # since eth0 is down when pfsense ran
   upnet eth0;
 
-  #Feedback message
-  #Calling it twice because at
-  #first instance the status
-  #is not well refreshed
+  # Feedback message
+  # Calling it twice because at
+  # first instance the status
+  # is not well refreshed
   clear && pfst;
   clear && pfst;
 }
 
-#this alias to start the sql service
+# this alias to start systemctl based services
+alias svc_on="allow_sudo && svc_on"
+
+# this function for svc_on alias
+function svc_on(){
+  sudo systemctl start "$1";
+}
+
+# this alias to stop systemctl based services
+alias svc_off="allow_sudo && svc_off"
+
+# this function for svc_off alias
+function svc_off(){
+  sudo systemctl stop "$1";
+}
+
+# this alias to view systemctl
+# based services status
+alias svc_stat="allow_sudo && svc_stat"
+
+# this function for svc_stat alias
+function svc_stat(){
+  sudo systemctl status "$1";
+}
+
+# this alias to show if a service if on or off
+alias svc_show_stat="allow_sudo && svc_show_stat"
+
+# this function for svc_show_stat alias
+function svc_show_stat(){
+  br;
+
+  local service_name="$1";
+  local check_command="$2";
+
+  if [[ "$check_command" == *"Active: active"* ]]; then
+    echo "${BOLD}$service_name Active [${GREEN}✓${WHITE}]";
+  elif [[ "$check_command" =~ ^[0-9]+$ ]]; then
+    echo "${BOLD}$service_name Active [${GREEN}✓${WHITE}]";
+  else
+    echo "${BOLD}$service_name Off [${RED}x${WHITE}]";
+  fi
+
+  br;
+}
+
+# this alias to start the sql service
 alias sqlon="sqlon"
 
-#this function for sqlon alias
+# this function for sqlon alias
 function sqlon(){
-  clear && br 2 && sudo clear;
-  sudo systemctl start mysql;
+  svc_on mysql;
   sqls;
 }
 
-#this alias to stop the sql service
+# this alias to stop the sql service
 alias sqloff="sqloff"
 
-#this function for sqloff alias
+# this function for sqloff alias
 function sqloff(){
-  clear && br 2 && sudo clear;
-  sudo systemctl stop mysql;
+  svc_off mysql;
   sqls;
 }
 
-#this alias to view the sql service
+# this alias to view the sql service
 alias sqls="sqls"
 
-#this function for sqloff alias
+# this function for sqloff alias
 function sqls(){
-  clear && br 2 && sudo clear;
-  br;
-  echo "  MySQL server status "
-  br;
-  sudo systemctl status mysql;
+  local name="MySQL Server"
+  local cmd="$(pgrep mariadb)"
+  
+  if [[ -z "$cmd" ]]; then
+    svc_show_stat "$name" "Active: inactive";
+  else
+    svc_show_stat "$name" "Active: active";
+  fi
 }
 
-#this alias to start the postgresql service
-alias psqlon="psqlon"
+# this alias to check sendmail process
+alias mails="mails"
 
-#this function for sqlon alias
-function psqlon(){  
-  clear && br 2 && sudo clear;
-  sudo systemctl start psql;
-  sqls;
+# this function for mails alias
+function mails(){
+  local name="Mail Server"
+  local cmd="$(sudo systemctl status postfix)"
+  svc_show_stat "$name" "$cmd"
 }
 
-#this alias to stop the postgresql service
-alias psqloff="psqloff"
+# this alias to start sendmail service
+alias mailon="mailon"
 
-#this function for sqloff alias
+# this function for mailon alias
+function mailon(){
+  svc_on postfix;
+  mails;
+}
+
+# this alias to stop sendmail service
+alias mailoff="mailoff"
+
+# this function for mailon alias
+function mailoff(){
+  svc_off postfix;
+  mails;
+}
+
+# this alias to check snmp service
+alias snmps="snmps"
+
+# this function for snmps alias
+function snmps(){
+  local name="SNMP Server";
+  local cmd="$(pgrep snmpd)";
+  svc_show_stat $name $cmd;
+}
+
+# this function to start snmpd service
+alias snmpon="snmpon"
+
+# this function for snmpon alias
+function snmpon(){
+  svc_on snmpd;
+  snmps;
+}
+
+# this alias to stop the snmp service
+alias snmpoff="snmpoff"
+
+# this function for snmpoff alias
+function snmpoff(){
+  svc_off snmpd;
+  snmps;
+}
+
+# this alias to start the postgresql service
+alias psqlon="allow_sudo && psqlon"
+
+# this function for sqlon alias
+function psqlon(){
+  sudo service postgresql start;
+  psqls;
+}
+
+# this alias to stop the postgresql service
+alias psqloff="allow_sudo && psqloff"
+
+# this function for sqloff alias
 function psqloff(){
-  clear && br 2 && sudo clear;
-  sudo systemctl stop psql;
-  sqls;
+  sudo service postgresql stop;
+  psqls;
 }
 
-#this alias to view the postgresql service
+# this alias to view the postgresql service
 alias psqls="psqls"
 
-#this function for psqls alias
+# this function for psqls alias
 function psqls(){
-  clear && br 2 && sudo clear;
-  br;
-  echo "  PostGreSQL server status "
-  br;
-  sudo systemctl status psql;
+  local name="PostgreSQL Server"
+  local cmd="$(sudo service postgresql status)"
+  svc_show_stat $name $cmd;
 }
 
-#this alias to call the sqlite3.Exe file
+# this alias to call the sqlite3.Exe file
 alias sqlite="sqlite"
 
-#this function for ssqlite alias
+# this function for ssqlite alias
 function sqlite(){
   if [[ $# -eq 0 ]]; then
     echo "■■▶ Please specify a file.db  ";  
@@ -2097,21 +2244,43 @@ function sqlite(){
   fi
 }
 
-#this alias to start the sql cli
-alias rdb="rdb"
+# this alias to start the sql cli
+alias rdb="allow_sudo && rdb"
 
-#this function for rdb alias
+# this function for rdb alias
 function rdb(){
-  clear && br 2 && sudo clear;
-  sudo systemctl start mysql;
-  sudo mysql -u root;
-  sudo systemctl stop mysql;
+  if ! pgrep mysql > /dev/null; then
+    sudo service mariadb start &>/dev/null
+  fi
+  c && br
+  local user=${1:-root}
+  echo "${BOLD}MySQL Server Active [${GREEN}✓${WHITE}]"
+  echo "${BOLD}User : $user"
+  local is_root='[[ "$user" == "root" ]]';
+  local flag=$(eval "$is_root" && echo "" || echo "-p");
+  sudo mysql -u $user $flag;
+  br
+  function check_mysql_server(){
+    echo -ne "${BOLD}${WHITE}[${GREEN}?${WHITE}]${WHITE} ${GREEN}Stop ${WHITE}MySQL Server ? (y/n) ";
+    read server
+    if [ "$server" = "y" ]; then
+      # echo -ne " ${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping ${GREEN}MySQL ${WHITE}Server  ";
+      echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Stopping MySQL Server ... "
+      sudo service mariadb stop &>/dev/null
+      echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} MySQL Server Stopped  ... ${GREEN}✓"
+    elif [ "$server" = "n" ];then
+      echo "${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Keeping ${GREEN}MySQL ${WHITE}Server ${GREEN}On";
+    else
+      check_mysql_server
+    fi
+  }
+  check_mysql_server
 }
 
-#this alias to start the sql cli
+# this alias to start the sql cli
 alias rdbp="rdbp"
 
-#this function for rdbp alias
+# this function for rdbp alias
 function rdbp(){
   clear && br 2 && sudo clear;
   sudo systemctl start psql;
@@ -2119,10 +2288,10 @@ function rdbp(){
   sudo systemctl stop psql;
 }
 
-#this alias to view the irc sever status
+# this alias to view the irc sever status
 alias irth="irth"
 
-#this function for irth alias
+# this function for irth alias
 function irth(){
   c && br 2 && sudo clear;
   echo "    irc server status : ";
@@ -2131,48 +2300,54 @@ function irth(){
   br;
 }
 
-#this alias to start the irc server
+# this alias to start the irc server
 alias ircon="ircon"
 
-#this function for ircon alias
+# this function for ircon alias
 function ircon(){
   clear && br 2 && sudo clear;
   sudo service inspircd start;
   irth;
 }
 
-#this alias to restart the irc server
+# this alias to restart the irc server
 alias ircrst="ircrst"
 
-#this function for ircrst alias
+# this function for ircrst alias
 function ircrst(){
   clear && br 2 && sudo clear;
   sudo service inspircd restart;
   irth;
 }
 
-#this alias to stop the irc server
+# this alias to stop the irc server
 alias ircoff="ircoff"
 
-#this function for ircoff alias
+# this function for ircoff alias
 function ircoff(){
   clear && br 2 && sudo clear;
   sudo service inspircd stop;
   irth;
 }
 
-# this alias to add & commit at the same time
+# this alias to git add and git commit at the same time
 alias gad="gad"
 
 # this function for gad alias
 function gad(){
-  git add "$1" && git commit "$1" -m "$2"
+  if [[ $# -eq 0 ]]; then
+    git add --all && git commit
+  elif [[ $# -eq 1 ]]; then
+    git add --all && git commit -m "$1"
+  elif [[ $# -eq 2 ]]; then
+    git add "$1" && git commit "$1" -m "$2";
+  fi
 }
 
 # this alias to create a new github repository using github cli
 alias ghc="ghc"
 
-#this function to sanitize the repository name
+# this function to sanitize the repository name
 function sanitize_repo_name() {
   local repo_name="$1"
   # Replace any characters that are not alphanumeric or hyphen with hyphen
@@ -2227,44 +2402,65 @@ function upnet(){
   sudo ifconfig "$1" up;
 }
 
+# this function to declare default git
+# based branch aliases variables
+# today 2024-03-09 20:38
+# function init_git_variables(){
+#   is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+#   if [[ $is_a_git_repo == "true "]]; then
+#     default_branch=$(basename $(git symbolic-ref refs/remotes/origin/HEAD))
+#     current_branch=$(git rev-parse --abbrev-ref HEAD)
+#   else
+#     echo "not in a git repo"
+#   fi
+# }
+
+#this alias to rename a git branch
+alias gnm="gnm"
+
+#this function for gnm alias
+function gnm(){
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    local current_branch=$(git rev-parse --abbrev-ref HEAD)
+    if [[ $# -eq 1 ]]; then
+      git branch -M $current_branch "$1";
+      cv;
+    elif [[ $# -eq 0 ]]; then
+      echo " ■■▶ Please pass the new name of '$current_branch' branch as argument " && br;
+    else
+      echo " ■■▶ Usage : gnm new_name_of_the_branch" && br;
+    fi
+  else
+    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+  fi
+}
+
 #this alias to switch to the last git branch
 alias gck="gck";
 
 #this function for gck alias
 function gck(){
-  # if [[ -d ./.git ]]; then
-  # old code, not working with subdirectories
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
+    local default_branch=$(basename $(git symbolic-ref refs/remotes/origin/HEAD))
+    local current_branch=$(git rev-parse --abbrev-ref HEAD)
     if [[ $# -eq 0 ]]; then
-      # local default_branch=$(grep default ~/.gitconfig | awk '{print $3}');
-      # git checkout $default_branch;
-      # nice but I can't loop over branches
-      # so I update the code today 02/04/2024
-      local default_branch=$(git config --get init.defaultBranch)
-      # local current_branch=$(git rev-parse --abbrev-ref HEAD)
-
-      # if [[ "$current_branch" != "$default_branch" ]]; then
+      if [[ "$current_branch" != "$default_branch" ]]; then
         git checkout "$default_branch"
-      # else
-      #   local branches=($(git for-each-ref --format='%(refname:short)' refs/heads/))
-      #   local current_index=0
-      #
-      #   for ((i=0; i<${#branches[@]}; i++)); do
-      #     if [[ "${branches[$i]}" == "$current_branch" ]]; then
-      #       current_index=$i
-      #       break
-      #     fi
-      #   done
-      #
-      #   current_index=$(( (current_index + 1) % ${#branches[@]} ))
-      #   git checkout "${branches[$current_index]}"
-      # fi
+      fi
     elif [[ $# -eq 1 ]]; then
-      git checkout "$1";
+      # check if the branch doesn't exist yet
+      if ! git rev-parse --verify "$1" >/dev/null 2>&1; then
+        git checkout -b "$1";
+      else
+        git checkout "$1";
+      fi
     else
-      echo " ■■▶ Usage : gck branch_to_switch" && br;
+      echo " gck        ==> switch to the default branch";
+      echo " gck branch ==> swith to the specified branch" && br;
     fi
   else
     echo " ■■▶ This won't work, you are not in a git repo !" && br;
@@ -2289,29 +2485,6 @@ function gcb(){
   fi
 }
 
-#this alias to rename a git branch
-alias gnm="gnm"
-
-#this function for gnm alias
-function gnm(){
-  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
-
-  if [[ "$is_a_git_repo" == "true" ]]; then
-    local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
-
-    if [[ $# -eq 1 ]]; then
-      git branch -M $current_branch "$1";
-      cv;
-    elif [[ $# -eq 0 ]]; then
-      echo " ■■▶ Please pass the new name of '$current_branch' branch as argument " && br;
-    else
-      echo " ■■▶ Usage : gnm new_name_of_the_branch" && br;
-    fi
-  else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
-  fi
-}
-
 #this alias to create a new branch and switch to it
 alias gbr="gbr"
 
@@ -2323,7 +2496,6 @@ function gbr(){
     if [[ $# -eq 1 ]]; then
       git checkout -b "$1";
     elif [[ $# -eq 0 ]]; then
-      # echo " ■■▶ Please pass the name of the new branch as argument " && br;
       git branch -a;
     else
       echo " ■■▶ Usage : gbr new_branch" && br;
@@ -2338,30 +2510,59 @@ alias gbd="gbd"
 
 #this function for gbd alias
 function gbd(){
-  # if [[ -d ./.git ]]; then
-  # old code, not working with subdirectories
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
+    local default_branch=$(basename $(git symbolic-ref refs/remotes/origin/HEAD))
+    local current_branch=$(git rev-parse --abbrev-ref HEAD)
     if [[ $# -eq 1 ]]; then
-      # local default_branch=$(grep default ~/.gitconfig | awk '{print $3}');
-      local default_branch=$(git config --get init.defaultBranch)
-      local current_branch=$(git rev-parse --abbrev-ref HEAD)
-      # if [[ "$1" != "$default_branch" ]]; then
-        # gck;
-      # fi
-      if [[ "$current_branch" != "$default_branch" ]]; then
-        git checkout $default_branch;
+      # check if the branch doesn't exist
+      if ! git rev-parse --verify "$1" >/dev/null 2>&1; then
+        echo " ■■▶ Fatal ! $1 is a Non Existing branch " && br;
+      else
+        if [[ "$current_branch" == "$default_branch" ]]; then
+          echo " ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+        else
+          git checkout $default_branch;
+          git branch -D "$1";
+        fi
       fi
-      git branch -D "$1";
     elif [[ $# -eq 0 ]]; then
-      echo " ■■▶ Please pass the name of the branch to delete as argument " && br;
+      if [[ "$current_branch" == "$default_branch" ]]; then
+        echo " ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+      else
+        git checkout "$default_branch";
+        git branch -D "$current_branch";
+      fi
     else
-      echo " ■■▶ Usage : gbd branch_to_delete" && br;
+      br
+      echo " gbd        --> Delete the current branch";
+      echo " gbd branch --> Delete the specified branch" && br;
     fi
   else
     echo " ■■▶ This won't work, you are not in a git repo !" && br;
   fi
+}
+
+# this alias to revert back to last commit
+alias grst="git checkout -- ."
+
+# this alias to push changes on current repo to remote repo
+alias gpsh="gpsh"
+
+# this function for gpsh alias
+function gpsh(){
+  local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+  git push origin $current_branch;
+}
+
+# this alias to pull changes from remote repo
+alias gpl="gpl"
+
+# this function for gpsh alias
+function gpl(){
+  local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+  git pull origin $current_branch;
 }
 
 #this function to bring a connection interface down 
@@ -2480,3 +2681,5 @@ kill-line() {
 
 zle -N kill-line
 bindkey "²²" kill-line
+
+eval $(thefuck --alias)

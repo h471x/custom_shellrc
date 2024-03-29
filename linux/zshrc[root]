@@ -279,7 +279,7 @@ dalias rld="rld"
 
 #this function for rld alias
 function rld(){
-  cat ~/.zshrc > /home/h471x/NTSOA/zsh_config/linux/"zshrc[root].txt" && all /home/h471x/NTSOA/zsh_config/linux/"zshrc[root].txt" && c && echo -e && echo "z s h    s a v e d " | figlet -t -c && echo -e && sleep 0.5 && source ~/.zshrc;}
+  cat ~/.zshrc > /home/h471x/NTSOA/zsh_config/linux/"zshrc[root]" && all /home/h471x/NTSOA/zsh_config/linux/"zshrc[root]" && c && echo -e && echo "z s h    s a v e d " | figlet -t -c && echo -e && sleep 0.5 && source ~/.zshrc;}
 
 
 #this alias to show the welcome message
@@ -534,13 +534,19 @@ function ed(){
 #this alias to open the current directory inside neovim
 alias nvm="nvm"
 
-#this function for nvm aliases
+# this function for nvm aliases
 function nvm(){
-  nvim "${1:-.}";
+  if [[ ! -e "$1" ]]; then
+    touch "$1"
+  fi
+  local file="$1"
+  nvim "${file:-.}";
   cv;
-  #if we have one argument then nvim will be launched with it,
-  #otherwise open the current directory if there is no argument
+  # if we have one argument then nvim will be launched with it,
+  # if the file doesn't exist we create just like nano do
+  # otherwise open the current directory if there is no argument
 }
+
 #this alias to create a file
 alias tf="tf"
 
@@ -634,7 +640,7 @@ function opdr(){
 alias usb="op /media/h471x"
 
 #this alias to view the pc state
-alias pc="c && echo -e && echo -e && sudo -u h471x neofetch"
+alias pc="c && echo -e && echo -e && sudo -u h471x neofetch --source /home/h471x/.config/neofetch/hn.txt"
 
 #this alias to go to home directory
 alias hm="op /root && cv"
