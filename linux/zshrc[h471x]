@@ -215,16 +215,18 @@ alias allow_sudo="allow_sudo"
 function allow_sudo(){
   # A simple trick is just to clear
   # the screen, clever ain't it ?
-  c && br;
-  sudo clear
+  c && br 2
+  sudo clear && return 0 || return 1
+  # In case of wrong sudo password
+  # Don't execute the following command
 }
+
+# this alias to ping a network
+alias reach="allow_sudo && reach"
 
 #this function to check if pfsense is reachable
 # coded 01/29/2024
 function reach(){
-  c && br;
-  allow_sudo;
-
   local target_IP="$1"
   local check_message="Checking $target_IP reachability..."
   local check_IP="sudo ping -c 1 -W 5 "
@@ -1052,11 +1054,10 @@ function nvm(){
 }
 
 # this alias to open nvim as root
-alias nvmr="nvmr"
+alias nvmr="allow_sudo && nvmr"
 
 # this function for nvmr alias
 function nvmr(){
-  allow_sudo;
   sudo nvim "${1:-.}"
   cv
 }
@@ -1120,9 +1121,7 @@ function hndo(){
 
     if [ "$password" = "$expected_password" ]; then
       c && br
-      #echo Password correct. Executing command: $1"
-      eval "$@"
-      return
+      return 0
     else
       attempts=$((attempts - 1))
       br
@@ -1656,12 +1655,10 @@ CHECKMARK="$(printf '\xE2\x9C\x94')"
 QUESTION_MARK="$(printf '\xE2\x9D\x93')"
 
 # this alias to run wifite
-alias whk="whk"
+alias whk="allow_sudo && whk"
 
 # this function for whk alias
 function whk(){
-  allow_sudo;
-
   function hack_wifi(){
     sudo wifite --kill;
     br;
@@ -1778,11 +1775,10 @@ function wcnt(){
 }
 
 # this alias to list all the wifi nearby
-alias wls="wls"
+alias wls="allow_sudo && wls"
 
 # this function for wls alias
 function wls(){
-  allow_sudo
   if [ -d /sys/class/net/wlan0 ]; then
     downnet eth0 && upnet wlan0;
     c && br 2;
@@ -1806,11 +1802,10 @@ function wchk(){
 }
 
 # this alias to run airgeddon
-alias rhk="rhk"
+alias rhk="allow_sudo && rhk"
 
 # this function for rhk alias
 function rhk(){
-  allow_sudo
   sudo airgeddon
 }
 
@@ -1855,22 +1850,20 @@ function stap(){
 }
 
 # this alias to start the apache2 service
-alias apon="apon"
+alias apon="allow_sudo && apon"
 
 # this function for apch alias
 function apon(){
-  allow_sudo;
   cd /var/www/html;
   sudo systemctl start apache2;
   stap;
 }
 
 # this alias to stop the apache2 service
-alias apoff="apoff"
+alias apoff="allow_sudo && apoff"
 
 # this function for apch alias
 function apoff(){
-  allow_sudo;
   sudo systemctl stop apache2;
   stap;
 }
@@ -1884,46 +1877,46 @@ function apd(){
   op /var/www/html
 }
 
-# this function to view the current mongodb
-# service, its status
-function mgst(){
-  if [[ $(pgrep mongod) ]]; then
-    c && br && echo " MongoDb Server is Active" && br;
+# # this function to view the current mongodb
+# # service, its status
+# function mgst(){
+#   if [[ $(pgrep mongod) ]]; then
+#     c && br && echo " MongoDb Server is Active" && br;
+#
+#     local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
+#
+#     if [ -d /sys/class/net/wlan0 ]; then
+#       local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
+#       echo " eth0  Interface Connection : http://$eth_ip";
+#       echo " wlan0 Interface Connection : http://$wlan_ip";
+#       br;
+#     else
+#       echo " $eth_ip" && br;
+#     fi
+#   else
+#     c && br && echo " MongoDb Server is Off" && br;
+#   fi
+# }
 
-    local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
-
-    if [ -d /sys/class/net/wlan0 ]; then
-      local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
-      echo " eth0  Interface Connection : http://$eth_ip";
-      echo " wlan0 Interface Connection : http://$wlan_ip";
-      br;
-    else
-      echo " $eth_ip" && br;
-    fi
-  else
-    c && br && echo " MongoDb Server is Off" && br;
-  fi
-}
-
-# this alias to start the mongod service
-alias mongon="mongon"
-
-# this function for mongon alias
-function mongon(){
-  allow_sudo;
-  sudo systemctl start mongod;
-  mgst;
-}
-
-# this alias to stop the mongod service
-alias mongoff="mongoff"
-
-# this function for mongoff alias
-function mongoff(){
-  allow_sudo;
-  sudo systemctl stop mongod;
-  mgst;
-}
+# # this alias to start the mongod service
+# alias mongon="mongon"
+#
+# # this function for mongon alias
+# function mongon(){
+#   allow_sudo;
+#   sudo systemctl start mongod;
+#   mgst;
+# }
+#
+# # this alias to stop the mongod service
+# alias mongoff="mongoff"
+#
+# # this function for mongoff alias
+# function mongoff(){
+#   allow_sudo;
+#   sudo systemctl stop mongod;
+#   mgst;
+# }
 
 # here to view the ssh status
 alias sth="sth"
@@ -1960,11 +1953,10 @@ function sshon(){
 }
 
 # this alias to kill the ssh server process
-alias sshoff="sshoff"
+alias sshoff="allow_sudo && sshoff"
 
 # this function for sshoff alias
 function sshoff(){
-  allow_sudo;
   # sudo kill $(sudo lsof -t -i:22);
   # or use this in termux
   if [[ $(pgrep sshd) ]]; then
@@ -2052,82 +2044,63 @@ function pfsense_connect(){
 
 # this alias to start the pfsense GUI
 # 01/29/2024
-alias pfson="pfson"
+alias pfson="allow_sudo && pfson"
 
 # this function for pfsense alias
 function pfson(){
-  #we will need permission
-  allow_sudo;
-
-  # echo "pfsense" | figlet;
-  #check if we can reach the PfSense server
-  #before calling the connect function
   reaching_check pfsense_connect;
-
-  #Feedback status
   pfst;
 }
 
 # this alias to close the pfsense GUI
 # 01/29/2024
-alias pfsoff="pfsoff"
+alias pfsoff="allow_sudo && pfsoff"
 
 # this function for pfsoff alias
 function pfsoff(){
-  #we will need permission
-  #for the following operations
-  allow_sudo;
-
-  #Kill the PfSense process
-  #based on its PID on pfson
   sudo kill $PFSENSE_PID;
-
-  #here to restart eth0 (bridged adapter)
-  #since eth0 is down when pfsense ran
+  # here to restart eth0 (bridged adapter)
+  # since eth0 is down when pfsense ran
   upnet eth0;
 
-  #Feedback message
-  #Calling it twice because at
-  #first instance the status
-  #is not well refreshed
+  # Feedback message
+  # Calling it twice because at
+  # first instance the status
+  # is not well refreshed
   clear && pfst;
   clear && pfst;
 }
 
 # this alias to start systemctl based services
-alias svc_on="svc_on"
+alias svc_on="allow_sudo && svc_on"
 
 # this function for svc_on alias
 function svc_on(){
-  allow_sudo;
   sudo systemctl start "$1";
 }
 
 # this alias to stop systemctl based services
-alias svc_off="svc_off"
+alias svc_off="allow_sudo && svc_off"
 
 # this function for svc_off alias
 function svc_off(){
-  allow_sudo;
   sudo systemctl stop "$1";
 }
 
 # this alias to view systemctl
 # based services status
-alias svc_stat="svc_stat"
+alias svc_stat="allow_sudo && svc_stat"
 
 # this function for svc_stat alias
 function svc_stat(){
-  allow_sudo;
   sudo systemctl status "$1";
 }
 
 # this alias to show if a service if on or off
-alias svc_show_stat="svc_show_stat"
+alias svc_show_stat="allow_sudo && svc_show_stat"
 
 # this function for svc_show_stat alias
 function svc_show_stat(){
-  allow_sudo;
   br;
 
   local service_name="$1";
@@ -2234,21 +2207,19 @@ function snmpoff(){
 }
 
 # this alias to start the postgresql service
-alias psqlon="psqlon"
+alias psqlon="allow_sudo && psqlon"
 
 # this function for sqlon alias
 function psqlon(){
-  allow_sudo;
   sudo service postgresql start;
   psqls;
 }
 
 # this alias to stop the postgresql service
-alias psqloff="psqloff"
+alias psqloff="allow_sudo && psqloff"
 
 # this function for sqloff alias
 function psqloff(){
-  allow_sudo;
   sudo service postgresql stop;
   psqls;
 }
@@ -2282,11 +2253,10 @@ function sqlite(){
 }
 
 # this alias to start the sql cli
-alias rdb="rdb"
+alias rdb="allow_sudo && rdb"
 
 # this function for rdb alias
 function rdb(){
-  allow_sudo;
   if ! pgrep mysql > /dev/null; then
     sudo service mariadb start &>/dev/null
   fi
