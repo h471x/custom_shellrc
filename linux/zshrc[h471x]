@@ -791,7 +791,7 @@ alias upg="allow_sudo && upg"
 
 #this function for up alias
 function upg(){
-  echo "u p g r a d i n g . . ." | figlet | lolcat;
+  echo "u p g r a d i n g . . ." | figlet -t -c;
   br && sudo apt upgrade && br;
 }
 
@@ -2554,6 +2554,15 @@ alias gpsh="gpsh"
 function gpsh(){
   local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
   git push origin $current_branch;
+}
+
+# this alias to pull changes from remote repo
+alias gpl="gpl"
+
+# this function for gpsh alias
+function gpl(){
+  local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+  git pull origin $current_branch;
 }
 
 #this function to bring a connection interface down 
