@@ -196,8 +196,8 @@ function rld(){
   clear;
   source ~/.zshrc;
   local backup_file="zshrc[$USER]"
-  sv ~/.zshrc ~/NTSOA/zsh_config/wsl/$backup_file;
-  all ~/NTSOA/zsh_config/wsl/$backup_file;
+  sv ~/.zshrc ~/NTSOA/zshrc/wsl/$backup_file;
+  all ~/NTSOA/zshrc/wsl/$backup_file;
   c && br;
   local saved_message="z s h    s a v e d"
   echo "$saved_message" | figlet -t -c;
