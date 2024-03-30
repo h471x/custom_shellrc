@@ -2479,6 +2479,34 @@ function glc(){
   fi
 }
 
+# this alias to merge branches
+alias gmb="gmb"
+
+# this function for gmb alias
+function gmb(){
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    local current_branch=$(git rev-parse --abbrev-ref HEAD)
+    if [[ $# -eq 1 ]]; then
+      # check if the branch doesn't exist
+      if ! git rev-parse --verify "$1" >/dev/null 2>&1; then
+        echo "${BOLD} ■■▶ Fatal ! $1 is a Non Existing branch " && br;
+      else
+        if [[ "$current_branch" == "$1" ]]; then
+          echo "${BOLD} ■■▶ Fatal ! Cannot Merge Identical Branch " && br;
+        else
+          git merge "$1";
+        fi
+      fi
+    elif [[ $# -eq 0 ]]; then
+      echo "${BOLD} ■■▶ Fatal ! Specify the Branch to merge to $current_branch" && br;
+    fi
+  else
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
+  fi
+}
+
 #this function to bring a connection interface down 
 function downnet(){
   sudo ifconfig "$1" down;
