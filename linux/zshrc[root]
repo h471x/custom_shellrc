@@ -185,7 +185,7 @@ dalias rld="rld"
 
 #this function for rld alias
 function rld(){
-  cat ~/.zshrc > /home/h471x/NTSOA/zsh_config/linux/"zshrc[root]" && all /home/h471x/NTSOA/zsh_config/linux/"zshrc[root]" && c && echo -e && echo "z s h    s a v e d " | figlet -t -c && echo -e && sleep 0.5 && source ~/.zshrc;
+  cat ~/.zshrc > /home/h471x/NTSOA/zshrc/linux/"zshrc[root]" && all /home/h471x/NTSOA/zshrc/linux/"zshrc[root]" && c && echo -e && echo "z s h    s a v e d " | figlet -t -c && echo -e && sleep 0.5 && source ~/.zshrc;
 }
 
 
