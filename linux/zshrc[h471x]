@@ -2298,12 +2298,12 @@ function gnm(){
       git branch -M $current_branch "$1";
       cv;
     elif [[ $# -eq 0 ]]; then
-      echo " ■■▶ Please pass the new name of '$current_branch' branch as argument " && br;
+      echo "${BOLD} ■■▶ Please pass the new name of '$current_branch' branch as argument " && br;
     else
-      echo " ■■▶ Usage : gnm new_name_of_the_branch" && br;
+      echo "${BOLD} ■■▶ Usage : gnm new_name_of_the_branch" && br;
     fi
   else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
@@ -2340,11 +2340,11 @@ function gck(){
         git checkout "$1";
       fi
     else
-      echo " gck        ==> switch to the default branch";
-      echo " gck branch ==> swith to the specified branch" && br;
+      echo "${BOLD} gck        ==> switch to the default branch";
+      echo "${BOLD} gck branch ==> swith to the specified branch" && br;
     fi
   else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
@@ -2359,10 +2359,10 @@ function gcb(){
     if [[ $# -eq 0 ]]; then
       git checkout -;
     else
-      echo " ■■▶ Usage : gcb (no argument)" && br;
+      echo "${BOLD} ■■▶ Usage : gcb (no argument)" && br;
     fi
   else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
@@ -2379,10 +2379,10 @@ function gbr(){
     elif [[ $# -eq 0 ]]; then
       git branch -a;
     else
-      echo " ■■▶ Usage : gbr new_branch" && br;
+      echo "${BOLD} ■■▶ Usage : gbr new_branch" && br;
     fi
   else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
@@ -2399,10 +2399,10 @@ function gbd(){
     if [[ $# -eq 1 ]]; then
       # check if the branch doesn't exist
       if ! git rev-parse --verify "$1" >/dev/null 2>&1; then
-        echo " ■■▶ Fatal ! $1 is a Non Existing branch " && br;
+        echo "${BOLD} ■■▶ Fatal ! $1 is a Non Existing branch " && br;
       else
         if [[ "$current_branch" == "$default_branch" ]]; then
-          echo " ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+          echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
         else
           git checkout $default_branch;
           git branch -D "$1";
@@ -2410,7 +2410,7 @@ function gbd(){
       fi
     elif [[ $# -eq 0 ]]; then
       if [[ "$current_branch" == "$default_branch" ]]; then
-        echo " ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+        echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
       else
         function check_delete_branch(){
           echo -ne "${BOLD}${WHITE}Delete branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
@@ -2428,11 +2428,11 @@ function gbd(){
       fi
     else
       br
-      echo " gbd        --> Delete the current branch";
-      echo " gbd branch --> Delete the specified branch" && br;
+      echo "${BOLD} gbd        --> Delete the current branch";
+      echo "${BOLD} gbd branch --> Delete the specified branch" && br;
     fi
   else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
@@ -2475,7 +2475,7 @@ function glc(){
     echo "${BOLD}${WHITE} Last Commit on ${GREEN}$current_branch ${WHITE}: $last_commit_message";
     br;
   else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
