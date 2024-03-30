@@ -2412,8 +2412,19 @@ function gbd(){
       if [[ "$current_branch" == "$default_branch" ]]; then
         echo " ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
       else
-        git checkout "$default_branch";
-        git branch -D "$current_branch";
+        function check_delete_branch(){
+          echo -ne "${BOLD}${WHITE}Delete branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
+          read delete_branch
+          if [ "$delete_branch" = "y" ]; then
+            git checkout "$default_branch";
+            git branch -D "$current_branch";
+          elif [ "$delete_branch" = "n" ];then
+            return 1
+          else
+            check_delete_branch
+          fi
+        }
+        check_delete_branch
       fi
     else
       br
