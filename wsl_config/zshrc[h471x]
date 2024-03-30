@@ -1791,12 +1791,12 @@ function gnm(){
       git branch -M $current_branch "$1";
       cv;
     elif [[ $# -eq 0 ]]; then
-      echo " ■■▶ Please pass the new name of '$current_branch' branch as argument " && br;
+      echo "${BOLD} ■■▶ Please pass the new name of '$current_branch' branch as argument " && br;
     else
-      echo " ■■▶ Usage : gnm new_name_of_the_branch" && br;
+      echo "${BOLD} ■■▶ Usage : gnm new_name_of_the_branch" && br;
     fi
   else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
@@ -1838,10 +1838,10 @@ function gck(){
         git checkout "$1";
       fi
     else
-      echo " ■■▶ Usage : gck branch or gck (switch default branch)" && br;
+      echo "${BOLD} ■■▶ Usage : gck branch or gck (switch default branch)" && br;
     fi
   else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
@@ -1856,10 +1856,10 @@ function gcb(){
     if [[ $# -eq 0 ]]; then
       git checkout -;
     else
-      echo " ■■▶ Usage : gcb (no argument)" && br;
+      echo "${BOLD} ■■▶ Usage : gcb (no argument)" && br;
     fi
   else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
@@ -1876,10 +1876,10 @@ function gbr(){
     elif [[ $# -eq 0 ]]; then
       git branch -a;
     else
-      echo " ■■▶ Usage : gbr new_branch" && br;
+      echo "${BOLD} ■■▶ Usage : gbr new_branch" && br;
     fi
   else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
@@ -1899,13 +1899,13 @@ function gbd(){
   if [[ "$is_a_git_repo" == "true" ]]; then 
     if [[ $# -eq 1 ]]; then
       if [[ "$1" == "$default_branch" ]]; then
-        echo " ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+        echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
       else
         git branch -D "$1";
       fi
     elif [[ $# -eq 0 ]]; then
       if [[ "$current_branch" == "$default_branch" ]]; then
-        echo " ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+        echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
       else
         function check_delete_branch(){
           echo -ne "${BOLD}${WHITE}Delete branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
@@ -1922,10 +1922,10 @@ function gbd(){
         check_delete_branch
       fi
     else
-      echo " ■■▶ Usage : gbd branch_to_delete" && br;
+      echo "${BOLD} ■■▶ Usage : gbd branch_to_delete" && br;
     fi
   else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
@@ -1943,7 +1943,7 @@ function gpsh(){
     local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
     git push origin $current_branch;
   else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
@@ -1958,7 +1958,7 @@ function gpl(){
     local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
     git pull origin $current_branch;
   else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
@@ -1980,7 +1980,7 @@ function glc(){
     echo "${BOLD}${WHITE} Last Commit on ${GREEN}$current_branch ${WHITE}: $last_commit_message";
     br;
   else
-    echo " ■■▶ This won't work, you are not in a git repo !" && br;
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
