@@ -279,8 +279,8 @@ function rld(){
   clear;
   source ~/.$(basename $SHELL)rc;
   local saved_file="zshrc[$USER]"
-  cat ~/.zshrc > ~/NTSOA/zsh_config/linux/$saved_file;
-  all ~/NTSOA/zsh_config/linux/$saved_file;
+  cat ~/.zshrc > ~/NTSOA/zshrc/linux/$saved_file;
+  all ~/NTSOA/zshrc/linux/$saved_file;
   c && br;
   echo "z s h    s a v e d " | figlet -t -c;
   # tlk "saved";
