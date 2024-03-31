@@ -202,7 +202,7 @@ function rld(){
   local saved_message="z s h    s a v e d"
   echo "$saved_message" | figlet -t -c;
   br && sleep 0.5;
-  op ~/NTSOA/zsh_config
+  op ~/NTSOA/zshrc
 }
 
 # this alias to edit a file
