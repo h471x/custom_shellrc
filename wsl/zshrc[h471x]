@@ -1010,7 +1010,15 @@ alias gthb="gthb"
 function gthb(){
   local github_id="mjoklplbddabcmpepnokjaffbmgbkkgg"
   open_web_app github.com $github_id GitHub
-  # chrome.exe --profile-directory=Default --app-id=$github_id
+}
+
+# this alias to open the GitLab app
+alias gtlb="gtlb"
+
+# this function for gthb alias
+function gtlb(){
+  local gitlab_id="jndlecohfigjmhidboiabnpjfmjgmacp"
+  open_web_app gitlab.com $gitlab_id GitLab
 }
 
 # this alias to open Facebook app
@@ -1250,6 +1258,52 @@ function ipsh(){
   # fi
 }
 
+# this alias to start services
+alias svc_on="allow_sudo && svc_on"
+
+# this function for svc_on alias
+function svc_on(){
+  sudo service "$1" start;
+}
+
+# this alias to stop systemctl based services
+alias svc_off="allow_sudo && svc_off"
+
+# this function for svc_off alias
+function svc_off(){
+  sudo service "$1" stop;
+}
+
+# this alias to view systemctl
+# based services status
+alias svc_stat="allow_sudo && svc_stat"
+
+# this function for svc_stat alias
+function svc_stat(){
+  sudo service "$1" status;
+}
+
+# this alias to show if a service if on or off
+alias svc_show_stat="allow_sudo && svc_show_stat"
+
+# this function for svc_show_stat alias
+function svc_show_stat(){
+  br;
+
+  local service_name="$1";
+  local check_command="$2";
+
+  if [[ "$check_command" == *"Active: active"* ]]; then
+    echo "${BOLD}$service_name Active [${GREEN}✓${WHITE}]";
+  elif [[ "$check_command" =~ ^[0-9]+$ ]]; then
+    echo "${BOLD}$service_name Active [${GREEN}✓${WHITE}]";
+  else
+    echo "${BOLD}$service_name Off [${RED}x${WHITE}]";
+  fi
+
+  br;
+}
+
 # I don't know why but this alias
 # make the PC slow down
 # # this alias to view saved wifi password
@@ -1385,6 +1439,60 @@ function sqls(){
   else
     echo "${BOLD}MySQL Server Down [${RED}x${WHITE}]"
   fi
+}
+
+# this alias to start the postgresql service
+alias psqlon="allow_sudo && psqlon"
+
+# this function for sqlon alias
+function psqlon(){
+  br;
+  echo "${BOLD}${WHITE}[${GREEN}+${WHITE}] Starting ${WHITE}PostgreSQL Server ...";
+  sudo service postgresql start &>/dev/null;
+  c && br;
+  echo "${BOLD}PostgreSQL Server Active [${GREEN}✓${WHITE}]";
+  br;
+
+  function check_postgres_shell(){
+    echo -ne "${BOLD}${WHITE}Access PostgreSQL${GREEN} Shell${WHITE} ? (y/n) ${RESET}";
+    read postgres_shell
+    if [ "$postgres_shell" = "y" ]; then
+      clear;
+      sudo su - postgres;
+    elif [ "$postgres_shell" = "n" ];then
+      return 1
+    else
+      check_postgres_shell
+    fi
+  }
+  check_postgres_shell
+}
+
+# this alias to stop the postgresql service
+alias psqloff="allow_sudo && psqloff"
+
+# this function for sqloff alias
+function psqloff(){
+  br;
+  echo "${BOLD}${WHITE}[${RED}x${WHITE}] Stopping ${WHITE}PostgreSQL Server ...";
+  sudo service postgresql stop &>/dev/null;
+  psqls;
+}
+
+# this alias to view the postgresql service
+alias psqls="allow_sudo && psqls"
+
+# this function for psqls alias
+function psqls(){
+  br;
+
+  if [[ $(pgrep postgres) ]]; then
+    echo "${BOLD}PostgreSQL Server Active [${GREEN}✓${WHITE}]";
+  else
+    echo "${BOLD}PostgreSQL Server Off [${RED}x${WHITE}]";
+  fi
+
+  br;
 }
 
 # this alias to start the web servers
@@ -1972,6 +2080,7 @@ function glc(){
   if [[ "$is_a_git_repo" == "true" ]]; then
     local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
     local commits_num=$(git log --oneline | wc -l);
+    local commit_text
     local last_commit=$(git log --format="%H" -n 1);
     local last_commit_message=$(git show --format=%B -s "$last_commit" | tr '\n' ' ');
     local last_commit_author=$(git log --format='%an' -n 1)
