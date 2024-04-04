@@ -1446,26 +1446,30 @@ alias psqlon="allow_sudo && psqlon"
 
 # this function for sqlon alias
 function psqlon(){
-  br;
-  echo "${BOLD}${WHITE}[${GREEN}+${WHITE}] Starting ${WHITE}PostgreSQL Server ...";
-  sudo service postgresql start &>/dev/null;
-  c && br;
-  echo "${BOLD}PostgreSQL Server Active [${GREEN}✓${WHITE}]";
-  br;
+  if [[ $(pgrep postgres) ]]; then
+    sudo su - postgres;
+  else
+    br;
+    echo "${BOLD}${WHITE}[${GREEN}+${WHITE}] Starting ${WHITE}PostgreSQL Server ...";
+    sudo service postgresql start &>/dev/null;
+    c && br;
+    echo "${BOLD}PostgreSQL Server Active [${GREEN}✓${WHITE}]";
+    br;
 
-  function check_postgres_shell(){
-    echo -ne "${BOLD}${WHITE}Access PostgreSQL${GREEN} Shell${WHITE} ? (y/n) ${RESET}";
-    read postgres_shell
-    if [ "$postgres_shell" = "y" ]; then
-      clear;
-      sudo su - postgres;
-    elif [ "$postgres_shell" = "n" ];then
-      return 1
-    else
-      check_postgres_shell
-    fi
-  }
-  check_postgres_shell
+    function check_postgres_shell(){
+      echo -ne "${BOLD}${WHITE}Access PostgreSQL${GREEN} Shell${WHITE} ? (y/n) ${RESET}";
+      read postgres_shell
+      if [ "$postgres_shell" = "y" ]; then
+        clear;
+        sudo su - postgres;
+      elif [ "$postgres_shell" = "n" ];then
+        return 1
+      else
+        check_postgres_shell
+      fi
+    }
+    check_postgres_shell
+  fi
 }
 
 # this alias to stop the postgresql service
@@ -1893,7 +1897,7 @@ function gnm(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+    local current_branch=$(git branch | awk '/\*/ {print $2}');
 
     if [[ $# -eq 1 ]]; then
       git branch -M $current_branch "$1";
@@ -1916,7 +1920,7 @@ function gck(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+    local current_branch=$(git branch | awk '/\*/ {print $2}');
     local default_branch=$(git rev-parse --abbrev-ref origin/HEAD | cut -c8-)
     if [ -z "$default_branch" ]; then
       default_branch=$(git config --get init.defaultBranch)
@@ -1936,7 +1940,7 @@ function gck(){
           if [ "$branch" = "y" ]; then
             git checkout -b "$new_branch";
           elif [ "$branch" = "n" ];then
-            return 1
+            return 0
           else
             check_new_branch
           fi
@@ -1997,14 +2001,10 @@ alias gbd="gbd"
 # this function for gbd alias
 function gbd(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
-  local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
-  # local default_branch=$(git rev-parse --abbrev-ref origin/HEAD | cut -c8-)
-  # if [ -z "$default_branch" ]; then
-  #   default_branch=$(git config --get init.defaultBranch)
-  # fi
-  local default_branch=$(git rev-parse --abbrev-ref origin/HEAD | cut -c8- 2>/dev/null || git config --get init.defaultBranch)
 
   if [[ "$is_a_git_repo" == "true" ]]; then 
+    local default_branch=$(git rev-parse --abbrev-ref origin/HEAD | cut -c8- 2>/dev/null || git config --get init.defaultBranch)
+    local current_branch=$(git branch | awk '/\*/ {print $2}');
     if [[ $# -eq 1 ]]; then
       if [[ "$1" == "$default_branch" ]]; then
         echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
@@ -2022,7 +2022,7 @@ function gbd(){
             git checkout "$default_branch";
             git branch -D "$current_branch";
           elif [ "$delete_branch" = "n" ];then
-            return 1
+            return 0
           else
             check_delete_branch
           fi
@@ -2048,7 +2048,7 @@ function gpsh(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+    local current_branch=$(git branch | awk '/\*/ {print $2}');
     git push origin $current_branch;
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
@@ -2063,7 +2063,7 @@ function gpl(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+    local current_branch=$(git branch | awk '/\*/ {print $2}');
     git pull origin $current_branch;
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
@@ -2078,16 +2078,21 @@ function glc(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    local current_branch=$(echo $(git branch) | awk -F "*" '{print $2}' | awk -F " " '{print $1}');
+    local current_branch=$(git branch | awk '/\*/ {print $2}');
     local commits_num=$(git log --oneline | wc -l);
-    local commit_text
+    local commit_text;
     local last_commit=$(git log --format="%H" -n 1);
     local last_commit_message=$(git show --format=%B -s "$last_commit" | tr '\n' ' ');
     local last_commit_author=$(git log --format='%an' -n 1)
+    [[ $commits_num -eq 1 ]] && commit_text="commit" || commit_text="commits";
 
-    echo "${BOLD}${GREEN} $last_commit_author ${WHITE}has ${BRIGHT_BLUE}$commits_num commits";
-    echo "${BOLD}${WHITE} Last Commit on ${GREEN}$current_branch ${WHITE}: $last_commit_message";
-    br;
+    if [[ "$1" == "show" ]]; then
+      git log --oneline;
+    else
+      echo "${BOLD}${GREEN} $last_commit_author ${WHITE}has ${BRIGHT_BLUE}$commits_num $commit_text";
+      echo "${BOLD}${WHITE} Last Commit on ${GREEN}$current_branch ${WHITE}: $last_commit_message";
+      br;
+    fi
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
@@ -2101,7 +2106,7 @@ function gmb(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    local current_branch=$(git rev-parse --abbrev-ref HEAD)
+    local current_branch=$(git branch | awk '/\*/ {print $2}');
     if [[ $# -eq 1 ]]; then
       # check if the branch doesn't exist
       if ! git rev-parse --verify "$1" >/dev/null 2>&1; then
