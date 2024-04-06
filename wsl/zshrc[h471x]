@@ -1030,6 +1030,15 @@ function pypi(){
   open_web_app pypi.org $pypi_id PyPi
 }
 
+# this alias to open cloud convert
+alias img="img"
+
+# this function for img alias
+function img(){
+  local cloud_convert_id="hdmdoclnahphbppladolaimacehflnnb"
+  open_web_app cloudconvert.com $cloud_convert_id "Cloud Convert"
+}
+
 # this alias to open Facebook app
 alias fb="fb"
 
