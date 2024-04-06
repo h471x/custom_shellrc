@@ -268,7 +268,7 @@ function bwsop(){
   $browser file:///$formatted_path/$formatted_file
 
   # Reload the terminal screen
-  cv
+  return 0
 }
 
 # this function to open video file
@@ -1021,6 +1021,15 @@ function gtlb(){
   open_web_app gitlab.com $gitlab_id GitLab
 }
 
+# this alias to open pypi
+alias pypi="pypi"
+
+# this function for pypi alias
+function pypi(){
+  local pypi_id="dhfmdekmhnminddhppcomhncjifnohcg"
+  open_web_app pypi.org $pypi_id PyPi
+}
+
 # this alias to open Facebook app
 alias fb="fb"
 
@@ -1140,7 +1149,7 @@ alias clock="clock"
 function clock(){
   cd /mnt/d/NTSOA/Desktop/DIGITAL\ CLOCK
   bwsop clock.html
-  hm
+  return 0
 }
 
 # this alias to access my musics
