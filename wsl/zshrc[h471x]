@@ -1031,10 +1031,10 @@ function pypi(){
 }
 
 # this alias to open cloud convert
-alias img="img"
+alias conv="conv"
 
 # this function for img alias
-function img(){
+function conv(){
   local cloud_convert_id="hdmdoclnahphbppladolaimacehflnnb"
   open_web_app cloudconvert.com $cloud_convert_id "Cloud Convert"
 }
