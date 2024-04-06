@@ -285,7 +285,7 @@ function rld(){
   echo "z s h    s a v e d " | figlet -t -c;
   # tlk "saved";
   br && sleep 0.5;
-  op /home/h471x/NTSOA/zsh_config;
+  op /home/h471x/NTSOA/zshrc;
 }
 
 #this alias to show the welcome message
@@ -2073,8 +2073,25 @@ alias psqlon="allow_sudo && psqlon"
 
 # this function for sqlon alias
 function psqlon(){
-  sudo service postgresql start;
-  psqls;
+  br;
+  echo "${BOLD}${WHITE}[${GREEN}+${WHITE}] Starting ${WHITE}PostgreSQL Server ...";
+  sudo service postgresql start &>/dev/null;
+  c && br;
+  echo "${BOLD}PostgreSQL Service Active [${GREEN}✓${WHITE}]";
+  br;
+
+  function check_postgres_shell(){
+    echo -ne "${BOLD}${WHITE}Access PostgreSQL${GREEN} Shell${WHITE} ? (y/n) ${RESET}";
+    read postgres_shell
+    if [ "$postgres_shell" = "y" ]; then
+      sudo su - postgres;
+    elif [ "$postgres_shell" = "n" ];then
+      return 1
+    else
+      check_postgres_shell
+    fi
+  }
+  check_postgres_shell
 }
 
 # this alias to stop the postgresql service
