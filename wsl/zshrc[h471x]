@@ -2114,7 +2114,7 @@ function glc(){
     [[ $commits_num -eq 1 ]] && commit_text="commit" || commit_text="commits";
 
     if [[ "$1" == "show" ]]; then
-      git log --oneline;
+      git log --oneline --no-decorate;
     else
       echo "${BOLD}${GREEN} $last_commit_author ${WHITE}has ${BRIGHT_BLUE}$commits_num $commit_text";
       echo "${BOLD}${WHITE} Last Commit on ${GREEN}$current_branch ${WHITE}: $last_commit_message";
