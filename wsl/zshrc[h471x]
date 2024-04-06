@@ -1039,6 +1039,15 @@ function img(){
   open_web_app cloudconvert.com $cloud_convert_id "Cloud Convert"
 }
 
+# this alias to open mastodon.social
+alias mstdn="mstdn"
+
+# this function for mstdn alias
+function mstdn(){
+  local mastodon_id="ikigfogfljecogfmdkeiipdcamdbibjl"
+  open_web_app mastodon.social $mastodon_id
+}
+
 # this alias to open Facebook app
 alias fb="fb"
 
