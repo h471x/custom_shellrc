@@ -5,6 +5,9 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# Make zsh instant prompt quiet
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+
 set autocd # change directory just by typing his name
 setopt promptsubst # enable command substitution in prompt
 
@@ -193,16 +196,23 @@ alias rld="rld"
 
 # this function for rld alias
 function rld(){
-  clear;
-  source ~/.zshrc;
-  local backup_file="zshrc[$USER]"
-  sv ~/.zshrc ~/NTSOA/zshrc/wsl/$backup_file;
-  all ~/NTSOA/zshrc/wsl/$backup_file;
+  c;
+
+  # local variables
+  local shellrc=.$(basename $SHELL)rc;
+  local backup_dir=$HOME/NTSOA/zshrc/wsl;
+  local backup_file=zshrc[$USER];
+  local saved_message="$shellrc backed up"
+
+  # source the config file and save it
+  source ~/$shellrc;
+  cat ~/$shellrc > $backup_dir/$backup_file;
+
+  # saved message display
   c && br;
-  local saved_message="z s h    s a v e d"
-  echo "$saved_message" | figlet -t -c;
+  echo "${BOLD}${WHITE}$saved_message";
   br && sleep 0.5;
-  op ~/NTSOA/zshrc
+  op $backup_dir;
 }
 
 # this alias to edit a file
@@ -920,9 +930,9 @@ alias open_web_app="allow_sudo && open_web_app";
 # this function to open chrome based app
 # it uses the Id of the App we created within
 # the Chrome browser, it will take 3 arguments :
-# first the name of the App
-# then the domain of the App
-# and finally the chrome Id
+# first the domain of the App
+# then the chrome App Id
+# finally the name of the App (optional)
 # writen today 2024-02-11 20:13
 function open_web_app(){
   local browser="chrome.exe"
@@ -953,14 +963,14 @@ function open_web_app(){
     echo "****************************"
   }
 
-  # here to call the open_app function
+  # check the stat
   if eval $reachable; then
     web_app_stat "Connected"
   else
     web_app_stat "Not Connected"
   fi
 
-  # check the stat
+  # here to call the open_app function
   eval $open_app
 }
 
@@ -971,8 +981,8 @@ alias gpt="gpt"
 function gpt(){
   local gpt_id="jckaldkomadaenmmgladeopgmfbahfjm"
   local gpt_link="chat.openai.com"
-  open_web_app $gpt_link $gpt_id ChatGpt
-  # chrome.exe --profile-directory=Default --app-id=$gpt_id
+  local gpt_name="ChatGpt"
+  open_web_app $gpt_link $gpt_id $gpt_name
 }
 
 # this alias to open Google Gemini app
@@ -981,8 +991,9 @@ alias gmn="gmn"
 # this function for gmn alias
 function gmn(){
   local gmn_id="acehpdabncjaanhpihehcmhidhmbdcoo"
-  open_web_app gemini.google.com $gmn_id Gemini
-  # chrome.exe --profile-directory=Default --app-id=$gpt_id
+  local gmn_link="gemini.google.com"
+  local gmn_name="Gemini"
+  open_web_app $gmn_link $gmn_id $gmn_name
 }
 
 # this alias to open ClaudeAI app
@@ -991,7 +1002,9 @@ alias cld="cld"
 # this function for cld alias
 fuction cld(){
   local claude_id="fmpnliohjhemenmnlpbfagaolkdacoja"
-  open_web_app claude.ai $claude_id ClaudeAI
+  local claude_link="claude.ai"
+  local claude_name="ClaudeAI"
+  open_web_app  $claude_link $claude_id $claude_name
 }
 
 # this alias to open reddit forum
@@ -1000,7 +1013,8 @@ alias rdt="rdt"
 # this function for rdt alias
 function rdt(){
   local reddit_id="lgnggepjiihbfdbedefdhcffnmhcahbm"
-  open_web_app reddit.com $reddit_id
+  local reddit_link="reddit.com"
+  open_web_app $reddit_link $reddit_id
 }
 
 # this alias to open the GitHub app
@@ -1009,7 +1023,9 @@ alias gthb="gthb"
 # this function for gthb alias
 function gthb(){
   local github_id="mjoklplbddabcmpepnokjaffbmgbkkgg"
-  open_web_app github.com $github_id GitHub
+  local github_link="github.com"
+  local github_name="GitHub"
+  open_web_app $github_link $github_id $github_name
 }
 
 # this alias to open the GitLab app
@@ -1018,7 +1034,9 @@ alias gtlb="gtlb"
 # this function for gthb alias
 function gtlb(){
   local gitlab_id="jndlecohfigjmhidboiabnpjfmjgmacp"
-  open_web_app gitlab.com $gitlab_id GitLab
+  local gitlab_link="gitlab.com"
+  local gitlab_name="GitLab"
+  open_web_app $gitlab_link $gitlab_id $gitlab_name
 }
 
 # this alias to open pypi
@@ -1027,7 +1045,9 @@ alias pypi="pypi"
 # this function for pypi alias
 function pypi(){
   local pypi_id="dhfmdekmhnminddhppcomhncjifnohcg"
-  open_web_app pypi.org $pypi_id PyPi
+  local pypi_link="pypi.org"
+  local pypi_name="PyPi"
+  open_web_app $pypi_link $pypi_id $pypi_name
 }
 
 # this alias to open cloud convert
@@ -1036,7 +1056,9 @@ alias conv="conv"
 # this function for img alias
 function conv(){
   local cloud_convert_id="hdmdoclnahphbppladolaimacehflnnb"
-  open_web_app cloudconvert.com $cloud_convert_id "Cloud Convert"
+  local cloud_convert_link="cloudconvert.com"
+  local cloud_convert_name="Cloud Convert"
+  open_web_app $cloud_convert_link $cloud_convert_id $cloud_convert_name
 }
 
 # this alias to open mastodon.social
@@ -1045,7 +1067,8 @@ alias mstdn="mstdn"
 # this function for mstdn alias
 function mstdn(){
   local mastodon_id="ikigfogfljecogfmdkeiipdcamdbibjl"
-  open_web_app mastodon.social $mastodon_id
+  local mastodon_link="mastodon.social"
+  open_web_app $mastodon_link $mastodon_id
 }
 
 # this alias to open Facebook app
@@ -1054,7 +1077,8 @@ alias fb="fb"
 # this function for fb alias
 function fb(){
   local fb_id="gelmehpcmiomoockkmdlfadoankpigol"
-  open_web_app facebook.com $fb_id
+  local fb_link="facebook.com"
+  open_web_app $fb_link $fb_id
 }
 
 # this alias to open Instagram app
@@ -1063,7 +1087,8 @@ alias itg="itg"
 # this function for fb alias
 function itg(){
   local insta_id="akpamiohjfcnimfljfndmaldlcfphjmp"
-  open_web_app instagram.com $insta_id
+  local insta_link="instagram.com"
+  open_web_app $insta_link $insta_id
 }
 
 # this alias to open the discord app
@@ -1072,7 +1097,8 @@ alias dsc="dsc"
 # this function for dsc alias
 function dsc(){
   local discord_id="magkoliahgffibhgfkmoealggombgknl"
-  open_web_app discord.com $disord_id Discord
+  local discord_link="discord.com"
+  open_web_app $discord_link $disord_id
 }
 
 # this alias to open Twitter X Web App
@@ -1081,7 +1107,9 @@ alias twx="twx"
 # this function for twx alias
 function twx(){
   local twitter_id="jgeocpdicgmkeemopbanhokmhcgcflmi"
-  open_web_app twitter.com $twitter_id TwitterX
+  local twitter_link="twitter.com"
+  local twitter_name="TwitterX"
+  open_web_app $twitter_link $twitter_id $twitter_name
 }
 
 # this alias to open YouTube Web App
@@ -1090,7 +1118,9 @@ alias ytb="ytb"
 # this function for ytb alias
 function ytb(){
   local youtube_id="agimnkijcaahngcdmfeangaknmldooml"
-  open_web_app youtube.com $youtube_id YouTube
+  local youtube_link="youtube.com"
+  local youtube_name="YouTube"
+  open_web_app $youtube_link $youtube_id $youtube_name
 }
 
 # this alias to open hackerank
@@ -1099,7 +1129,9 @@ alias hcrk="hcrk"
 # this function for hcrk alias
 function hcrk(){
   local hackerrank_id="jhcacpbneohogfnaanlbdfpjpfmfmpdk"
-  open_web_app hackerrank.com $hackerrank_id HackerRank
+  local hackerrank_link="hackerrank.com"
+  local hackerrank_name="HackerRank"
+  open_web_app $hackerrank_link $hackerrank_id $hackerrank_name
 }
 
 # this alias to open LinkedIn WebApp
@@ -1108,7 +1140,9 @@ alias lnk="lnk"
 # this function for lnk alias
 function lnk(){
   local linkedin_id="ohghonlafcimfigiajnmhdklcbjlbfda"
-  open_web_app linkedin.com $linkedin_id LinkedIn
+  local linkedin_link="linkedin.com"
+  local linkedin_name="LinkedIn"
+  open_web_app $linkedin_link $linkedin_id $linkedin_name
 }
 
 # this alias to open netlify web app
@@ -1117,7 +1151,9 @@ alias ntlf="ntlf"
 # this function for ntlf alias
 function ntlf(){
   local netlify_id="dlbhokdiippnblopfealccihgfhaofkb"
-  open_web_app netlify.com $netlify_id NetLify
+  local netlify_link="netlify.com"
+  local netlify_name="NetLify"
+  open_web_app $netlify_link $netlify_id $netlify_name
 }
 
 # this alias to open dev.to web app
@@ -1126,7 +1162,9 @@ alias devto="devto"
 # this function for devto alias
 function devto(){
   local devto_id="ecapchmcnohmakooheeinoaidebbiacm"
-  open_web_app dev.to $devto_id DevTo
+  local devto_link="dev.to"
+  local devto_name="DevTo"
+  open_web_app $devto_link $devto_id $devto_name
 }
 
 # this alias to open compiler explorer
@@ -1144,7 +1182,9 @@ alias rtr="rtr"
 # this function for rtr alias
 function rtr(){
   local airtel_id="phkfjlcmjmnindcbhfmnmlikainlhodg"
-  open_web_app www.airtel.mg $airtel_id "Airtel Router"
+  local airtel_link="www.airtel.mg"
+  local airtel_name="Airtel Router"
+  open_web_app $airtel_link $airtel_id $airtel_name
 }
 
 # this alias to view the HTX_AP dashboard
@@ -1154,7 +1194,8 @@ alias htx="htx"
 function htx(){
   local router_id="kmkglniimomjkiakgepingonppimlibg"
   local router_IP="192.168.19.1"
-  open_web_app $router_IP $router_id "h471x Router"
+  local router_name="h471x Router"
+  open_web_app $router_IP $router_id $router_name
 }
 
 # this alias to play directly the typing game
