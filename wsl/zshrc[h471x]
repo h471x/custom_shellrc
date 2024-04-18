@@ -141,7 +141,7 @@ CASE_SENSITIVE="true"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(fastfile copyfile vscode extract docker zsh-autosuggestions git nmap terraform sudo themes encode64 python zsh-syntax-highlighting)
+plugins=(web-search fastfile copyfile vscode extract docker zsh-autosuggestions git nmap terraform sudo themes encode64 python zsh-syntax-highlighting)
 
 # here the color of the auto-suggestion
 # ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE=fg=#0000ff"
@@ -284,6 +284,11 @@ function exop(){
 # this alias to open file with browser
 alias bwsop="bwsop"
 
+# SOLVED : no need for this annoying code
+# since we only use Windows Explorer to
+# open files according to their default apps
+# and there is no lag like we did here
+#
 # this function bwsop alias
 function bwsop(){
   local file_name="$1"
@@ -303,6 +308,7 @@ function bwsop(){
 
 # SOLVED : using explorer.exe
 # this function to open video file
+#
 # function play_video(){
 #   # local video="$1"
 #   # local formatted_video=$(echo "$file" | sed -e 's/ /%20/g' -e 's/\\//g')
@@ -670,8 +676,8 @@ alias vf="vf"
 function vf() {
   if [[ -f "$1" ]]; then
     case "${1##*.}" in
-      pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) explorer.exe "$1" ;;
-      html) bwsop "$1" ;;
+      html|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) explorer.exe "$1" ;;
+      # open all files that have default app with windows explorer
       *) nvim "$1" ;;
     esac
     cv
@@ -1276,8 +1282,7 @@ alias clock="clock"
 # this function for clock alias
 function clock(){
   cd /mnt/d/NTSOA/Desktop/DIGITAL\ CLOCK
-  bwsop clock.html
-  return 0
+  op clock.html
 }
 
 # this alias to access my musics
@@ -1364,7 +1369,7 @@ function edt(){
   local recent_file=$(ls -t . | head -n1)
 
   # Open the most recent time schedule
-  explorer.exe $recent_file
+  op $recent_file
   cv
 }
 
@@ -2181,7 +2186,7 @@ function glc(){
     if [[ "$1" == "show" ]]; then
       git log --oneline --no-decorate;
     else
-      echo "${BOLD}${GREEN} $last_commit_author ${WHITE}has ${BRIGHT_BLUE}$commits_num $commit_text";
+      echo "${BOLD}${GREEN} $last_commit_author ${WHITE}has ${BRIGHT_BLUE}$UNDERLINE$commits_num $commit_text$RESET";
       echo "${BOLD}${WHITE} Last Commit on ${GREEN}$current_branch ${WHITE}: $last_commit_message";
       br;
     fi
