@@ -335,14 +335,14 @@ function cv() {
     else
       folder_header="visible($visible_item) hidden($hidden_item) total($(($total_item - 2))) ";
     fi
-    echo " ■■▶ $folder_name folder content : $folder_header";
+    echo "   $folder_name -> $folder_header";
   }
 
   # this function to show the content of the cv
   function show_content(){
     # local flag="${1:-}"
     # ls $flag $folder_content;
-    ls $folder_content
+    eza --icons=always --no-quotes $folder_content
   }
 
   # this function to show the all of the cv content
@@ -386,12 +386,12 @@ function cvf() {
     else
       folder_header="visible($visible_item) hidden($hidden_item) total($(($total_item - 2))) ";
     fi
-    echo " ■■▶ $folder_name folder content : $folder_header";
+    echo "   $folder_name -> $folder_header";
   }
 
   # this function to show the content of the cv
   function show_content(){
-    ls -a $folder_content;
+    eza --icons=always -a $folder_content;
   }
 
   # this function to show the cv
@@ -468,7 +468,7 @@ alias cvg="cvg"
 function cvg(){
   c && br;
   echo "   $(basename "$PWD") folder content with "$1" : ";
-  br && ls | grep "$1" && br;
+  br && eza --icons=always | grep "$1" && br;
 }
 
 # this alias to open a directory
@@ -670,8 +670,8 @@ alias vf="vf"
 function vf() {
   if [[ -f "$1" ]]; then
     case "${1##*.}" in
-      jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar) explorer.exe "$1" ;;
-      html|pdf) bwsop "$1" ;;
+      pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) explorer.exe "$1" ;;
+      html) bwsop "$1" ;;
       *) nvim "$1" ;;
     esac
     cv
@@ -901,7 +901,7 @@ function rdf(){
 
 # this alias to view the pc state
 # DIRTY:
-alias pc="c && echo -e && echo -e && neofetch --source ~/.config/neofetch/hn.txt"
+alias pc="c && echo -e && echo -e && neofetch --source ~/.config/neofetch/htx2.txt"
 
 #call this pc alias at startup
 #pc
@@ -1179,13 +1179,15 @@ function devto(){
   open_web_app $devto_link $devto_id $devto_name
 }
 
-# this alias to open compiler explorer
+# this alias to open Compiler Explorer Web App
 alias cmplr="cmplr"
 
 # this function for cmplr alias
 function cmplr(){
-  local compiler_explorer_link="chjjlngghpbmipjipdfdjhcndbiklfje"
-  open_web_app godbolt.org $compiler_explorer_link "Compiler Explorer"
+  local cmplr_id="chjjlngghpbmipjipdfdjhcndbiklfje"
+  local cmplr_link="godbolt.org"
+  local cmplr_name="Compiler Explorer"
+  open_web_app $cmplr_link $cmplr_id $cmplr_name
 }
 
 # this alias to open daedalOS Web App
@@ -1499,7 +1501,8 @@ function sth(){
     local wifi_iface="wifi0"
     local wifi_ip=$(ifconfig $wifi_iface | grep inet | awk '{print $2}');
     # echo " Connect Via  ==>  ssh $USER@$ip";
-    echo "Ssh Connection via $wifi_iface Interface : ${BLUE}ssh $USER@$wifi_ip${WHITE}";
+    echo "Ssh Connection via $wifi_iface Interface";
+    echo "${BLUE}ssh $USER@$wifi_ip${WHITE}";
   else
     echo "${BOLD}Ssh Server Off [${RED}x${WHITE}]"
   fi
@@ -1931,7 +1934,7 @@ alias ghc="ghc"
 function ghc() {
   local repo="$(basename $PWD)"
   local repo_name="$(clean_repo "$repo")"
-  local isPrivate='"${2:-1}" == "private"'
+  local isPrivate='"$1" == "private"'
   local repo_visibility
   eval "[[ $isPrivate ]]" && repo_visibility="private" || repo_visibility="public"
 
@@ -2229,7 +2232,7 @@ alias sqlite="sqlite"
 # this function for ssqlite alias
 function sqlite(){
   if [[ $# -eq 0 ]]; then
-    echo "■■▶ Please specify a file.db  ";  
+    echo "■■▶ Please specify a file.db  ";
   else
     if [[ $# -eq 1 && "${1##*.}" -eq "db" ]]; then
       c && br;
@@ -2275,3 +2278,5 @@ bindkey "²²" kill-line
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 # eval $(thefuck --alias)
+# eval "$(fzf --zsh)"
+# eval "$(fzf --preview 'cat {}')"
