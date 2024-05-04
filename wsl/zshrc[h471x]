@@ -8,7 +8,7 @@ fi
 # Make zsh instant prompt quiet
 typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
-set autocd # change directory just by typing his name
+set autocd         # change directory just by typing his name
 setopt promptsubst # enable command substitution in prompt
 
 # configure keybindings
@@ -22,10 +22,11 @@ fastfile_var_prefix='$'
 export ZSH="$HOME/.oh-my-zsh"
 
 # Binaries
-WSL_PATH=/home/h471x/.local/bin/ SQLITE_PATH=/mnt/c/Program\ Files/sqlite
+WSL_PATH=/home/h471x/.local/bin/
+SQLITE_PATH=/mnt/c/Program\ Files/sqlite
 QT_PATH=/mnt/d/NTSOA/INSTALLED/QT/Tools/QtCreator/bin
 PYTHON_PATH=/mnt/d/NTSOA/INSTALLED/PYTHON
-VIRTUAL_BOX_PATH=/mnt/c/Virtual\ Box
+VIRTUAL_BOX_PATH="/mnt/c/'Virtual Box'"
 WIRESHARK_PATH=/mnt/c/Program\ Files/Wireshark
 TOTAL_CMD_PATH=/mnt/c/Program\ Files/totalcmd
 THEME_TOOL_PATH=/mnt/d/NTSOA/INSTALLED/THEME_TOOL
@@ -139,14 +140,27 @@ CASE_SENSITIVE="true"
 # Which plugins would you like to load?
 # Standard plugins can be found in $ZSH/plugins/
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(web-search fastfile copyfile vscode extract docker zsh-autosuggestions git nmap terraform sudo themes encode64 python zsh-syntax-highlighting)
+plugins=(
+  zsh-syntax-highlighting
+  zsh-autosuggestions
+  web-search
+  vscode
+  sudo
+)
 
 # here the color of the auto-suggestion
 # ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE=fg=#0000ff"
 DISABLE_AUTO_UPDATE="true" #here to disable oh-my-zsh auto update  
 source $ZSH/oh-my-zsh.sh
+
+# this alias to list
+alias list="list"
+
+# this function for list alias
+function list(){
+  local list_app="ls"
+  eval $list_app
+}
 
 # this alias to clear
 alias c="clear"
@@ -251,11 +265,10 @@ function ed(){
 alias nvm="nvm"
 
 # this function for nvm aliases
+# if we have one argument then nvim will be launched with it,
+# otherwise open the current directory if there is no argument
 function nvm(){
   nvim "${1:-.}";
-  # cv;
-  # if we have one argument then nvim will be launched with it,
-  # otherwise open the current directory if there is no argument
 }
 
 # this alias to open nvim as root
@@ -264,21 +277,16 @@ alias nvmr="allow_sudo && nvmr"
 # this function for nvmr alias
 function nvmr(){
   sudo nvim "${1:-.}";
-  cv
 }
 
 # this alias to open the current directory in windows explorer
 alias exop="exop"
 
 # this function for exop alias
-function exop(){
-  if [[ $# -eq 0 ]]; then
-    explorer.exe .;
-  elif [[ $# -eq 1 ]]; then
-    cd $1;
-    explorer.exe .;
-  fi
-  cv;
+function exop() {
+  [ $# -eq 1 ] && cd "$1"
+  explorer.exe .
+  cv
 }
 
 # this alias to open file with browser
@@ -326,22 +334,24 @@ alias cv="cv"
 # updated today 01/25/2024 to adjust the title
 # when we have more than 50 visible items
 function cv() {
-  local folder_content="${target:-$PWD}"
   local target="$1"
+  local folder_content="${target:-$PWD}"
   local folder_name=$(basename $folder_content)
   local visible_item=$(ls $folder_content | wc -l)
-  local total_item=$(ls -a $folder_content | wc -l)
-  local hidden_item=$((total_item - visible_item - 2))
+  local total_item=$(ls -A $folder_content | wc -l)
+  local hidden_item=$((total_item - visible_item))
 
   # this function for the header of cv alias
   function show_header(){
     local folder_header
-    if [[ $hidden_item -eq 0 ]]; then
+    if [[ $total_item -eq 0 ]]; then
+      folder_header="Empty(0)";
+    elif [[ $hidden_item -eq 0 ]]; then
       folder_header="total($visible_item)";
     else
-      folder_header="visible($visible_item) hidden($hidden_item) total($(($total_item - 2))) ";
+      folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
     fi
-    echo "   $folder_name -> $folder_header";
+    echo "${BOLD}${WHITE}   $folder_name -> $folder_header ${RESET}";
   }
 
   # this function to show the content of the cv
@@ -377,22 +387,24 @@ alias cvf="cvf"
 # updated today 01/25/2024 to adjust the title
 # when we have more than 50 visible items
 function cvf() {
-  local folder_content="${target:-$PWD}"
   local target="$1"
+  local folder_content="${target:-$PWD}"
   local folder_name=$(basename $folder_content)
   local visible_item=$(ls $folder_content | wc -l)
-  local total_item=$(ls -a $folder_content | wc -l)
-  local hidden_item=$((total_item - visible_item - 2))
+  local total_item=$(ls -A $folder_content | wc -l)
+  local hidden_item=$((total_item - visible_item))
 
   # this function for the header of cv alias
   function show_header(){
     local folder_header
-    if [[ $hidden_item -eq 0 ]]; then
+    if [[ $total_item -eq 0 ]]; then
+      folder_header="Empty(0)";
+    elif [[ $hidden_item -eq 0 ]]; then
       folder_header="total($visible_item)";
     else
-      folder_header="visible($visible_item) hidden($hidden_item) total($(($total_item - 2))) ";
+      folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
     fi
-    echo "   $folder_name -> $folder_header";
+    echo "${BOLD}${WHITE}   $folder_name -> $folder_header";
   }
 
   # this function to show the content of the cv
@@ -419,6 +431,38 @@ function cvf() {
   show_all;
 }
 
+# this alias to view the current directory content
+# with specifications
+alias cvg="cvg"
+
+# this function for cvg alias
+function cvg(){
+  local folder_name=$(basename $PWD)
+  local item="$1"
+  local matched_items=$(ls -A | grep "$item" | wc -l)
+
+  function show_header(){
+    echo "${BOLD}   $folder_name -> contains $matched_items '$1' ${RESET}";
+  }
+
+  function show_content(){
+    eza --icons=always --color=always -a | grep "$1";
+  }
+
+  # this function to show the cv
+  function show_all(){
+    c && br;
+
+    if [[ $matched_items -lt 20 ]]; then
+      show_header $1; br;
+      show_content $1; br;
+    else
+      show_content $1; br;
+      show_header $1;
+    fi
+  }
+  show_all $item;
+}
 
 # this line to count line and words inside a file
 alias flc="flc"
@@ -466,17 +510,6 @@ command_not_found_handler() {
   fi
 }
 
-# this alias to view the current directory content
-# with specifications
-alias cvg="cvg"
-
-# this function for cv alias
-function cvg(){
-  c && br;
-  echo "   $(basename "$PWD") folder content with "$1" : ";
-  br && eza --icons=always | grep "$1" && br;
-}
-
 # this alias to open a directory
 alias op="op"
 
@@ -517,6 +550,119 @@ function dtp(){
 
 # this alias to view the books
 alias books='exop /mnt/d/NTSOA/"0 ENI"/"ENI 2023"/"ENI L1 LESSONS"/BOOKS'
+
+# this alias to play directly the typing game
+alias typing="cd /mnt/d/NTSOA/dev/github_repo/typing && rn play.sh && cv"
+
+# this alias to show the HTML clock
+alias clock="clock"
+
+# this function for clock alias
+function clock(){
+  cd /mnt/d/NTSOA/Desktop/DIGITAL\ CLOCK
+  op clock.html
+}
+
+# this alias to access my musics
+alias msc="op /mnt/d/NTSOA/music/hiravao"
+
+# this alias to access pictures
+alias pct="op /mnt/c/Users/lab_l/OneDrive/Pictures"
+
+# this alias to view the setup
+alias setup="op /mnt/d/NTSOA/SETUP"
+
+# this alias to open FL Studio
+alias fl="FL64.exe; cv"
+
+# this alias to open apple music
+alias music="AppleMusic.exe; cv"
+
+# this alias to open notepad
+alias ntp="notepad.exe && cv"
+
+# this alias to open VirtualBox
+alias vm="cd $VIRTUAL_BOX_PATH && explorer.exe VirtualBox.exe && return 1; cd - &>/dev/null && cv"
+
+# this alias to open wireshark
+alias wsh="wireshark.exe && cv"
+
+# this alias to open total commander
+alias tcmd="TOTALCMD64.exe && cv"
+
+# this alias to launch windows python
+alias py="python.exe"
+
+# CRITICAL: make the PC Crash
+# this alias to open obs Studio
+# alias obs="obs64.exe && cv"
+
+# CRITICAL: make the PC Crash
+# this alias to open gns3
+# alias gns="gns3.exe"
+
+# this alias to switch to windows terminal
+alias wds="wds"
+
+# this function for wds alias
+function wds(){
+  c && br 2;
+  cmd.exe;
+  cv;
+}
+
+# this alias to switch to powershell terminal
+alias pws="pws"
+
+# this function for pws alias
+function pws(){
+  c && br 2;
+  powershell.exe;
+  cv;
+}
+
+# this alias to enter cmd as admin
+alias cmd="cmd"
+
+# this function for cmd alias
+function cmd(){
+  powershell.exe -command "Start-Process cmd -Verb RunAs";
+  x;
+}
+
+# this alias to open the state drive
+alias sd="op /mnt/d"
+
+# this alias to access directly the eni folder
+alias eni="eni"
+
+# this function for eni alias
+function eni(){
+  local eni_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/S4
+  op $eni_path
+}
+
+# this alias to access the ENI time schedule
+alias edt="edt"
+
+# this function for edt alias
+function edt(){
+  local edt_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/L2\ 2024
+  cd $edt_path
+
+  local recent_file=$(ls -t . | head -n1)
+  op $recent_file
+
+  cv
+}
+
+# this alias to set the recent file variable
+function rctf(){
+  echo $(ls -tR | head)
+}
+
+# this alias to view the devops folder
+alias dvps="op /mnt/d/NTSOA/DEVOPS/devops"
 
 # this alias to create a directory
 alias dr="dr"
@@ -570,7 +716,8 @@ function rn(){
   # 2024-02-12 00:27
   case "${1##*.}" in
     py)
-      all "$1" && c && echo -e && python3 "$1" && echo -e;;
+      # all "$1" && c && echo -e && py "$1" && echo -e;;
+      py "$1" return 0;;
     c || cpp) #update 07/28/2023
       file="$1";
       out="${file%.*}"
@@ -676,8 +823,9 @@ alias vf="vf"
 function vf() {
   if [[ -f "$1" ]]; then
     case "${1##*.}" in
-      html|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) explorer.exe "$1" ;;
+      wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) explorer.exe "$1" ;;
       # open all files that have default app with windows explorer
+      html) bwsop "$1";;
       *) nvim "$1" ;;
     esac
     cv
@@ -727,7 +875,7 @@ alias mns="mns"
 function mns(){
   if [[ $(command -v "$1") ]]; then
     local manual_path=~/NTSOA/manual
-    #here to check if the command exists
+    # here to check if the command exists
     man "$1" | cat > $manual_path/"$1"_manual.txt;
     all $manual_path/"$1"_manual.txt;
     vf $manual_path/"$1"_manual.txt;
@@ -788,7 +936,10 @@ alias hndo="hndo"
 # this function for hndo alias
 function hndo(){
   local attempts=3
-  local expected_password="password"
+  local attempts_num=$(echo $attempts)
+  local expected_hashed_password="5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+  # this is "password" hashed
+  # use this command : echo -n password | sha256sum | awk '{print $1}'
 
   c && br 2
 
@@ -796,7 +947,10 @@ function hndo(){
     echo -ne "Your Password, Sir : "
     read -s password
 
-    if [ "$password" = "$expected_password" ]; then
+    # Hash the entered password
+    hashed_input=$(echo -n "$password" | sha256sum | awk '{print $1}')
+
+    if [ "$hashed_input" = "$expected_hashed_password" ]; then
       c && br
       eval "$@"
       return
@@ -808,7 +962,7 @@ function hndo(){
       if [ $attempts -gt 0 ]; then
         continue
       else
-        echo "hndo: 3 incorrect password attempts"
+        echo "hndo: $attempts_num incorrect password attempts"
         return 1
       fi
     fi
@@ -990,6 +1144,7 @@ function open_web_app(){
 
   # here to call the open_app function
   eval $open_app
+  return 0
 }
 
 # this alias to open chatGpt app
@@ -1043,7 +1198,12 @@ function gthb(){
   local github_id="mjoklplbddabcmpepnokjaffbmgbkkgg"
   local github_link="github.com"
   local github_name="GitHub"
-  open_web_app $github_link $github_id $github_name
+
+  if [[ $# -eq 0 ]]; then
+    open_web_app $github_link $github_id $github_name
+  elif [[ $# -eq 1 ]]; then
+    gh repo view $USER/$1 --web
+  fi
 }
 
 # this alias to open the GitLab app
@@ -1109,15 +1269,16 @@ function itg(){
   open_web_app $insta_link $insta_id
 }
 
-# this alias to open the discord app
-alias dsc="dsc"
-
-# this function for dsc alias
-function dsc(){
-  local discord_id="magkoliahgffibhgfkmoealggombgknl"
-  local discord_link="discord.com"
-  open_web_app $discord_link $disord_id
-}
+# # this alias to open the discord app
+# alias dsc="dsc"
+#
+# # this function for dsc alias
+# function dsc(){
+#   # local discord_id="magkoliahgffibhgfkmoealggombgknl"
+#   local discord_id="magkoliahgffibhgfkmoealggombgknl"
+#   local discord_link="discord.com"
+#   open_web_app $discord_link $disord_id
+# }
 
 # this alias to open Twitter X Web App
 alias twx="twx"
@@ -1251,6 +1412,28 @@ function kgl(){
   open_web_app $kgl_link $kgl_id $kgl_name
 }
 
+# this alias to open Ip Info Web App
+alias ipinfo="ipinfo"
+
+# this function for ipinfo alias
+function ipinfo(){
+  local ipinfo_id="adopfgmhmfaggadmlkiklebhncpjnnac"
+  local ipinfo_link="ipinfo.io"
+  local ipinfo_name="IpInfo"
+  open_web_app $ipinfo_link $ipinfo_id $ipinfo_name
+}
+
+# this alias to open Course Careers Web App
+alias crs="crs"
+
+# this function for crs alias
+function crs(){
+  local crs_id="ndljfckhgknkknnkmemfkalcibbpfhla"
+  local crs_link="coursecareers.com"
+  local crs_name="Course Careers"
+  open_web_app $crs_link $crs_id $crs_name
+}
+
 # this alias to recharge the router
 alias rtr="rtr"
 
@@ -1272,114 +1455,6 @@ function htx(){
   local router_name="h471x Router"
   open_web_app $router_IP $router_id $router_name
 }
-
-# this alias to play directly the typing game
-alias typing="cd /mnt/d/NTSOA/dev/github_repo/typing && rn play.sh && cv"
-
-# this alias to show the HTML clock
-alias clock="clock"
-
-# this function for clock alias
-function clock(){
-  cd /mnt/d/NTSOA/Desktop/DIGITAL\ CLOCK
-  op clock.html
-}
-
-# this alias to access my musics
-alias msc="op /mnt/d/NTSOA/music/hiravao"
-
-# this alias to access pictures
-alias pct="op /mnt/c/Users/lab_l/OneDrive/Pictures"
-
-# this alias to view the setup
-alias setup="op /mnt/d/NTSOA/SETUP"
-
-# this alias to open FL Studio
-alias fl="FL64.exe; cv"
-
-# this alias to open apple music
-alias music="AppleMusic.exe; cv"
-
-# this alias to open notepad
-alias ntp="notepad.exe && cv"
-
-# this alias to open VirtualBox
-alias vm="VirtualBox.exe"
-
-# this alias to open wireshark
-alias wsh="wireshark.exe && cv"
-
-# this alias to open total commander
-alias tcmd="TOTALCMD64.exe && cv"
-
-# this alias to launch windows python
-alias py="python.exe"
-
-# CRITICAL: make the PC Crash
-# this alias to open obs Studio
-# alias obs="obs64.exe && cv"
-
-# CRITICAL: make the PC Crash
-# this alias to open gns3
-# alias gns="gns3.exe"
-
-# this alias to switch to windows terminal
-alias wds="wds"
-
-# this function for wds alias
-function wds(){
-  c && br 2;
-  cmd.exe;
-  cv;
-}
-
-# this alias to switch to powershell terminal
-alias pws="pws"
-
-# this function for pws alias
-function pws(){
-  c && br 2;
-  powershell.exe;
-  cv;
-}
-
-# this alias to enter cmd as admin
-alias cmd="cmd"
-
-# this function for cmd alias
-function cmd(){
-  powershell.exe -command "Start-Process cmd -Verb RunAs";
-  x;
-}
-
-# this alias to open the state drive
-alias sd="op /mnt/d"
-
-# this alias to access directly the eni folder
-alias eni="op /mnt/d/NTSOA/0\ ENI/ENI\ 2024/"
-
-# this alias to access the ENI time schedule
-alias edt="edt"
-
-# this function for edt alias
-function edt(){
-  cd /mnt/d/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/L2\ 2024
-
-  # Find the most recent file in the directory
-  local recent_file=$(ls -t . | head -n1)
-
-  # Open the most recent time schedule
-  op $recent_file
-  cv
-}
-
-# this alias to set the recent file variable
-function rctf(){
-  echo $(ls -tR | head)
-}
-
-# this alias to view the devops folder
-alias dvps="op /mnt/d/NTSOA/DEVOPS/devops"
 
 # this alias to view the history
 alias hst="hst"
@@ -1507,7 +1582,7 @@ function sth(){
     local wifi_ip=$(ifconfig $wifi_iface | grep inet | awk '{print $2}');
     # echo " Connect Via  ==>  ssh $USER@$ip";
     echo "Ssh Connection via $wifi_iface Interface";
-    echo "${BLUE}ssh $USER@$wifi_ip${WHITE}";
+    echo "${BOLD}${WHITE}==> ssh $USER@$wifi_ip";
   else
     echo "${BOLD}Ssh Server Off [${RED}x${WHITE}]"
   fi
@@ -1627,7 +1702,7 @@ alias psqlon="allow_sudo && psqlon"
 # this function for sqlon alias
 function psqlon(){
   if [[ $(pgrep postgres) ]]; then
-    sudo su - postgres;
+    sudo -u postgres psql;
   else
     br;
     echo "${BOLD}${WHITE}[${GREEN}+${WHITE}] Starting ${WHITE}PostgreSQL Server ...";
@@ -1650,6 +1725,7 @@ function psqlon(){
     }
     check_postgres_shell
   fi
+  return 0
 }
 
 # this alias to stop the postgresql service
@@ -1937,9 +2013,14 @@ alias ghc="ghc"
 
 # this function for ghc alias
 function ghc() {
-  local repo="$(basename $PWD)"
+  # if $@ -eq 0; then
+    # local repo="$(basename $PWD)"
+    # local isPrivate='"$1" == "private"'
+  # elif $@ -eq 1; then
+    local repo="$(basename $PWD)"
+    local isPrivate='"$1" == "private"'
+  # fi
   local repo_name="$(clean_repo "$repo")"
-  local isPrivate='"$1" == "private"'
   local repo_visibility
   eval "[[ $isPrivate ]]" && repo_visibility="private" || repo_visibility="public"
 
@@ -1984,7 +2065,7 @@ function gcm(){
 }
 
 #this alias to view all repos in the GitHub
-alias ghls="gh repo list"
+alias ghls="gh repo list -L 1000"
 
 #this alias to rename a git branch
 alias gnm="gnm"
@@ -2099,14 +2180,51 @@ alias gbd="gbd"
 function gbd(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
-  if [[ "$is_a_git_repo" == "true" ]]; then 
+  if [[ "$is_a_git_repo" == "true" ]]; then
     local default_branch=$(git rev-parse --abbrev-ref origin/HEAD | cut -c8- 2>/dev/null || git config --get init.defaultBranch)
     local current_branch=$(git branch | awk '/\*/ {print $2}');
+
     if [[ $# -eq 1 ]]; then
       if [[ "$1" == "$default_branch" ]]; then
         echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+      elif ! git show-ref --verify --quiet "refs/heads/$1" &>/dev/null; then
+        echo "${BOLD} ■■▶ Fatal ! Branch ${GREEN}$1 ${WHITE}doesn't exist ${RESET}" && br;
       else
-        git branch -D "$1";
+        # this to check if we want to delete the remote branch too
+        function check_delete_remote_branch(){
+          if [[ "$current_branch" == "$default_branch" ]]; then
+            echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+          else
+            echo -ne "${BOLD}${WHITE}Delete remote branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
+            read delete_remote_branch
+            if [ "$delete_remote_branch" = "y" ]; then
+              git push origin --delete "$current_branch";
+            elif [ "$delete_remote_branch" = "n" ];then
+              return 0
+            else
+              check_delete_remote_branch
+            fi
+          fi
+        }
+        function check_delete_branch(){
+          local branch_name="$1"
+          echo -ne "${BOLD}${WHITE}Delete branch${GREEN} "$branch_name"${WHITE} ? (y/n) ${RESET}";
+          read delete_branch
+          if [ "$delete_branch" = "y" ]; then
+            if [[ "$current_branch" != "$default_branch" ]]; then
+              git checkout $default_branch;
+            fi
+            if git ls-remote --exit-code --heads origin "$1" >/dev/null 2>&1; then
+              check_delete_remote_branch
+            fi
+            git branch -D "$1";
+          elif [ "$delete_branch" = "n" ]; then
+            return 0;
+          else
+            check_delete_branch $branch_name
+          fi
+        }
+        check_delete_branch $1
       fi
     elif [[ $# -eq 0 ]]; then
       if [[ "$current_branch" == "$default_branch" ]]; then
@@ -2116,6 +2234,25 @@ function gbd(){
           echo -ne "${BOLD}${WHITE}Delete branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
           read delete_branch
           if [ "$delete_branch" = "y" ]; then
+            # this to check if we want to delete the remote branch too
+            function check_delete_remote_branch(){
+              if [[ "$current_branch" == "$default_branch" ]]; then
+                echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+              else
+                echo -ne "${BOLD}${WHITE}Delete remote branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
+                read delete_remote_branch
+                if [ "$delete_remote_branch" = "y" ]; then
+                  git push origin --delete "$current_branch";
+                elif [ "$delete_remote_branch" = "n" ];then
+                  return 0
+                else
+                  check_delete_remote_branch
+                fi
+              fi
+            }
+            if git ls-remote --exit-code origin $current_branch >/dev/null 2>&1; then
+              check_delete_remote_branch
+            fi
             git checkout "$default_branch";
             git branch -D "$current_branch";
           elif [ "$delete_branch" = "n" ];then
@@ -2181,12 +2318,14 @@ function glc(){
     local last_commit=$(git log --format="%H" -n 1);
     local last_commit_message=$(git show --format=%B -s "$last_commit" | tr '\n' ' ');
     local last_commit_author=$(git log --format='%an' -n 1)
+    local commits_done_today=$(git log --oneline --since="$(date +"%Y-%m-%d 00:00:00")" --author="$last_commit_author" | wc -l)
     [[ $commits_num -le 1 ]] && commit_text="commit" || commit_text="commits";
+    [[ $commits_done_today -le 1 ]] && commit_done_text="commit" || commit_done_text="commits";
 
     if [[ "$1" == "show" ]]; then
       git log --oneline --no-decorate;
     else
-      echo "${BOLD}${GREEN} $last_commit_author ${WHITE}has ${BRIGHT_BLUE}$UNDERLINE$commits_num $commit_text$RESET";
+      echo "${BOLD}${GREEN} $last_commit_author ${WHITE}has ${LIGHT_BLUE}$commits_num $commit_text ${WHITE}including ${LIGHT_BLUE}$commits_done_today $commit_done_text ${WHITE}today";
       echo "${BOLD}${WHITE} Last Commit on ${GREEN}$current_branch ${WHITE}: $last_commit_message";
       br;
     fi
