@@ -1606,10 +1606,12 @@ alias wpass="wpass"
 # this function for wpass alias
 function wpass(){
   cd /mnt/d/NTSOA
-  local wifi="$1"
+  # consider all arguments as one string
+  local wifi="$*"
   local password=$(cmd.exe /c netsh wlan show profiles "$wifi" key=clear | grep "Key Content" | awk '{print $4}')
   echo "Wifi SSID : $wifi";
   echo "Password  : $password";
+  cd - &>/dev/null;
 }
 
 # this alias to view the ssh server status
@@ -2056,17 +2058,28 @@ function clean_repo() {
 alias ghc="ghc"
 
 # this function for ghc alias
+# SOLVED: 05-11-2024 23:28
+# use shift to assign the argument
+# after the first one to be the
+# condition of is Private
 function ghc() {
-  # if $@ -eq 0; then
-    # local repo="$(basename $PWD)"
-    # local isPrivate='"$1" == "private"'
-  # elif $@ -eq 1; then
-    local repo="$(basename $PWD)"
-    local isPrivate='"$1" == "private"'
-  # fi
+  if [[ $# -eq 0 ]]; then
+    local repo="$(basename "$PWD")"
+  elif [[ $# -eq 1 ]]; then
+    if [[ $1 != "private" ]]; then
+      local repo="$1"
+    elif [[ $1 -eq "private" ]]; then
+      local repo="$(basename "$PWD")"
+      local isPrivate="$1"
+    fi
+  elif [[ $# -gt 1 ]]; then
+    local repo="$1"
+    shift
+    local isPrivate="$1"
+  fi
+
   local repo_name="$(clean_repo "$repo")"
-  local repo_visibility
-  eval "[[ $isPrivate ]]" && repo_visibility="private" || repo_visibility="public"
+  local repo_visibility=$([[ $isPrivate == "private" ]] && echo "private" || echo "public")
 
   # create the repo & clone it locally
   gh repo create "$repo_name" --$repo_visibility -c;
@@ -2090,22 +2103,28 @@ function ghd(){
 alias gad="gad"
 
 # this function for gad alias
+# SOLVED: 05-11-2024 23:43
+# handled git add and git commit
+# according to the first argument
+# if it's not a file then it is
+# a commit message, otherwise check
+# if it is a file then the rest
+# of the argument is the commit
 function gad(){
   if [[ $# -eq 0 ]]; then
     git add --all && git commit
-  elif [[ $# -eq 1 ]]; then
-    git add --all && git commit -m "$1"
-  elif [[ $# -eq 2 ]]; then
-    git add "$1" && git commit "$1" -m "$2";
+  elif [[ $# -ge 1 ]]; then
+    if [[ -f "$1" ]]; then
+      if [[ $# -eq 1 ]]; then
+        echo "${BOLD}${RED}Error : no commit message !"
+      else
+        # consider all arguments from the second one as one string
+        git add "$1" && git commit "$1" -m "${*:2}";
+      fi
+    else
+      git add --all && git commit -m "$*"
+    fi
   fi
-}
-
-# this alias to make a long commit
-alias gcm="gcm"
-
-# this function for gcm alias
-function gcm(){
-  git add . && git commit
 }
 
 #this alias to view all repos in the GitHub
@@ -2433,9 +2452,6 @@ function sqlite(){
   fi
 }
 
-# this alias to run npm
-alias np="/mnt/d/NTSOA/INSTALLED/NODEJS/npm"
-
 # this alias to call the windows nodeJS Program
 alias node="node"
 
@@ -2444,21 +2460,25 @@ function node(){
   node.exe $@;
 }
 
-# this alias to call the windows npm
+# Alias to call the windows npm
 alias npm="npm"
 
-# this function for npm alias
-function npm(){
-  cmd.exe /c npm $@;
+# Function for npm alias
+function npm() {
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c npm "$@"
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!"
+  fi
 }
 
-# this alias to run the windows mysql command
-alias mysql="mysql"
-
-# this function for mysql alias
-function mysql(){
-  mysql.exe $@;
-}
+# # this alias to run the windows mysql command
+# alias mysql="mysql"
+#
+# # this function for mysql alias
+# function mysql(){
+#   mysql.exe $@;
+# }
 
 kill-line() {
   if [[ $BUFFER == "" ]]; then
