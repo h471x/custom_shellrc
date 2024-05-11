@@ -271,6 +271,9 @@ function nvm(){
   nvim "${1:-.}";
 }
 
+# this alias to call neovim in a cooler way
+alias hnvim="nvim"
+
 # this alias to open nvim as root
 alias nvmr="allow_sudo && nvmr"
 
@@ -346,12 +349,15 @@ function cv() {
     local folder_header
     if [[ $total_item -eq 0 ]]; then
       folder_header="Empty(0)";
+      folder_icon=" "
     elif [[ $hidden_item -eq 0 ]]; then
       folder_header="total($visible_item)";
+      folder_icon=" "
     else
       folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
+      folder_icon=" "
     fi
-    echo "${BOLD}${WHITE}   $folder_name -> $folder_header ${RESET}";
+    echo "${BOLD}${WHITE} $folder_icon $folder_name -> $folder_header ${RESET}";
   }
 
   # this function to show the content of the cv
@@ -399,12 +405,15 @@ function cvf() {
     local folder_header
     if [[ $total_item -eq 0 ]]; then
       folder_header="Empty(0)";
+      folder_icon=" "
     elif [[ $hidden_item -eq 0 ]]; then
       folder_header="total($visible_item)";
+      folder_icon=" "
     else
       folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
+      folder_icon=" "
     fi
-    echo "${BOLD}${WHITE}   $folder_name -> $folder_header";
+    echo "${BOLD}${WHITE} $folder_icon $folder_name -> $folder_header ${RESET}";
   }
 
   # this function to show the content of the cv
@@ -592,6 +601,9 @@ alias tcmd="TOTALCMD64.exe && cv"
 
 # this alias to launch windows python
 alias py="python.exe"
+
+# this alias to run jupyter notebook
+alias jpnt="cmd.exe /c jupyter notebook"
 
 # CRITICAL: make the PC Crash
 # this alias to open obs Studio
@@ -1152,7 +1164,7 @@ alias gpt="gpt"
 
 # this function for gpt alias
 function gpt(){
-  local gpt_id="jckaldkomadaenmmgladeopgmfbahfjm"
+  local gpt_id="febkkahnhhdppidjakkemnckfhnkidba"
   local gpt_link="chat.openai.com"
   local gpt_name="ChatGpt"
   open_web_app $gpt_link $gpt_id $gpt_name
@@ -1227,6 +1239,18 @@ function pypi(){
   local pypi_name="PyPi"
   open_web_app $pypi_link $pypi_id $pypi_name
 }
+
+# this alias to open testpypi
+alias testpypi="testpypi"
+
+# this function for pypi alias
+function testpypi(){
+  local test_pypi_id="opibpddgphoocjppppodcfdfdccdeoif"
+  local test_pypi_link="test.pypi.org"
+  local test_pypi_name="Test PyPi"
+  open_web_app $test_pypi_link $test_pypi_id $test_pypi_name
+}
+
 
 # this alias to open cloud convert
 alias conv="conv"
@@ -1434,6 +1458,17 @@ function crs(){
   open_web_app $crs_link $crs_id $crs_name
 }
 
+# this alias to open Stackoverflow Web App
+alias stck="stck"
+
+# this function for stck alias
+function stck(){
+  local stck_id="gafidhmaaknkinigcnolmldilpdlfdpa"
+  local stck_link="stackoveerflow.com"
+  local stck_name="Stack Over Flow"
+  open_web_app $stck_link $stck_id $stck_name
+}
+
 # this alias to recharge the router
 alias rtr="rtr"
 
@@ -1558,15 +1593,24 @@ function svc_show_stat(){
   br;
 }
 
-# CRITICAL:
 # I don't know why but this alias
 # make the PC slow down
-# # this alias to view saved wifi password
-# alias wpass="wpass"
-# # this function for wpass alias
-# function wpass(){
-#   cmd.exe /c 'netsh wlan show profiles "ENI 1" key=clear' | grep "Key Content" | awk '{print $4}'
-# }
+# this alias to view saved wifi password
+# SOLVED: 05-11-2024 22:44
+# Just execute it inside the
+# hard drive of windows instead of WSL
+# directories, so just cd to whatever
+# hard drive of windows to make it run
+alias wpass="wpass"
+
+# this function for wpass alias
+function wpass(){
+  cd /mnt/d/NTSOA
+  local wifi="$1"
+  local password=$(cmd.exe /c netsh wlan show profiles "$wifi" key=clear | grep "Key Content" | awk '{print $4}')
+  echo "Wifi SSID : $wifi";
+  echo "Password  : $password";
+}
 
 # this alias to view the ssh server status
 alias sth="sth"
@@ -2321,11 +2365,12 @@ function glc(){
     local commits_done_today=$(git log --oneline --since="$(date +"%Y-%m-%d 00:00:00")" --author="$last_commit_author" | wc -l)
     [[ $commits_num -le 1 ]] && commit_text="commit" || commit_text="commits";
     [[ $commits_done_today -le 1 ]] && commit_done_text="commit" || commit_done_text="commits";
-
+    [[ $commits_done_today -gt 0 ]] &&
+      commit_done="${WHITE}including ${LIGHT_BLUE}$commits_done_today $commit_done_text ${WHITE}today" || commit_done=""
     if [[ "$1" == "show" ]]; then
       git log --oneline --no-decorate;
     else
-      echo "${BOLD}${GREEN} $last_commit_author ${WHITE}has ${LIGHT_BLUE}$commits_num $commit_text ${WHITE}including ${LIGHT_BLUE}$commits_done_today $commit_done_text ${WHITE}today";
+      echo "${BOLD}${GREEN} $last_commit_author ${WHITE}has ${LIGHT_BLUE}$commits_num $commit_text $commit_done";
       echo "${BOLD}${WHITE} Last Commit on ${GREEN}$current_branch ${WHITE}: $last_commit_message";
       br;
     fi
@@ -2397,6 +2442,14 @@ alias node="node"
 # this function for node alias
 function node(){
   node.exe $@;
+}
+
+# this alias to call the windows npm
+alias npm="npm"
+
+# this function for npm alias
+function npm(){
+  cmd.exe /c npm $@;
 }
 
 # this alias to run the windows mysql command
