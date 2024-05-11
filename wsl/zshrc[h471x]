@@ -603,7 +603,16 @@ alias tcmd="TOTALCMD64.exe && cv"
 alias py="python.exe"
 
 # this alias to run jupyter notebook
-alias jpnt="cmd.exe /c jupyter notebook"
+alias jptr="jptr"
+
+# this function for jptr alias
+function jptr(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c jupyter notebook
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!"
+  fi
+}
 
 # CRITICAL: make the PC Crash
 # this alias to open obs Studio
@@ -1593,6 +1602,20 @@ function svc_show_stat(){
   br;
 }
 
+function clean_argument() {
+  local arg="$1"
+  # Replace spaces with backslashes
+  local clean_arg="${arg// /\\}"
+
+  # Replace special characters with escaped versions
+  local special_chars='[][{}()*+?.\\^$|]'
+  local escaped_special_chars="$(echo "$special_chars" | sed 's/\\/\\\\/g')" # Escape backslashes for sed
+  local arg_pattern="s/[$escaped_special_chars]/\\\\&/g"
+
+  clean_arg="$(echo "$clean_arg" | sed -E "$arg_pattern")"
+  echo "$clean_arg"
+}
+
 # I don't know why but this alias
 # make the PC slow down
 # this alias to view saved wifi password
@@ -1611,6 +1634,39 @@ function wpass(){
   local password=$(cmd.exe /c netsh wlan show profiles "$wifi" key=clear | grep "Key Content" | awk '{print $4}')
   echo "Wifi SSID : $wifi";
   echo "Password  : $password";
+  cd - &>/dev/null;
+}
+
+# this alias to "list known wifi"
+alias wls="wls"
+
+# this function for wls alias
+function wls(){
+  cd /mnt/d/NTSOA
+  if [[ $# -eq 0 ]]; then
+    num_profiles=1
+    grep_string=$(cmd.exe /c netsh wlan show profiles | grep -i "All User Profile" | awk '{print $5}' | shuf -n 1)
+  else
+    if [[ "$1" =~ ^[0-9]+$ ]]; then
+      num_profiles=$1
+      grep_string=""
+    else
+      num_profiles=99999999
+      grep_string="$1"
+    fi
+  fi
+
+  # Loop through each Wi-Fi profile
+  while IFS= read -r wifi; do
+    # Retrieve password for the current Wi-Fi profile
+    local password=$(cmd.exe /c netsh wlan show profiles "$wifi" key=clear | grep "Key Content" | awk '{print $4}')
+
+    # Print Wi-Fi SSID and password
+    echo "Wifi SSID : $wifi"
+    echo "Password  : $password"
+    echo
+  done < <(cmd.exe /c netsh wlan show profiles | grep -i "$grep_string" | grep 'All User Profile' | awk '{$1=$2=$3=""; print substr($0, 6)}' | head -n "$num_profiles")
+
   cd - &>/dev/null;
 }
 
