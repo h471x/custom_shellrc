@@ -327,7 +327,7 @@ function bwsop(){
 # }
 
 # this alias to edit bashrc
-alias ct="nvim ~/.zshrc && cv"
+alias ct="nvim ~/.zshrc"
 
 # this alias to have the current view
 # of working directory content using ls
@@ -1079,17 +1079,13 @@ alias allow_sudo="allow_sudo"
 # this function for allow_sudo alias
 # HACK : 05-12-2024 15:28
 # check if sudo requires a password
-# then clear the screen to prompt,
+# then show the password prompt,
 # otherwise just execute the next command
 function allow_sudo(){
-  # Check if sudo password is required
   sudo -n true &>/dev/null
   if [ $? -eq 1 ]; then
-    # Sudo password is not required, execute the commands
-    c && br 2
-    sudo clear && return 0 || return 1
+    sudo echo && return 0 || return 1
   else
-    # Sudo password is required, just return 0
     return 0
   fi
 }
@@ -1105,7 +1101,7 @@ function rdf(){
 
 # this alias to view the pc state
 # DIRTY:
-alias pc="c && echo -e && echo -e && neofetch --source ~/.config/neofetch/htx2.txt"
+alias pc="c && br 2 && neofetch --source ~/.config/neofetch/htx2.txt"
 
 #call this pc alias at startup
 #pc
@@ -1158,7 +1154,7 @@ function open_web_app(){
 
   local check="sudo ping -c 1 -W 5 "
   local check_message="Checking $app_name ..."
-  local reachable="br && echo ' $check_message' && eval $check $app_domain &> /dev/null;"
+  local reachable="c && br && echo ' $check_message' && eval $check $app_domain &> /dev/null;"
 
   if [ -n "$app_id" ]; then
     open_app="$browser --profile-directory=Default --app-id=$app_id;"
@@ -1752,7 +1748,7 @@ alias sshon="allow_sudo && sshon"
 
 # this function for sshon alias
 function sshon(){
-  sudo /etc/init.d/ssh start;
+  sudo /etc/init.d/ssh start &>/dev/null;
   sth;
 }
 
@@ -1771,8 +1767,8 @@ function sshoff(){
 # this function to view the current apache2
 # service, its status
 function stap(){
+  c && br;
   if [[ $(pgrep apache2) ]]; then
-    c && br;
     echo "${BOLD}Apache Server Active [${GREEN}✓${WHITE}]"
     br;
 
@@ -1786,7 +1782,6 @@ function stap(){
     echo "$loopback_iface    Interface Connection (Private) : ${BRIGHT_BLUE}http://$loopback_ip ${WHITE}";
     br;
   else
-    c && br;
     echo "${BOLD}Apache Server Off [${RED}x${WHITE}]"
     br
   fi
@@ -1798,7 +1793,7 @@ alias apon="allow_sudo && apon"
 # this function for apch alias
 function apon(){
   cd /var/www/html;
-  br;
+  c && br;
   echo "${BOLD}[${GREEN}+${WHITE}]${WHITE} Starting Apache Server ..."; br;
   sudo service apache2 start &>/dev/null;
   stap;
@@ -1827,9 +1822,7 @@ alias sqlon="allow_sudo && sqlon"
 
 # this function for sqlon alias
 function sqlon(){
-  br
   sudo service mariadb start;
-  br
   sqls;
 }
 
@@ -1847,7 +1840,7 @@ alias sqls="allow_sudo && sqls"
 
 # this function for sqloff alias
 function sqls(){
-  br;
+  c && br;
   if [[ $(pgrep mariadb) ]]; then
     echo "${BOLD}MySQL Server Active [${GREEN}✓${WHITE}]"
   else
@@ -1919,7 +1912,7 @@ alias webon="allow_sudo && webon"
 
 # this function for webon alias
 function webon(){
-  br;
+  c && br;
   echo "${BOLD}${WHITE} Starting Web Servers"; br;
 
   # Apache Server
@@ -1956,7 +1949,7 @@ alias weboff="allow_sudo && weboff"
 
 # this function for weboff alias
 function weboff(){
-  br;
+  c && br;
   echo "${BOLD}${WHITE} Stopping Web Servers"; br;
 
   # Apache Server
@@ -1983,7 +1976,7 @@ alias webs="allow_sudo && webs"
 
 # this function for webs alias
 function webs(){
-  br;
+  c && br;
   echo "${BOLD} Web Servers Status"; br;
 
   function check_web(){
@@ -2061,7 +2054,7 @@ alias mails="allow_sudo && mails"
 
 # this function for mails alias
 function mails(){
-  br;
+  c && br;
   if sudo service postfix status &>/dev/null; then
     echo "${BOLD}Mail Server Active [${GREEN}✓${WHITE}]"
   else
@@ -2074,9 +2067,7 @@ alias mailon="allow_sudo && mailon"
 
 # this function for mailon alias
 function mailon(){
-  br
   sudo service postfix start
-  br
   mails
 }
 
@@ -2085,9 +2076,7 @@ alias mailoff="allow_sudo && mailoff"
 
 # this function for mailon alias
 function mailoff(){
-  br
   sudo service postfix stop
-  br
   mails
 }
 
