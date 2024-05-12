@@ -158,7 +158,7 @@ alias list="list"
 
 # this function for list alias
 function list(){
-  local list_app="ls"
+  local list_app="eza --icons=always --no-quotes"
   eval $list_app
 }
 
@@ -602,6 +602,18 @@ alias tcmd="TOTALCMD64.exe && cv"
 # this alias to launch windows python
 alias py="python.exe"
 
+# Alias to call the windows pip
+alias pip="pip"
+
+# Function for pip alias
+function pip() {
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c pip "$@"
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!"
+  fi
+}
+
 # this alias to run jupyter notebook
 alias jptr="jptr"
 
@@ -738,7 +750,7 @@ function rn(){
   case "${1##*.}" in
     py)
       # all "$1" && c && echo -e && py "$1" && echo -e;;
-      py "$1" return 0;;
+      py "$@" return 0;;
     c || cpp) #update 07/28/2023
       file="$1";
       out="${file%.*}"
@@ -1629,11 +1641,19 @@ alias wpass="wpass"
 # this function for wpass alias
 function wpass(){
   cd /mnt/d/NTSOA
-  # consider all arguments as one string
-  local wifi="$*"
-  local password=$(cmd.exe /c netsh wlan show profiles "$wifi" key=clear | grep "Key Content" | awk '{print $4}')
-  echo "Wifi SSID : $wifi";
-  echo "Password  : $password";
+  if [[ $# -eq 0 ]]; then
+    # consider all arguments as one string
+    local wifi=$(cmd.exe /c netsh wlan show profiles | grep -i "All User Profile" | awk '{print $5}' | shuf -n 1)
+    local password=$(cmd.exe /c netsh wlan show profiles "$wifi" key=clear | grep "Key Content" | awk '{print $4}')
+    echo "Wifi SSID : $wifi";
+    echo "Password  : $password";
+  else
+    # consider all arguments as one string
+    local wifi="$*"
+    local password=$(cmd.exe /c netsh wlan show profiles "$wifi" key=clear | grep "Key Content" | awk '{print $4}')
+    echo "Wifi SSID : $wifi";
+    echo "Password  : $password";
+  fi
   cd - &>/dev/null;
 }
 
@@ -1643,29 +1663,55 @@ alias wls="wls"
 # this function for wls alias
 function wls(){
   cd /mnt/d/NTSOA
-  if [[ $# -eq 0 ]]; then
-    num_profiles=1
-    grep_string=$(cmd.exe /c netsh wlan show profiles | grep -i "All User Profile" | awk '{print $5}' | shuf -n 1)
-  else
-    if [[ "$1" =~ ^[0-9]+$ ]]; then
-      num_profiles=$1
-      grep_string=""
-    else
-      num_profiles=99999999
-      grep_string="$1"
-    fi
-  fi
 
-  # Loop through each Wi-Fi profile
-  while IFS= read -r wifi; do
-    # Retrieve password for the current Wi-Fi profile
-    local password=$(cmd.exe /c netsh wlan show profiles "$wifi" key=clear | grep "Key Content" | awk '{print $4}')
-
+  function print_message(){
+    wifi="$1"
+    password="$2"
     # Print Wi-Fi SSID and password
     echo "Wifi SSID : $wifi"
     echo "Password  : $password"
     echo
-  done < <(cmd.exe /c netsh wlan show profiles | grep -i "$grep_string" | grep 'All User Profile' | awk '{$1=$2=$3=""; print substr($0, 6)}' | head -n "$num_profiles")
+  }
+
+  function wifi_and_pass(){
+    num_profiles="$1"
+    grep_string="$2"
+    # Loop through each Wi-Fi profile
+    while IFS= read -r wifi; do
+      # Retrieve password for the current Wi-Fi profile
+      local password=$(cmd.exe /c netsh wlan show profiles "$wifi" key=clear | grep "Key Content" | awk '{print $4}')
+      print_message $wifi $password
+    done < <(cmd.exe /c netsh wlan show profiles | grep -i "$grep_string" | grep 'All User Profile' | awk '{$1=$2=$3=""; print substr($0, 6)}' | head -n "$num_profiles")
+  }
+
+  function wifi_name(){
+    wifi_count=0
+    # Loop through each Wi-Fi profile
+    while IFS= read -r wifi; do
+      echo "- $wifi"
+      ((wifi_count++))
+    done < <(cmd.exe /c netsh wlan show profiles | grep 'All User Profile' | awk '{$1=$2=$3=""; print substr($0, 6)}')
+  }
+
+  if [[ $# -eq 0 ]]; then
+    num_profiles=1
+    grep_string=$(cmd.exe /c netsh wlan show profiles | grep -i "All User Profile" | awk '{print $5}' | shuf -n 1)
+    wifi_and_pass $num_profiles $grep_string
+  elif [[ $# -eq 1 ]]; then
+    if [[ "$1" =~ ^[0-9]+$ ]]; then
+      num_profiles=$1
+      grep_string=""
+      wifi_and_pass $num_profiles $grep_string
+    elif [[ "$1" != "-a" ]]; then
+      num_profiles=99999999
+      grep_string="$1"
+      wifi_and_pass $num_profiles $grep_string
+    elif [[ "$1" -eq "-a" ]]; then
+      wifi_name
+      echo
+      echo "Known Wi-Fi Connections ($wifi_count) "
+    fi
+  fi
 
   cd - &>/dev/null;
 }
@@ -2523,6 +2569,18 @@ alias npm="npm"
 function npm() {
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe /c npm "$@"
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!"
+  fi
+}
+
+# Alias to call the windows npx
+alias npx="npx"
+
+# Function for npx alias
+function npx() {
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c npx "$@"
   else
     echo "${BOLD}${RED}Please execute this command inside Windows directory!"
   fi
