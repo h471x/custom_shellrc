@@ -610,7 +610,9 @@ function pip() {
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe /c pip "$@"
   else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!"
+    cd /mnt/d/NTSOA
+    cmd.exe /c pip "$@"
+    cd - &>/dev/null;
   fi
 }
 
@@ -1075,12 +1077,21 @@ function mvf(){
 alias allow_sudo="allow_sudo"
 
 # this function for allow_sudo alias
+# HACK : 05-12-2024 15:28
+# check if sudo requires a password
+# then clear the screen to prompt,
+# otherwise just execute the next command
 function allow_sudo(){
-  # hack: just clear the screen
-  c && br 2
-  sudo clear && return 0 || return 1
-  # In case of wrong sudo password
-  # Don't execute the following command
+  # Check if sudo password is required
+  sudo -n true &>/dev/null
+  if [ $? -eq 1 ]; then
+    # Sudo password is not required, execute the commands
+    c && br 2
+    sudo clear && return 0 || return 1
+  else
+    # Sudo password is required, just return 0
+    return 0
+  fi
 }
 
 # this alias to force delete
