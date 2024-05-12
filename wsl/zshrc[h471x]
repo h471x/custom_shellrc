@@ -600,7 +600,7 @@ alias wsh="wireshark.exe && cv"
 alias tcmd="TOTALCMD64.exe && cv"
 
 # this alias to launch windows python
-alias py="python.exe"
+alias python="python.exe"
 
 # Alias to call the windows pip
 alias pip="pip"
@@ -624,7 +624,7 @@ function jptr(){
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe /c jupyter notebook
   else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!"
+    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
   fi
 }
 
@@ -752,7 +752,7 @@ function rn(){
   case "${1##*.}" in
     py)
       # all "$1" && c && echo -e && py "$1" && echo -e;;
-      py "$@" return 0;;
+      python "$@" return 0;;
     c || cpp) #update 07/28/2023
       file="$1";
       out="${file%.*}"
