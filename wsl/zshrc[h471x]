@@ -42,9 +42,10 @@ BROWSER_PATH=$CHROME_PATH:$EDGE_PATH
 
 # Applications
 NPM_PATH=/mnt/c/Users/lab_l/AppData/Roaming/npm/npm
+NGROK_PATH=/mnt/d/NTSOA/INSTALLED/NGROK/
 POT_PLAYER_PATH=/mnt/d/NTSOA/INSTALLED/POT\ PLAYER/PotPlayer
 FL_STUDIO_PATH=/mnt/d/NTSOA/INSTALLED/FL\ STUDIO\ 12
-APP_PATH=$NPM_PATH:$POT_PLAYER_PATH:$FL_STUDIO_PATH
+APP_PATH=$NPM_PATH:$POT_PLAYER_PATH:$FL_STUDIO_PATH:$NGROK_PATH
 
 # Including all the paths
 PATH=$BINARY_PATH:$BROWSER_PATH:$APP_PATH:$PATH
@@ -1497,6 +1498,17 @@ function stck(){
   open_web_app $stck_link $stck_id $stck_name
 }
 
+# this alias to open Canva Web App
+alias canva="canva"
+
+# this function for canva alias
+function canva(){
+  local canva_id="mnnncmnfcndlghkomlbaadoonfnjcadg"
+  local canva_link="canva.com"
+  local canva_name="Canva"
+  open_web_app $canva_link $canva_id $canva_name
+}
+
 # this alias to recharge the router
 alias rtr="rtr"
 
@@ -1896,7 +1908,7 @@ alias psqls="allow_sudo && psqls"
 
 # this function for psqls alias
 function psqls(){
-  br;
+  c && br;
 
   if [[ $(pgrep postgres) ]]; then
     echo "${BOLD}PostgreSQL Server Active [${GREEN}✓${WHITE}]";
@@ -2560,6 +2572,14 @@ alias node="node"
 # this function for node alias
 function node(){
   node.exe $@;
+}
+
+# this alias for windows ngrok
+alias ngrok="ngrok"
+
+# this function for ngrok alias
+function ngrok(){
+  ngrok.exe $@;
 }
 
 # Alias to call the windows npm
