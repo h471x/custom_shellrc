@@ -666,6 +666,22 @@ function cmd(){
   x;
 }
 
+# this alias to open x64dbg
+alias dbg64="dbg64"
+
+# this function for debug alias
+function dbg64(){
+  powershell.exe -command "Start-Process x64dbg -Verb RunAs"
+}
+
+# this alias to open x32dbg
+alias dbg32="dbg32"
+
+# this function for debug alias
+function dbg32(){
+  powershell.exe -command "Start-Process x32dbg -Verb RunAs"
+}
+
 # this alias to open the state drive
 alias sd="op /mnt/d"
 
@@ -798,8 +814,6 @@ function rn(){
  esac
 }
 
-
-
 #this alias to update the package
 alias upd="allow_sudo && upd"
 
@@ -883,13 +897,13 @@ alias cl="linecount"
 
 # this function for the cl alias
 function linecount() {
-    if [ -z "$1" ]; then
-        echo "Please provide a filename"
-    elif [ -z "$2" ]; then
-        wc -l "$1" | awk '{print $1, "lines"}'
-    else
-        grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
-    fi
+  if [ -z "$1" ]; then
+      echo "Please provide a filename"
+  elif [ -z "$2" ]; then
+      wc -l "$1" | awk '{print $1, "lines"}'
+  else
+      grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
+  fi
 };
 
 # this line to view a command manual
