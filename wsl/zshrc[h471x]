@@ -594,14 +594,42 @@ alias ntp="notepad.exe && cv"
 # this alias to open VirtualBox
 alias vm="cd $VIRTUAL_BOX_PATH && explorer.exe VirtualBox.exe && return 1; cd - &>/dev/null && cv"
 
+function vm(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    # VirtualBox must be added to the path
+    cmd.exe /c VirtualBox.exe
+  else
+    cd /mnt/d/NTSOA
+    cmd.exe /c VirtualBox.exe
+    cd - &>/dev/null;
+  fi
+}
+
 # this alias to open wireshark
-alias wsh="wireshark.exe && cv"
+alias wsh="wsh"
+
+# this alias for wsh alias
+function wsh(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    wireshark.exe
+  else
+    cd /mnt/d/NTSOA
+    wireshark.exe
+    cd - &>/dev/null;
+  fi
+}
 
 # this alias to open total commander
 alias tcmd="TOTALCMD64.exe && cv"
 
 # this alias to launch windows python
 alias python="python.exe"
+
+# this alias to launch windows java
+alias java="java.exe"
+
+# this alias to launch javac windows
+alias javac="javac.exe"
 
 # Alias to call the windows pip
 alias pip="pip"
@@ -666,6 +694,24 @@ function cmd(){
   x;
 }
 
+# this alias to open dosbox config files
+alias dosbox="dosbox"
+
+# this function for dosbox alias
+function dosbox(){
+  op /mnt/c/Users/lab_l/AppData/Local/DOSBox
+}
+
+# this alias to launch the debug
+alias debug="debug"
+
+# this function for debug alias
+function debug(){
+  cd /mnt/d/NTSOA/INSTALLED/DOSBOX/DOSBox-0.74-3
+  DOSBox.exe DEBUG.COM
+  cd - &>/dev/null
+}
+
 # this alias to open x64dbg
 alias dbg64="dbg64"
 
@@ -700,6 +746,20 @@ alias edt="edt"
 # this function for edt alias
 function edt(){
   local edt_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/L2\ 2024
+  cd $edt_path
+
+  local recent_file=$(ls -t . | head -n1)
+  op $recent_file
+
+  cv
+}
+
+# this alias to access the raw ENI time schedule
+alias edtr="edtr"
+
+# this function for edtr alias
+function edtr(){
+  local edt_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/RAW
   cd $edt_path
 
   local recent_file=$(ls -t . | head -n1)
@@ -747,7 +807,16 @@ alias opdr="opdr"
 
 # this function for opdr alias
 function opdr(){
-  dr "$1" && op "$1";
+  dr "$*" && op "$*";
+}
+
+# this alias to open recent file / directory
+alias rct="rct"
+
+# this function for rct alias
+function rct(){
+  local recent_file=$(ls -t . | head -n1)
+  op $recent_file
 }
 
 # this alias to run an executable file or a script
@@ -814,19 +883,19 @@ function rn(){
  esac
 }
 
-#this alias to update the package
+# this alias to update the package
 alias upd="allow_sudo && upd"
 
-#this function for up alias
+# this function for up alias
 function upd(){
   echo "u p d a t i n g .  .  ." | figlet -t -c;
   br && sudo apt update && br;
 }
 
-#this alia to update the package
+# this alia to update the package
 alias upg="allow_sudo && upg"
 
-#this function for up alias
+# this function for up alias
 function upg(){
   echo "u p g r a d i n g . . ." | figlet -t -c;
   br && sudo apt upgrade && br;
@@ -845,7 +914,7 @@ function ist(){
       ;;
     *)
       echo "   I n s t a l l i n g .  .  . " | figlet;
-      br && echo "Package =======> "$1" ";
+      c && br && echo "Package =======> "$1" ";
       br && sudo apt install "$1" && br;
       ;;
   esac
@@ -1128,6 +1197,9 @@ alias hm="cd && cv"
 # DIRTY:
 alias whm="cd /mnt/c/Users/lab_l/OneDrive/Bureau && op Home.lnk && nd"
 
+# this alias to open the evangile directory
+alias gospel="op /mnt/d/NTSOA/EVANGILE"
+
 #this alias to enter the NTSOA directory
 alias hn="op /mnt/d/NTSOA"
 
@@ -1208,7 +1280,7 @@ alias gpt="gpt"
 # this function for gpt alias
 function gpt(){
   local gpt_id="febkkahnhhdppidjakkemnckfhnkidba"
-  local gpt_link="chat.openai.com"
+  local gpt_link="chatgpt.com"
   local gpt_name="ChatGpt"
   open_web_app $gpt_link $gpt_id $gpt_name
 }
@@ -1521,6 +1593,17 @@ function canva(){
   local canva_link="canva.com"
   local canva_name="Canva"
   open_web_app $canva_link $canva_id $canva_name
+}
+
+# this alias to open MuseScore Web App
+alias mscr="mscr"
+
+# this function for mscr alias
+function mscr(){
+  local mscr_id="ocbioacpdhnddoolpphbcnbndighhfkn"
+  local mscr_link="musescore.com"
+  local mscr_name="MuseScore"
+  open_web_app $mscr_link $mscr_id $mscr_name
 }
 
 # this alias to recharge the router
@@ -1882,7 +1965,7 @@ function psqlon(){
   if [[ $(pgrep postgres) ]]; then
     sudo -u postgres psql;
   else
-    br;
+    c && br;
     echo "${BOLD}${WHITE}[${GREEN}+${WHITE}] Starting ${WHITE}PostgreSQL Server ...";
     sudo service postgresql start &>/dev/null;
     c && br;
@@ -1890,7 +1973,7 @@ function psqlon(){
     br;
 
     function check_postgres_shell(){
-      echo -ne "${BOLD}${WHITE}Access PostgreSQL${GREEN} Shell${WHITE} ? (y/n) ${RESET}";
+      echo -ne "${BOLD}${WHITE}Access PostgreSQL${GREEN} Shell${WHITE} ? (y/n) ";
       read postgres_shell
       if [ "$postgres_shell" = "y" ]; then
         clear;
@@ -1911,7 +1994,7 @@ alias psqloff="allow_sudo && psqloff"
 
 # this function for sqloff alias
 function psqloff(){
-  br;
+  c && br;
   echo "${BOLD}${WHITE}[${RED}x${WHITE}] Stopping ${WHITE}PostgreSQL Server ...";
   sudo service postgresql stop &>/dev/null;
   psqls;
@@ -2304,8 +2387,9 @@ function gck(){
       if ! git rev-parse --verify "$1" >/dev/null 2>&1; then
         local new_branch="$1"
         function check_new_branch(){
-          echo -ne "${BOLD}${WHITE}New branch${GREEN} "$new_branch"${WHITE} ? (y/n) ${RESET}";
+          echo -ne "${BOLD}${WHITE}New branch${GREEN} "$new_branch"${WHITE} ? (y/n) ";
           read branch
+          echo "${RESET}"
           if [ "$branch" = "y" ]; then
             git checkout -b "$new_branch";
           elif [ "$branch" = "n" ];then
@@ -2388,6 +2472,7 @@ function gbd(){
           else
             echo -ne "${BOLD}${WHITE}Delete remote branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
             read delete_remote_branch
+            echo "${RESET}"
             if [ "$delete_remote_branch" = "y" ]; then
               git push origin --delete "$current_branch";
             elif [ "$delete_remote_branch" = "n" ];then
@@ -2503,21 +2588,26 @@ function glc(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
+    local repo_name=$(basename "$(git rev-parse --show-toplevel)")
     local current_branch=$(git branch | awk '/\*/ {print $2}');
     local commits_num=$(git log --oneline | wc -l);
     local commit_text;
     local last_commit=$(git log --format="%H" -n 1);
-    local last_commit_message=$(git show --format=%B -s "$last_commit" | tr '\n' ' ');
+    local last_commit_message=$(git show --format=%B -s "$last_commit" | head -n 1);
     local last_commit_author=$(git log --format='%an' -n 1)
-    local commits_done_today=$(git log --oneline --since="$(date +"%Y-%m-%d 00:00:00")" --author="$last_commit_author" | wc -l)
+    local current_user=$(git config user.name)
+    local commits_done_today=$(git log --oneline --since="$(date +"%Y-%m-%d 00:00:00")" --author="$current_user" | wc -l)
+    local commits_contrib_today=$(git log --oneline --since="$(date +"%Y-%m-%d 00:00:00")" --author="$last_commit_author" | wc -l)
     [[ $commits_num -le 1 ]] && commit_text="commit" || commit_text="commits";
     [[ $commits_done_today -le 1 ]] && commit_done_text="commit" || commit_done_text="commits";
+    [[ $commits_contrib_today -le 1 ]] && commit_contrib_text="commit" || commit_contrib_text="commits";
     [[ $commits_done_today -gt 0 ]] &&
-      commit_done="${WHITE}including ${LIGHT_BLUE}$commits_done_today $commit_done_text ${WHITE}today" || commit_done=""
+      commit_done="${WHITE}Including ${LIGHT_BLUE}$commits_done_today $commit_done_text ${WHITE}by ${GREEN}$current_user ${WHITE}today" || commit_done="${WHITE}Including ${LIGHT_BLUE}$commits_contrib_today $commit_contrib_text ${WHITE}by ${GREEN}$last_commit_author ${WHITE}today"
     if [[ "$1" == "show" ]]; then
       git log --oneline --no-decorate;
     else
-      echo "${BOLD}${GREEN} $last_commit_author ${WHITE}has ${LIGHT_BLUE}$commits_num $commit_text $commit_done";
+      echo "${BOLD}${LIGHT_BLUE} $repo_name ${WHITE}has ${LIGHT_BLUE}$commits_num $commit_text ";
+      echo " $commit_done";
       echo "${BOLD}${WHITE} Last Commit on ${GREEN}$current_branch ${WHITE}: $last_commit_message";
       br;
     fi
