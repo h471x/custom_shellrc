@@ -1038,7 +1038,8 @@ alias nd="nd"
 
 # this function for nd alias
 function nd(){
-	cd - && cv;
+	cd - &>/dev/null;
+  cv;
 }
 
 # this alias to switch to root
