@@ -1606,6 +1606,9 @@ function mscr(){
   open_web_app $mscr_link $mscr_id $mscr_name
 }
 
+# this alias to open fast.com
+alias fast="open_web_app fast.com"
+
 # this alias to recharge the router
 alias rtr="rtr"
 
