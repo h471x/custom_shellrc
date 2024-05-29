@@ -1737,7 +1737,8 @@ function clean_argument() {
 
   # Replace special characters with escaped versions
   local special_chars='[][{}()*+?.\\^$|]'
-  local escaped_special_chars="$(echo "$special_chars" | sed 's/\\/\\\\/g')" # Escape backslashes for sed
+  # Escape backslashes for sed
+  local escaped_special_chars="$(echo "$special_chars" | sed 's/\\/\\\\/g')"
   local arg_pattern="s/[$escaped_special_chars]/\\\\&/g"
 
   clean_arg="$(echo "$clean_arg" | sed -E "$arg_pattern")"
@@ -1759,14 +1760,26 @@ function wpass(){
   cd /mnt/d/NTSOA
   if [[ $# -eq 0 ]]; then
     # consider all arguments as one string
-    local wifi=$(cmd.exe /c netsh wlan show profiles | grep -i "All User Profile" | awk '{print $5}' | shuf -n 1)
-    local password=$(cmd.exe /c netsh wlan show profiles "$wifi" key=clear | grep "Key Content" | awk '{print $4}')
+    local wifi=$(
+      cmd.exe /c netsh wlan show profiles |
+        grep -i "All User Profile" |
+        awk '{print $5}' | shuf -n 1
+    )
+    local password=$(
+      cmd.exe /c netsh wlan show profiles "$wifi" key=clear |
+        grep "Key Content" |
+        awk '{print $4}'
+    )
     echo "Wifi SSID : $wifi";
     echo "Password  : $password";
   else
     # consider all arguments as one string
     local wifi="$*"
-    local password=$(cmd.exe /c netsh wlan show profiles "$wifi" key=clear | grep "Key Content" | awk '{print $4}')
+    local password=$(
+      cmd.exe /c netsh wlan show profiles "$wifi" key=clear |
+        grep "Key Content" |
+        awk '{print $4}'
+    )
     echo "Wifi SSID : $wifi";
     echo "Password  : $password";
   fi
@@ -1795,9 +1808,18 @@ function wls(){
     # Loop through each Wi-Fi profile
     while IFS= read -r wifi; do
       # Retrieve password for the current Wi-Fi profile
-      local password=$(cmd.exe /c netsh wlan show profiles "$wifi" key=clear | grep "Key Content" | awk '{print $4}')
+      local password=$(
+        cmd.exe /c netsh wlan show profiles "$wifi" key=clear |
+          grep "Key Content" | awk '{print $4}'
+      )
       print_message $wifi $password
-    done < <(cmd.exe /c netsh wlan show profiles | grep -i "$grep_string" | grep 'All User Profile' | awk '{$1=$2=$3=""; print substr($0, 6)}' | head -n "$num_profiles")
+    done < <(
+      cmd.exe /c netsh wlan show profiles |
+        grep -i "$grep_string" |
+        grep 'All User Profile' |
+        awk '{$1=$2=$3=""; print substr($0, 6)}' |
+        head -n "$num_profiles"
+    )
   }
 
   function wifi_name(){
@@ -1806,12 +1828,20 @@ function wls(){
     while IFS= read -r wifi; do
       echo "- $wifi"
       ((wifi_count++))
-    done < <(cmd.exe /c netsh wlan show profiles | grep 'All User Profile' | awk '{$1=$2=$3=""; print substr($0, 6)}')
+    done < <(
+      cmd.exe /c netsh wlan show profiles |
+        grep 'All User Profile' |
+        awk '{$1=$2=$3=""; print substr($0, 6)}'
+    )
   }
 
   if [[ $# -eq 0 ]]; then
     num_profiles=1
-    grep_string=$(cmd.exe /c netsh wlan show profiles | grep -i "All User Profile" | awk '{print $5}' | shuf -n 1)
+    grep_string=$(
+      cmd.exe /c netsh wlan show profiles |
+        grep -i "All User Profile" |
+        awk '{print $5}' | shuf -n 1
+    )
     wifi_and_pass $num_profiles $grep_string
   elif [[ $# -eq 1 ]]; then
     if [[ "$1" =~ ^[0-9]+$ ]]; then
@@ -2302,12 +2332,18 @@ alias ghd="ghd"
 
 # this function for ghd alias
 function ghd(){
-  local repo="$(git config --get remote.origin.url | awk -F '/' '{print $NF}' | sed 's/.git$//')"
-  local repo_name=${1:-$(clean_repo $repo)}
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
-  # delete the repo
-  gh repo delete "$repo_name" --yes;
-  rm -rf .git;
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    local repo="$(git config --get remote.origin.url | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+    local repo_name=${1:-$(clean_repo $repo)}
+
+    # delete the repo
+    gh repo delete "$repo_name" --yes;
+    rm -rf .git;
+  else
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
+  fi
 }
 
 # this alias to git add and git commit at the same 00:31
@@ -2322,19 +2358,25 @@ alias gad="gad"
 # if it is a file then the rest
 # of the argument is the commit
 function gad(){
-  if [[ $# -eq 0 ]]; then
-    git add --all && git commit
-  elif [[ $# -ge 1 ]]; then
-    if [[ -f "$1" ]]; then
-      if [[ $# -eq 1 ]]; then
-        echo "${BOLD}${RED}Error : no commit message !"
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    if [[ $# -eq 0 ]]; then
+      git add --all && git commit
+    elif [[ $# -ge 1 ]]; then
+      if [[ -f "$1" ]]; then
+        if [[ $# -eq 1 ]]; then
+          echo "${BOLD}${RED}Error : no commit message !"
+        else
+          # consider all arguments from the second one as one string
+          git add "$1" && git commit "$1" -m "${*:2}";
+        fi
       else
-        # consider all arguments from the second one as one string
-        git add "$1" && git commit "$1" -m "${*:2}";
+        git add --all && git commit -m "$*"
       fi
-    else
-      git add --all && git commit -m "$*"
     fi
+  else
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
 
@@ -2683,7 +2725,13 @@ alias ngrok="ngrok"
 
 # this function for ngrok alias
 function ngrok(){
-  ngrok.exe $@;
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start ngrok $@;
+  else
+    cd /mnt/d/NTSOA
+    cmd.exe /c start ngrok $@;
+    cd - &>/dev/null
+  fi
 }
 
 # Alias to call the windows npm
@@ -2692,7 +2740,7 @@ alias npm="npm"
 # Function for npm alias
 function npm() {
   if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c npm "$@"
+    cmd.exe /c start npm "$@"
   else
     echo "${BOLD}${RED}Please execute this command inside Windows directory!"
   fi
@@ -2704,7 +2752,19 @@ alias npx="npx"
 # Function for npx alias
 function npx() {
   if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c npx "$@"
+    cmd.exe /c start npx "$@"
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!"
+  fi
+}
+
+# Alias to call the windows vue
+alias vue="vue"
+
+# Function for vue alias
+function vue() {
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start vue "$@"
   else
     echo "${BOLD}${RED}Please execute this command inside Windows directory!"
   fi
