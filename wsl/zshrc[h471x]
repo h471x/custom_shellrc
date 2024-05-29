@@ -2728,11 +2728,21 @@ alias ngrok="ngrok"
 
 # this function for ngrok alias
 function ngrok(){
+  # check for dashes
+  for arg in "$@"; do
+    if [[ "$arg" == *-* ]]; then
+      local ngrok_cmd='cmd.exe /c ngrok "$@"'
+    else
+      local ngrok_cmd='cmd.exe /c start ngrok "$@"'
+    fi
+  done
+
+  # Check the current directory
   if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start ngrok $@;
+    eval $ngrok_cmd
   else
     cd /mnt/d/NTSOA
-    cmd.exe /c start ngrok $@;
+    eval $ngrok_cmd
     cd - &>/dev/null
   fi
 }
