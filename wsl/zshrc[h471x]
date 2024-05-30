@@ -570,7 +570,16 @@ alias clock="clock"
 # this function for clock alias
 function clock(){
   cd /mnt/d/NTSOA/Desktop/DIGITAL\ CLOCK
-  op clock.html
+
+  # Replace all Spaces and Back-slashes with %20
+  local formatted_path=$(wslpath -m . | sed -e 's/ /%20/g' -e 's/\\//g')
+
+  # Open Pdf file with edge and the other files with chrome
+  cmd.exe /c start chrome "file:///$formatted_path/clock.html"
+
+  # return to the previous directory
+  cd - &>/dev/null
+  return 0
 }
 
 # this alias to access my musics
@@ -594,9 +603,9 @@ alias ntp="notepad.exe && cv"
 # this alias to open VirtualBox
 alias vm="vm"
 
+# this function for vm alias
 function vm(){
   if [[ "$PWD" == "/mnt/"* ]]; then
-    # VirtualBox must be added to the path
     cmd.exe /c start VirtualBox.exe
   else
     cd /mnt/d/NTSOA
@@ -611,10 +620,10 @@ alias wsh="wsh"
 # this alias for wsh alias
 function wsh(){
   if [[ "$PWD" == "/mnt/"* ]]; then
-    wireshark.exe
+    cmd.exe /c start wireshark.exe
   else
     cd /mnt/d/NTSOA
-    wireshark.exe
+    cmd.exe /c start wireshark.exe
     cd - &>/dev/null;
   fi
 }
@@ -651,7 +660,7 @@ alias jptr="jptr"
 # this function for jptr alias
 function jptr(){
   if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c jupyter notebook
+    cmd.exe /c start jupyter notebook
   else
     echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
   fi
