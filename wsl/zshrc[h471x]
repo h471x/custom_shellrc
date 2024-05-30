@@ -1234,20 +1234,29 @@ alias open_web_app="allow_sudo && open_web_app";
 # then the chrome App Id
 # finally the name of the App (optional)
 # writen today 2024-02-11 20:13
+# IMPROVED : 05-30-2024 18:36
+# have access to the shell after execution
 function open_web_app(){
-  local browser="chrome.exe"
+  local browser_name="chrome.exe"
   local app_domain="$1"
   local app_id="$2"
   local app_name="${3:-$(convert_url $app_domain)}"
-
+  local current_directory="$PWD"
   local check="sudo ping -c 1 -W 5 "
   local check_message="Checking $app_name ..."
   local reachable="c && br && echo ' $check_message' && eval $check $app_domain &> /dev/null;"
 
+  # if the current directory is a WSL
+  # directory then switch to windows
+  # directory before executing the script
+  if [[ "$current_directory" != "/mnt/"* ]]; then
+    cd /mnt/d/NTSOA
+  fi
+
   if [ -n "$app_id" ]; then
-    open_app="$browser --profile-directory=Default --app-id=$app_id;"
+    open_app='cmd.exe /c start chrome --profile-directory=Default --app-id=$app_id;'
   else
-    open_app="$browser $app_domain;"
+    open_app='cmd.exe /c start chrome $app_domain'
   fi
 
   # this function to display the web app status
@@ -1257,10 +1266,11 @@ function open_web_app(){
     br
     echo " WebApp  : $app_name"
     echo " Link    : $app_domain"
-    echo " Browser : $browser"
+    echo " Browser : $browser_name"
     echo " Status  : $1"
     br
     echo "****************************"
+    br
   }
 
   # check the stat
@@ -1272,6 +1282,12 @@ function open_web_app(){
 
   # here to call the open_app function
   eval $open_app
+
+  # if we changed directory then get back
+  if [[ "$PWD" != "$current_directory" ]]; then
+    cd - &>/dev/null
+  fi
+
   return 0
 }
 
@@ -1879,6 +1895,7 @@ function sth(){
     local wifi_iface="wifi0"
     local wifi_ip=$(ifconfig $wifi_iface | grep inet | awk '{print $2}');
     # echo " Connect Via  ==>  ssh $USER@$ip";
+    # check_ngrok="cmd.exe /c 'tasklist | findstr /I "ngrok"'"
     echo "Ssh Connection via $wifi_iface Interface";
     echo "${BOLD}${WHITE}==> ssh $USER@$wifi_ip";
   else
@@ -2648,7 +2665,8 @@ function glc(){
     [[ $commits_done_today -le 1 ]] && commit_done_text="commit" || commit_done_text="commits";
     [[ $commits_contrib_today -le 1 ]] && commit_contrib_text="commit" || commit_contrib_text="commits";
     [[ $commits_done_today -gt 0 ]] &&
-      commit_done="${WHITE}Including ${LIGHT_BLUE}$commits_done_today $commit_done_text ${WHITE}by ${GREEN}$current_user ${WHITE}today" || commit_done="${WHITE}Including ${LIGHT_BLUE}$commits_contrib_today $commit_contrib_text ${WHITE}by ${GREEN}$last_commit_author ${WHITE}today"
+      commit_done="${WHITE}Including ${LIGHT_BLUE}$commits_done_today $commit_done_text ${WHITE}by ${GREEN}$current_user ${WHITE}today" ||
+      commit_done="${WHITE}Including ${LIGHT_BLUE}$commits_contrib_today $commit_contrib_text ${WHITE}by ${GREEN}$last_commit_author ${WHITE}today"
     if [[ "$1" == "show" ]]; then
       git log --oneline --no-decorate;
     else
@@ -2728,22 +2746,45 @@ function node(){
 alias ngrok="ngrok"
 
 # this function for ngrok alias
+# IMPROVED: 05-29-2024 10:25
 function ngrok(){
-  # check for dashes
+  # default ngrok command that redirects
+  # to a new terminal so the current one
+  # is available for other commands
+  local ngrok_cmd='cmd.exe /c start ngrok "$@"'
+
+  # check for dashes then do not
+  # redirect to another terminal
   for arg in "$@"; do
     if [[ "$arg" == *-* ]]; then
       local ngrok_cmd='cmd.exe /c ngrok "$@"'
-    else
-      local ngrok_cmd='cmd.exe /c start ngrok "$@"'
+      break
     fi
   done
 
   # Check the current directory
+  # because ngrok will work only
+  # on windows'directory rather
+  # than WSL's one so we move
   if [[ "$PWD" == "/mnt/"* ]]; then
     eval $ngrok_cmd
   else
     cd /mnt/d/NTSOA
     eval $ngrok_cmd
+    cd - &>/dev/null
+  fi
+}
+
+# this alias to launch process explorer
+alias prex="prex"
+
+# this function for prex alias
+function prex(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start procexp64
+  else
+    cd /mnt/d/NTSOA
+    cmd.exe /c start procexp64
     cd - &>/dev/null
   fi
 }
