@@ -592,15 +592,15 @@ alias music="AppleMusic.exe; cv"
 alias ntp="notepad.exe && cv"
 
 # this alias to open VirtualBox
-alias vm="cd $VIRTUAL_BOX_PATH && explorer.exe VirtualBox.exe && return 1; cd - &>/dev/null && cv"
+alias vm="vm"
 
 function vm(){
   if [[ "$PWD" == "/mnt/"* ]]; then
     # VirtualBox must be added to the path
-    cmd.exe /c VirtualBox.exe
+    cmd.exe /c start VirtualBox.exe
   else
     cd /mnt/d/NTSOA
-    cmd.exe /c VirtualBox.exe
+    cmd.exe /c start VirtualBox.exe
     cd - &>/dev/null;
   fi
 }
@@ -1235,9 +1235,9 @@ alias open_web_app="allow_sudo && open_web_app";
 # finally the name of the App (optional)
 # writen today 2024-02-11 20:13
 # IMPROVED : 05-30-2024 18:36
-# have access to the shell after execution
+# Shell access after execution
 function open_web_app(){
-  local browser_name="chrome.exe"
+  local browser="chrome.exe"
   local app_domain="$1"
   local app_id="$2"
   local app_name="${3:-$(convert_url $app_domain)}"
@@ -1253,10 +1253,14 @@ function open_web_app(){
     cd /mnt/d/NTSOA
   fi
 
+  # if there is an app ID open
+  # that windowed chrome app
+  # otherwise launch chrome with
+  # with the domain passed as argument
   if [ -n "$app_id" ]; then
-    open_app='cmd.exe /c start chrome --profile-directory=Default --app-id=$app_id;'
+    open_app='cmd.exe /c start $browser --profile-directory=Default --app-id=$app_id;'
   else
-    open_app='cmd.exe /c start chrome $app_domain'
+    open_app='cmd.exe /c start $browser $app_domain'
   fi
 
   # this function to display the web app status
@@ -1266,7 +1270,7 @@ function open_web_app(){
     br
     echo " WebApp  : $app_name"
     echo " Link    : $app_domain"
-    echo " Browser : $browser_name"
+    echo " Browser : $browser"
     echo " Status  : $1"
     br
     echo "****************************"
