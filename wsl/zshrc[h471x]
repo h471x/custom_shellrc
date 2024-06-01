@@ -634,6 +634,18 @@ alias tcmd="TOTALCMD64.exe && cv"
 # this alias to launch windows python
 alias python="python.exe"
 
+# this alias to launch windows go
+alias go="go"
+
+# this function for go alias
+function go(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c go $@
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
+  fi
+}
+
 # this alias to launch windows java
 alias java="java.exe"
 
@@ -666,13 +678,25 @@ function jptr(){
   fi
 }
 
-# CRITICAL: make the PC Crash
 # this alias to open obs Studio
-# alias obs="obs64.exe && cv"
+alias obs="obs"
 
-# CRITICAL: make the PC Crash
+# this function for obs alias
+function obs(){
+  cd /mnt/d/NTSOA/INSTALLED/OBS\ STUDIO/obs-studio/bin/64bit
+  cmd.exe /c start obs64.exe
+  cd - &>/dev/null
+}
+
 # this alias to open gns3
-# alias gns="gns3.exe"
+alias gns="gns"
+
+# this function for gns alias
+function gns(){
+  cd /mnt/d/NTSOA/INSTALLED/GNS3
+  cmd.exe /c start gns3.exe
+  cd - &>/dev/null
+}
 
 # this alias to switch to windows terminal
 alias wds="wds"
@@ -680,7 +704,17 @@ alias wds="wds"
 # this function for wds alias
 function wds(){
   c && br 2;
-  cmd.exe;
+  # Check the current directory
+  # because ngrok will work only
+  # on windows'directory rather
+  # than WSL's one so we move
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe;
+  else
+    cd /mnt/c/Windows/
+    cmd.exe;
+    cd - &>/dev/null
+  fi
   cv;
 }
 
@@ -717,7 +751,7 @@ alias debug="debug"
 # this function for debug alias
 function debug(){
   cd /mnt/d/NTSOA/INSTALLED/DOSBOX/DOSBox-0.74-3
-  DOSBox.exe DEBUG.COM
+  cmd.exe /c start DOSBox.exe DEBUG.COM
   cd - &>/dev/null
 }
 
@@ -726,7 +760,10 @@ alias dbg64="dbg64"
 
 # this function for debug alias
 function dbg64(){
-  powershell.exe -command "Start-Process x64dbg -Verb RunAs"
+  # powershell.exe -command "Start-Process x64dbg -Verb RunAs"
+  cd /mnt/d/NTSOA/INSTALLED/SHORTCUTS/
+  explorer.exe x64dbg.lnk
+  cd - &>/dev/null
 }
 
 # this alias to open x32dbg
@@ -734,7 +771,10 @@ alias dbg32="dbg32"
 
 # this function for debug alias
 function dbg32(){
-  powershell.exe -command "Start-Process x32dbg -Verb RunAs"
+  # powershell.exe -command "Start-Process x32dbg -Verb RunAs"
+  cd /mnt/d/NTSOA/INSTALLED/SHORTCUTS/
+  explorer.exe x32dbg.lnk
+  cd - &>/dev/null
 }
 
 # this alias to open the state drive
@@ -758,9 +798,10 @@ function edt(){
   cd $edt_path
 
   local recent_file=$(ls -t . | head -n1)
-  op $recent_file
+  explorer.exe $recent_file
 
-  cv
+  # cv
+  cd - &>/dev/null
 }
 
 # this alias to access the raw ENI time schedule
@@ -772,9 +813,10 @@ function edtr(){
   cd $edt_path
 
   local recent_file=$(ls -t . | head -n1)
-  op $recent_file
+  explorer.exe $recent_file
 
-  cv
+  # cv
+  cd - &>/dev/null
 }
 
 # this alias to set the recent file variable
@@ -1275,15 +1317,10 @@ function open_web_app(){
   # this function to display the web app status
   function web_app_stat(){
     c && br
-    echo "****************************"
-    br
     echo " WebApp  : $app_name"
     echo " Link    : $app_domain"
     echo " Browser : $browser"
     echo " Status  : $1"
-    br
-    echo "****************************"
-    br
   }
 
   # check the stat
@@ -1634,6 +1671,28 @@ function mscr(){
   local mscr_link="musescore.com"
   local mscr_name="MuseScore"
   open_web_app $mscr_link $mscr_id $mscr_name
+}
+
+# this alias to open Docker Hub Web App
+alias dckhb="dckhb"
+
+# this function for dckhb alias
+function dckhb(){
+  local dckhb_id="mclclddaglkchjeeijdmnlfcfedonbll"
+  local dckhb_link="hub.docker.com"
+  local dckhb_name="Docker Hub"
+  open_web_app $dckhb_link $dckhb_id $dckhb_name
+}
+
+# this alias to open Nano Midi Web App
+alias midi="midi"
+
+# this function for midi alias
+function midi(){
+  local midi_id="cajodfhkmmnbofphdiodilpglpkjaepb"
+  local midi_link="nanomidi.net"
+  local midi_name="Nano Midi"
+  open_web_app $midi_link $midi_id $midi_name
 }
 
 # this alias to open fast.com
@@ -2769,7 +2828,7 @@ function ngrok(){
   # check for dashes then do not
   # redirect to another terminal
   for arg in "$@"; do
-    if [[ "$arg" == *-* ]]; then
+    if [[ "$arg" == -* || "$arg" == --* ]]; then
       local ngrok_cmd='cmd.exe /c ngrok "$@"'
       break
     fi
@@ -2807,8 +2866,16 @@ alias npm="npm"
 
 # Function for npm alias
 function npm() {
+  local npm_cmd='cmd.exe /c start npm "$@"'
+  for arg in "$@"; do
+    if [[ ("$arg" != "--verbose" || "$arg" != "-g") && ("$arg" == -* || "$arg" == --*) ]]; then
+      local npm_cmd='cmd.exe /c npm "$@"'
+      break
+    fi
+  done
+
   if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start npm "$@"
+    eval $npm_cmd
   else
     echo "${BOLD}${RED}Please execute this command inside Windows directory!"
   fi
@@ -2819,8 +2886,16 @@ alias npx="npx"
 
 # Function for npx alias
 function npx() {
+  local npx_cmd='cmd.exe /c start npx "$@"'
+  for arg in "$@"; do
+    if [[ "$arg" != "--verbose" && ("$arg" == -* || "$arg" == --*) ]]; then
+      local npx_cmd='cmd.exe /c npx "$@"'
+      break
+    fi
+  done
+
   if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start npx "$@"
+    eval $npx_cmd
   else
     echo "${BOLD}${RED}Please execute this command inside Windows directory!"
   fi
@@ -2831,8 +2906,16 @@ alias vue="vue"
 
 # Function for vue alias
 function vue() {
+  local vue_cmd='cmd.exe /c start vue "$@"'
+  for arg in "$@"; do
+    if [[ "$arg" != "--verbose" && ("$arg" == -* || "$arg" == --*) ]]; then
+      local vue_cmd='cmd.exe /c vue "$@"'
+      break
+    fi
+  done
+
   if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start vue "$@"
+    eval $vue_cmd
   else
     echo "${BOLD}${RED}Please execute this command inside Windows directory!"
   fi
