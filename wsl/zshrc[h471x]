@@ -562,7 +562,15 @@ function dtp(){
 alias books='exop /mnt/d/NTSOA/"0 ENI"/"ENI 2023"/"ENI L1 LESSONS"/BOOKS'
 
 # this alias to play directly the typing game
-alias typing="cd /mnt/d/NTSOA/dev/github_repo/typing && rn play.sh && cv"
+alias typing="typing"
+
+# this function for typing alias
+function typing(){
+  cd /mnt/d/NTSOA/dev/github_repo/typing
+  cmd.exe /c start python server.py
+  cmd.exe /c start chrome "http://localhost:8000"
+  cd - &>/dev/null
+}
 
 # this alias to show the HTML clock
 alias clock="clock"
@@ -651,6 +659,9 @@ alias java="java.exe"
 
 # this alias to launch javac windows
 alias javac="javac.exe"
+
+# this alias to launch jar windows
+alias jar="jar.exe"
 
 # Alias to call the windows pip
 alias pip="pip"
@@ -1491,8 +1502,8 @@ alias twx="twx"
 
 # this function for twx alias
 function twx(){
-  local twitter_id="jgeocpdicgmkeemopbanhokmhcgcflmi"
-  local twitter_link="twitter.com"
+  local twitter_id="lodlkdfmihgonocnmddehnfgiljnadcf"
+  local twitter_link="x.com"
   local twitter_name="TwitterX"
   open_web_app $twitter_link $twitter_id $twitter_name
 }
@@ -1693,6 +1704,17 @@ function midi(){
   local midi_link="nanomidi.net"
   local midi_name="Nano Midi"
   open_web_app $midi_link $midi_id $midi_name
+}
+
+# this alias to open Google Chat Web App
+alias chat="chat"
+
+# this function for chat alias
+function chat(){
+  local chat_id="mdpkiolbdkhdjpekfbkbmhigcaggjagi"
+  local chat_link="mail.google.com"
+  local chat_name="Google Chat"
+  open_web_app $chat_link $chat_id $chat_name
 }
 
 # this alias to open fast.com
@@ -2476,6 +2498,73 @@ function gad(){
 #this alias to view all repos in the GitHub
 alias ghls="gh repo list -L 1000"
 
+# this function to check if a username exists on github
+# INSPIRED FROM : https://gist.github.com/RitheeshBaradwaj/22eafb0c33acf42af4db000366343d63
+# 06-04-2024 19:48
+function is_a_github_user() {
+  username="$1"
+
+  # Check if username is empty
+  if [[ -z "$username" ]]; then
+    return 1
+  fi
+
+  # Build the API URL
+  url="https://api.github.com/users/$username"
+
+  # Use wget to capture the response (redirecting output to a variable)
+  # wget by default outputs content, so we use the -q (quiet) option to suppress it
+  # We pipe the response to grep for processing
+  response=$(wget -qO- --no-check-certificate "$url")
+
+  # Check if there is no output
+  # meaning it is not found
+  if [[ -z "$response" ]]; then
+    # Not Found
+    return 1
+  else
+    # Found
+    return 0
+  fi
+}
+
+# this alias to add collaborator to the repo
+alias ghadd="ghadd"
+
+# this function for ghadd alias
+# INSPIRED FROM : https://github.com/cli/cli/issues/2807
+# 06-04-2024 19:23
+function ghadd(){
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    if [[ $# -eq 0 ]]; then
+      echo "${BOLD} ■■▶ Specify the username of the new collaborator !" && br;
+    elif [[ $# -gt 0 ]]; then
+      local current_user=$(less /home/$USER/.config/gh/hosts.yml | grep user | awk '{print $2}')
+      local repo="$(git config --get remote.origin.url | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+      local repo_name=$(clean_repo $repo)
+
+      # Loop through each collaborator username provided as an argument
+      for collaborator in "$@"; do
+        echo -ne "${BOLD} Inviting ${LIGHT_BLUE}$collaborator ${WHITE}to collaborate on ${LIGHT_BLUE}$repo_name${WHITE} "
+
+        # Check if the collaborator exists on GitHub
+        if is_a_github_user "$collaborator"; then
+          # Add collaborator using gh api (replace with actual command)
+          gh api --method=PUT "repos/$current_user/$repo_name/collaborators/$collaborator" &>/dev/null
+          echo "${BOLD}${GREEN} ${WHITE}"
+        else
+          echo "${BOLD}${RED}✘ ${WHITE}"
+          # echo "${BOLD}${LIGHT_BLUE} $collaborator ${WHITE}is ${RED}Not Found ${WHITE}on GitHub !"
+        fi
+      done
+    fi
+  else
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
+  fi
+}
+
 #this alias to rename a git branch
 alias gnm="gnm"
 
@@ -2508,10 +2597,10 @@ function gck(){
 
   if [[ "$is_a_git_repo" == "true" ]]; then
     local current_branch=$(git branch | awk '/\*/ {print $2}');
-    local default_branch=$(git rev-parse --abbrev-ref origin/HEAD | cut -c8-)
-    if [ -z "$default_branch" ]; then
+    # local default_branch=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null | cut -c8-)
+    # if [ -z "$default_branch" ]; then
       default_branch=$(git config --get init.defaultBranch)
-    fi
+    # fi
 
     if [[ $# -eq 0 ]]; then
       if [[ "$current_branch" != "$default_branch" ]]; then
