@@ -1407,7 +1407,7 @@ function gthb(){
     local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
     local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
 
-    gh repo view $repo_owner/$repo_name --web
+    gh repo view $repo_owner/$repo_name --web &>/dev/null
   else
     local github_id="mjoklplbddabcmpepnokjaffbmgbkkgg"
     local github_link="github.com"
@@ -2498,6 +2498,47 @@ function ghd(){
         fi
       }
       check_delete_repo
+    fi
+  else
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
+  fi
+}
+
+# this alias to change repo visibility
+alias ghv="ghv"
+
+# this function for ghv alias
+# 06-05-2024 02:23
+function ghv(){
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    local repo_url=$(git config --get remote.origin.url)
+    local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+    local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+
+    if [[ "$repo_owner" != "$current_user" ]]; then
+      echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
+    else
+      local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+      local isPrivate=$(gh repo view $repo_name --json isPrivate --jq '.isPrivate')
+      local new_visibility=$([[ $isPrivate == "true" ]] && echo "public" || echo "private")
+
+      function toggle_visibility(){
+        echo -ne "${BOLD}${WHITE} Make ${LIGHT_BLUE}$repo_name ${WHITE}repo ${GREEN}$new_visibility ${WHITE}? (y/n) ";
+        read change_visibility
+        if [ "$change_visibility" = "y" ]; then
+          # toggle visibility
+          echo -ne "${BOLD} Changing repo visibility to ${GREEN}$new_visibility ${WHITE}... ";
+          gh repo edit "$repo_owner/$repo_name" --visibility "$new_visibility" &>/dev/null;
+          echo "${BOLD}${GREEN} ${WHITE}";
+        elif [ "$change_visibility" = "n" ];then
+          return 0
+        else
+          toggle_visibility
+        fi
+      }
+      toggle_visibility
     fi
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
