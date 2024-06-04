@@ -1400,14 +1400,22 @@ alias gthb="gthb"
 
 # this function for gthb alias
 function gthb(){
-  local github_id="mjoklplbddabcmpepnokjaffbmgbkkgg"
-  local github_link="github.com"
-  local github_name="GitHub"
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
-  if [[ $# -eq 0 ]]; then
-    open_web_app $github_link $github_id $github_name
-  elif [[ $# -eq 1 ]]; then
-    gh repo view $USER/$1 --web
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    local repo_url=$(git config --get remote.origin.url)
+    local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+    local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+
+    gh repo view $repo_owner/$repo_name --web
+  else
+    local github_id="mjoklplbddabcmpepnokjaffbmgbkkgg"
+    local github_link="github.com"
+    local github_name="GitHub"
+
+    if [[ $# -eq 0 ]]; then
+      open_web_app $github_link $github_id $github_name
+    fi
   fi
 }
 
@@ -2437,9 +2445,22 @@ function ghc() {
   local repo_name="$(clean_repo "$repo")"
   local repo_visibility=$([[ $isPrivate == "private" ]] && echo "private" || echo "public")
 
-  # create the repo & clone it locally
-  gh repo create "$repo_name" --$repo_visibility -c;
-  mv "$repo_name/.git" . && rm -rf "$repo_name";
+  function check_create_repo(){
+    echo -ne "${BOLD}${WHITE} Create ${GREEN}$repo_visibility ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
+    read create_repo
+    if [ "$create_repo" = "y" ]; then
+      # create the repo & clone it locally
+      echo -ne "${BOLD} New repository ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ... "
+      gh repo create "$repo_name" --$repo_visibility -c &>/dev/null;
+      mv "$repo_name/.git" . && rm -rf "$repo_name";
+      echo "${BOLD}${GREEN} ${WHITE}"
+    elif [ "$create_repo" = "n" ];then
+      return 0
+    else
+      check_create_repo
+    fi
+  }
+  check_create_repo
 }
 
 # this alias to delete a github repo via Github CLI
@@ -2450,12 +2471,34 @@ function ghd(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    local repo="$(git config --get remote.origin.url | awk -F '/' '{print $NF}' | sed 's/.git$//')"
-    local repo_name=${1:-$(clean_repo $repo)}
+    local repo_url=$(git config --get remote.origin.url)
+    local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+    local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
 
-    # delete the repo
-    gh repo delete "$repo_name" --yes;
-    rm -rf .git;
+    if [[ "$repo_owner" != "$current_user" ]]; then
+      echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
+    else
+      local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+      local isPrivate=$(gh repo view $repo_name --json isPrivate --jq '.isPrivate')
+      local repo_visibility=$([[ $isPrivate == "true" ]] && echo "private" || echo "public")
+
+      function check_delete_repo(){
+        echo -ne "${BOLD}${WHITE} Delete ${GREEN}$repo_visibility ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
+        read delete_repo
+        if [ "$delete_repo" = "y" ]; then
+          # delete the repo
+          echo -ne "${BOLD} Deleting repository ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ... ";
+          gh repo delete "$repo_name" --yes &>/dev/null;
+          rm -rf .git;
+          echo "${BOLD}${GREEN} ${WHITE}";
+        elif [ "$delete_repo" = "n" ];then
+          return 0
+        else
+          check_delete_repo
+        fi
+      }
+      check_delete_repo
+    fi
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
@@ -2547,8 +2590,7 @@ function ghadd(){
       local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
       local repo_url=$(git config --get remote.origin.url)
       local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
-      local repo="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
-      local repo_name=$(clean_repo $repo)
+      local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
 
       # check if we are not the owner of the repo
       if [[ "$repo_owner" != "$current_user" ]]; then
@@ -2590,8 +2632,7 @@ function ghdel(){
       local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
       local repo_url=$(git config --get remote.origin.url)
       local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
-      local repo="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
-      local repo_name=$(clean_repo "$repo")
+      local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
 
       # check if we are not the owner of the repo
       if [[ "$repo_owner" != "$current_user" ]]; then
@@ -2643,8 +2684,7 @@ function ghcls(){
     local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
     local repo_url=$(git config --get remote.origin.url)
     local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
-    local repo="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
-    local repo_name=$(clean_repo "$repo")
+    local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
 
     # check if we are not the owner of the repo
     if [[ "$repo_owner" != "$current_user" ]]; then
@@ -2714,10 +2754,11 @@ function gck(){
 
   if [[ "$is_a_git_repo" == "true" ]]; then
     local current_branch=$(git branch | awk '/\*/ {print $2}');
-    # local default_branch=$(git rev-parse --abbrev-ref origin/HEAD 2>/dev/null | cut -c8-)
-    # if [ -z "$default_branch" ]; then
+    local default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+
+    if [[ -z "$default_branch" ]]; then
       default_branch=$(git config --get init.defaultBranch)
-    # fi
+    fi
 
     if [[ $# -eq 0 ]]; then
       if [[ "$current_branch" != "$default_branch" ]]; then
@@ -2730,7 +2771,6 @@ function gck(){
         function check_new_branch(){
           echo -ne "${BOLD}${WHITE}New branch${GREEN} "$new_branch"${WHITE} ? (y/n) ";
           read branch
-          echo "${RESET}"
           if [ "$branch" = "y" ]; then
             git checkout -b "$new_branch";
           elif [ "$branch" = "n" ];then
@@ -2793,12 +2833,16 @@ function gbr(){
 alias gbd="gbd"
 
 # this function for gbd alias
-function gbd(){
+function gbd() {
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    local default_branch=$(git rev-parse --abbrev-ref origin/HEAD | cut -c8- 2>/dev/null || git config --get init.defaultBranch)
     local current_branch=$(git branch | awk '/\*/ {print $2}');
+    local default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+
+    if [[ -z "$default_branch" ]]; then
+      default_branch=$(git config --get init.defaultBranch)
+    fi
 
     if [[ $# -eq 1 ]]; then
       if [[ "$1" == "$default_branch" ]]; then
@@ -2807,13 +2851,12 @@ function gbd(){
         echo "${BOLD} ■■▶ Fatal ! Branch ${GREEN}$1 ${WHITE}doesn't exist ${RESET}" && br;
       else
         # this to check if we want to delete the remote branch too
-        function check_delete_remote_branch(){
+        function check_delete_remote_branch() {
           if [[ "$current_branch" == "$default_branch" ]]; then
             echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
           else
             echo -ne "${BOLD}${WHITE}Delete remote branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
             read delete_remote_branch
-            echo "${RESET}"
             if [ "$delete_remote_branch" = "y" ]; then
               git push origin --delete "$current_branch";
             elif [ "$delete_remote_branch" = "n" ];then
@@ -2823,7 +2866,8 @@ function gbd(){
             fi
           fi
         }
-        function check_delete_branch(){
+
+        check_delete_branch() {
           local branch_name="$1"
           echo -ne "${BOLD}${WHITE}Delete branch${GREEN} "$branch_name"${WHITE} ? (y/n) ${RESET}";
           read delete_branch
@@ -2847,12 +2891,12 @@ function gbd(){
       if [[ "$current_branch" == "$default_branch" ]]; then
         echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
       else
-        function check_delete_branch(){
+        function check_delete_branch() {
           echo -ne "${BOLD}${WHITE}Delete branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
           read delete_branch
           if [ "$delete_branch" = "y" ]; then
             # this to check if we want to delete the remote branch too
-            function check_delete_remote_branch(){
+            function check_delete_remote_branch() {
               if [[ "$current_branch" == "$default_branch" ]]; then
                 echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
               else
