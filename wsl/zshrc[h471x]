@@ -2514,6 +2514,8 @@ function is_a_github_user() {
 
   # Use wget to capture the response (redirecting output to a variable)
   # wget by default outputs content, so we use the -q (quiet) option to suppress it
+  # -O- option specifies that the downloaded content should be written
+  # to standard output (stdout) instead of a file.
   # We pipe the response to grep for processing
   response=$(wget -qO- --no-check-certificate "$url")
 
@@ -2534,6 +2536,7 @@ alias ghadd="ghadd"
 # this function for ghadd alias
 # INSPIRED FROM : https://github.com/cli/cli/issues/2807
 # 06-04-2024 19:23
+# Uses the github cli rest API
 function ghadd(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
@@ -2541,24 +2544,134 @@ function ghadd(){
     if [[ $# -eq 0 ]]; then
       echo "${BOLD} ■■▶ Specify the username of the new collaborator !" && br;
     elif [[ $# -gt 0 ]]; then
-      local current_user=$(less /home/$USER/.config/gh/hosts.yml | grep user | awk '{print $2}')
-      local repo="$(git config --get remote.origin.url | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+      local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+      local repo_url=$(git config --get remote.origin.url)
+      local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+      local repo="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
       local repo_name=$(clean_repo $repo)
 
-      # Loop through each collaborator username provided as an argument
-      for collaborator in "$@"; do
-        echo -ne "${BOLD} Inviting ${LIGHT_BLUE}$collaborator ${WHITE}to collaborate on ${LIGHT_BLUE}$repo_name${WHITE} "
+      # check if we are not the owner of the repo
+      if [[ "$repo_owner" != "$current_user" ]]; then
+        echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
+      else
+        # Loop through each collaborator username provided as an argument
+        for collaborator in "$@"; do
+          echo -ne "${BOLD} Inviting ${LIGHT_BLUE}$collaborator ${WHITE}to collaborate on ${LIGHT_BLUE}$repo_name${WHITE} "
 
-        # Check if the collaborator exists on GitHub
-        if is_a_github_user "$collaborator"; then
-          # Add collaborator using gh api (replace with actual command)
-          gh api --method=PUT "repos/$current_user/$repo_name/collaborators/$collaborator" &>/dev/null
-          echo "${BOLD}${GREEN} ${WHITE}"
-        else
-          echo "${BOLD}${RED}✘ ${WHITE}"
-          # echo "${BOLD}${LIGHT_BLUE} $collaborator ${WHITE}is ${RED}Not Found ${WHITE}on GitHub !"
-        fi
-      done
+          # Check if the collaborator exists on GitHub
+          if is_a_github_user "$collaborator"; then
+            # Add collaborator using gh api
+            gh api --method=PUT "repos/$current_user/$repo_name/collaborators/$collaborator" &>/dev/null
+            echo "${BOLD}${GREEN} ${WHITE}"
+          else
+            echo "${BOLD}${RED}✘ ${WHITE}"
+          fi
+        done
+      fi
+    fi
+  else
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
+  fi
+}
+
+# this alias to delete a contributor
+alias ghdel="ghdel"
+
+# this function for ghdel alias
+# IMPROVED : 06-04-2024 23:52
+# Derived from ghadd
+function ghdel(){
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    if [[ $# -eq 0 ]]; then
+      echo "${BOLD} ■■▶ Specify the username of the collaborator to remove !" && br;
+    elif [[ $# -gt 0 ]]; then
+      local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+      local repo_url=$(git config --get remote.origin.url)
+      local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+      local repo="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+      local repo_name=$(clean_repo "$repo")
+
+      # check if we are not the owner of the repo
+      if [[ "$repo_owner" != "$current_user" ]]; then
+        echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
+      else
+        # Loop through each collaborator username provided as an argument
+        for collaborator in "$@"; do
+          echo -ne "${BOLD} Removing ${LIGHT_BLUE}$collaborator ${WHITE}from ${LIGHT_BLUE}$repo_name${WHITE} "
+
+          # Check if the collaborator exists on GitHub
+          if is_a_github_user "$collaborator"; then
+            # Check for pending invitations
+            local invitation_id=$(gh api "repos/$current_user/$repo_name/invitations" --jq ".[] | select(.invitee.login==\"$collaborator\") | .id")
+
+            if [[ -n "$invitation_id" ]]; then
+              # Delete the pending invitation
+              gh api --method=DELETE "repos/$current_user/$repo_name/invitations/$invitation_id" &>/dev/null
+              echo -ne " ${BOLD}(invitation deleted) "
+            fi
+
+            # Remove collaborator using gh api
+            gh api --method=DELETE "repos/$current_user/$repo_name/collaborators/$collaborator" &>/dev/null
+            echo "${BOLD}${GREEN} ${WHITE}"
+          else
+            echo "${BOLD}${RED}✘ ${WHITE}"
+          fi
+        done
+      fi
+    fi
+  else
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
+  fi
+}
+
+# this alias to list all collaborators
+alias ghcls="ghcls"
+
+# this function for ghcls alias
+# IMPROVED : 06-04-2024 23:52
+# Derived from ghadd
+function ghcls(){
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+    local repo_url=$(git config --get remote.origin.url)
+    local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+    local repo="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+    local repo_name=$(clean_repo "$repo")
+
+    # check if we are not the owner of the repo
+    if [[ "$repo_owner" != "$current_user" ]]; then
+      echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
+    else
+      echo "${BOLD} ${LIGHT_BLUE}Collaborators ${WHITE}for the ${LIGHT_BLUE}$repo_name ${WHITE}repository "
+
+      # List collaborators using gh api
+      local collaborators=$(gh api "repos/$current_user/$repo_name/collaborators" --jq '.[].login')
+      local invitations=$(gh api "repos/$current_user/$repo_name/invitations" --jq '.[].invitee.login')
+
+      # Iterate through each collaborator
+      if [[ -n "$collaborators" ]]; then
+        while IFS= read -r collaborator; do
+          if [[ "$collaborator" == "$current_user" ]]; then
+            echo " ● $collaborator (owner)"
+          else
+            echo " ● $collaborator"
+          fi
+        done <<< "$collaborators"
+      else
+        echo "No collaborators found."
+      fi
+
+      # Check if there are pending invitations
+      if [[ -n "$invitations" ]]; then
+        # Print pending invitations
+        while IFS= read -r invitee; do
+          echo " ● $invitee (invitation pending)"
+        done <<< "$invitations"
+      fi
     fi
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
