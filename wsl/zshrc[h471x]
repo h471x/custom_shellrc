@@ -2597,12 +2597,16 @@ function ghdel(){
       if [[ "$repo_owner" != "$current_user" ]]; then
         echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
       else
+        # Retrieve the list of collaborators
+        local collaborators=$(gh api "repos/$current_user/$repo_name/collaborators" --jq '.[].login')
+        local invitations=$(gh api "repos/$current_user/$repo_name/invitations" --jq '.[].invitee.login')
+
         # Loop through each collaborator username provided as an argument
         for collaborator in "$@"; do
-          echo -ne "${BOLD} Removing ${LIGHT_BLUE}$collaborator ${WHITE}from ${LIGHT_BLUE}$repo_name${WHITE} "
-
-          # Check if the collaborator exists on GitHub
-          if is_a_github_user "$collaborator"; then
+          # Check if the collaborator exists in the list of collaborators
+          if echo "$collaborators" | grep -q "$collaborator" ||
+            echo "$invitations" | grep -q "$collaborator"; then
+            echo -ne "${BOLD} Removing ${LIGHT_BLUE}$collaborator ${WHITE}from ${LIGHT_BLUE}$repo_name${WHITE} "
             # Check for pending invitations
             local invitation_id=$(gh api "repos/$current_user/$repo_name/invitations" --jq ".[] | select(.invitee.login==\"$collaborator\") | .id")
 
@@ -2616,7 +2620,7 @@ function ghdel(){
             gh api --method=DELETE "repos/$current_user/$repo_name/collaborators/$collaborator" &>/dev/null
             echo "${BOLD}${GREEN} ${WHITE}"
           else
-            echo "${BOLD}${RED}✘ ${WHITE}"
+            echo "${BOLD}${LIGHT_BLUE}$collaborator ${WHITE}is not a ${LIGHT_BLUE}collaborator ${RED}✘ ${WHITE}"
           fi
         done
       fi
