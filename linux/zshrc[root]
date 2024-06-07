@@ -5,6 +5,9 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# Make zsh instant prompt quiet
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
+
 #here to make scrollbar work again disabling mouse
 #unsetopt mouse
 
@@ -35,6 +38,12 @@ DISABLE_AUTO_UPDATE="true"
 source $ZSH/oh-my-zsh.sh
 
 PATH=$PATH:/usr/bin/sqlite3
+
+# this alias to clear but with extra lines
+alias x="clear && echo -e && echo -e && echo -e && echo -e && echo -e && echo -e"
+
+# call x alias at startup
+x;
 
 #this alias to launch tmux
 alias tx="sudo -u h471x tmux && cv"
@@ -181,7 +190,7 @@ function all(){
 }
 
 #this alias to reload the zshrx file
-dalias rld="rld"
+alias rld="rld"
 
 #this function for rld alias
 function rld(){
@@ -557,7 +566,7 @@ alias hn="op /home/h471x/NTSOA"
 
 #here to clear at startup
 # clear && echo -e && echo    " $(basename "$PWD") folder content : " && echo -e && ls && echo -e
-cv
+# cv
 
 #here to view the ssh status
 alias sth="sth"
