@@ -22,7 +22,7 @@ fastfile_var_prefix='$'
 export ZSH="$HOME/.oh-my-zsh"
 
 # Binaries
-WSL_PATH=/home/h471x/.local/bin/
+WSL_PATH=/home/h471x/.local/bin/:/usr/bin/scp
 SQLITE_PATH=/mnt/c/Program\ Files/sqlite
 QT_PATH=/mnt/d/NTSOA/INSTALLED/QT/Tools/QtCreator/bin
 PYTHON_PATH=/mnt/d/NTSOA/INSTALLED/PYTHON
@@ -677,6 +677,20 @@ function pip() {
   fi
 }
 
+# this alias to use windows nslookup
+alias nslookup="nslookup"
+
+# this function for nslookup alias
+function nslookup(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c nslookup "$@"
+  else
+    cd /mnt/d/NTSOA
+    cmd.exe /c nslookup "$@"
+    cd - &>/dev/null;
+  fi
+}
+
 # this alias to run jupyter notebook
 alias jptr="jptr"
 
@@ -762,7 +776,7 @@ alias debug="debug"
 # this function for debug alias
 function debug(){
   cd /mnt/d/NTSOA/INSTALLED/DOSBOX/DOSBox-0.74-3
-  cmd.exe /c start DOSBox.exe DEBUG.COM
+  cmd.exe /c start DOSBox.exe DEBUGX.COM
   cd - &>/dev/null
 }
 
@@ -1242,7 +1256,7 @@ alias rdf="allow_sudo && rdf"
 
 # this function for rdf alias
 function rdf(){
-  sudo rm -rf "$@";
+  sudo rm -rfv "$@";
   cv;
 }
 
@@ -2508,7 +2522,7 @@ function ghd(){
 alias ghv="ghv"
 
 # this function for ghv alias
-# 06-05-2024 02:23
+# IMPROVED : 06-06-2024 10:47
 function ghv(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
@@ -2524,21 +2538,26 @@ function ghv(){
       local isPrivate=$(gh repo view $repo_name --json isPrivate --jq '.isPrivate')
       local new_visibility=$([[ $isPrivate == "true" ]] && echo "public" || echo "private")
 
-      function toggle_visibility(){
-        echo -ne "${BOLD}${WHITE} Make ${LIGHT_BLUE}$repo_name ${WHITE}repo ${GREEN}$new_visibility ${WHITE}? (y/n) ";
-        read change_visibility
-        if [ "$change_visibility" = "y" ]; then
-          # toggle visibility
-          echo -ne "${BOLD} Changing repo visibility to ${GREEN}$new_visibility ${WHITE}... ";
-          gh repo edit "$repo_owner/$repo_name" --visibility "$new_visibility" &>/dev/null;
-          echo "${BOLD}${GREEN} ${WHITE}";
-        elif [ "$change_visibility" = "n" ];then
-          return 0
-        else
-          toggle_visibility
-        fi
-      }
-      toggle_visibility
+      if [[ "$1" == "show" ]]; then
+        local visibility=$([[ $isPrivate == "true" ]] && echo "private" || echo "public") 
+        echo "${BOLD} This repo ${LIGHT_BLUE}$repo_name ${WHITE}is ${GREEN}$visibility";
+      else
+        function toggle_visibility(){
+          echo -ne "${BOLD}${WHITE} Make ${LIGHT_BLUE}$repo_name ${WHITE}repo ${GREEN}$new_visibility ${WHITE}? (y/n) ";
+          read change_visibility
+          if [ "$change_visibility" = "y" ]; then
+            # toggle visibility
+            echo -ne "${BOLD} Changing repo visibility to ${GREEN}$new_visibility ${WHITE}... ";
+            gh repo edit "$repo_owner/$repo_name" --visibility "$new_visibility" &>/dev/null;
+            echo "${BOLD}${GREEN} ${WHITE}";
+          elif [ "$change_visibility" = "n" ];then
+            return 0
+          else
+            toggle_visibility
+          fi
+        }
+        toggle_visibility
+      fi
     fi
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
@@ -2600,7 +2619,6 @@ function is_a_github_user() {
   # wget by default outputs content, so we use the -q (quiet) option to suppress it
   # -O- option specifies that the downloaded content should be written
   # to standard output (stdout) instead of a file.
-  # We pipe the response to grep for processing
   response=$(wget -qO- --no-check-certificate "$url")
 
   # Check if there is no output
