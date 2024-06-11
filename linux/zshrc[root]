@@ -82,38 +82,45 @@ function br(){
 # of working directory content using ls
 alias cv="cv"
 
-#this function for cv alias
-#updated today 01/25/2024 to adjust the title
-#when we have more than 50 visible items
+# this function for cv alias
+# updated today 01/25/2024 to adjust the title
+# when we have more than 50 visible items
 function cv() {
-  local folder_content="${target:-$PWD}"
   local target="$1"
+  local folder_content="${target:-$PWD}"
   local folder_name=$(basename $folder_content)
   local visible_item=$(ls $folder_content | wc -l)
-  local total_item=$(ls -a $folder_content | wc -l)
-  local hidden_item=$((total_item - visible_item - 2))
+  local total_item=$(ls -A $folder_content | wc -l)
+  local hidden_item=$((total_item - visible_item))
 
-  #this function for the header of cv alias
+  # this function for the header of cv alias
   function show_header(){
     local folder_header
-    if [[ $hidden_item -eq 0 ]]; then
+    if [[ $total_item -eq 0 ]]; then
+      folder_header="Empty(0)";
+      folder_icon=" "
+    elif [[ $hidden_item -eq 0 ]]; then
       folder_header="total($visible_item)";
+      folder_icon=" "
     else
-      folder_header="visible($visible_item) hidden($hidden_item) total($(($total_item - 2))) ";
+      folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
+      folder_icon=" "
     fi
-    echo " ■■▶ $folder_name folder content : $folder_header";
+    echo "${BOLD}${WHITE} $folder_icon $folder_name -> $folder_header ${RESET}";
   }
 
-  #this function to show the content of the cv
+  # this function to show the content of the cv
   function show_content(){
-    ls $folder_content;
+    # local flag="${1:-}"
+    # ls $flag $folder_content;
+    eza --icons=always --no-quotes $folder_content
   }
 
-  #this function to show the cv
+  # this function to show the all of the cv content
   function show_all(){
-    clear && br;
+    c && br;
 
-    if [[ $visible_item -lt 50 ]]; then
+    if [[ $visible_item -lt 30 ]]; then
       show_header;
       br;
       show_content;
@@ -128,41 +135,46 @@ function cv() {
   show_all;
 }
 
-#this alias to view the current directory content
+# this alias to view the current directory content
 alias cvf="cvf"
 
-#this function for cvf alias
-#updated today 01/25/2024 to adjust the title
-#when we have more than 50 visible items
+# this function for cvf alias
+# updated today 01/25/2024 to adjust the title
+# when we have more than 50 visible items
 function cvf() {
-  local folder_content="${target:-$PWD}"
   local target="$1"
+  local folder_content="${target:-$PWD}"
   local folder_name=$(basename $folder_content)
   local visible_item=$(ls $folder_content | wc -l)
-  local total_item=$(ls -a $folder_content | wc -l)
-  local hidden_item=$((total_item - visible_item - 2))
+  local total_item=$(ls -A $folder_content | wc -l)
+  local hidden_item=$((total_item - visible_item))
 
-  #this function for the header of cv alias
+  # this function for the header of cv alias
   function show_header(){
     local folder_header
-    if [[ $hidden_item -eq 0 ]]; then
+    if [[ $total_item -eq 0 ]]; then
+      folder_header="Empty(0)";
+      folder_icon=" "
+    elif [[ $hidden_item -eq 0 ]]; then
       folder_header="total($visible_item)";
+      folder_icon=" "
     else
-      folder_header="visible($visible_item) hidden($hidden_item) total($(($total_item - 2))) ";
+      folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
+      folder_icon=" "
     fi
-    echo " ■■▶ $folder_name folder content : $folder_header";
+    echo "${BOLD}${WHITE} $folder_icon $folder_name -> $folder_header ${RESET}";
   }
 
-  #this function to show the content of the cv
+  # this function to show the content of the cv
   function show_content(){
-    ls -a $folder_content;
+    eza --icons=always -a $folder_content;
   }
 
-  #this function to show the cv
+  # this function to show the cv
   function show_all(){
-    clear && br;
+    c && br;
 
-    if [[ $hidden_item -lt 50 ]]; then
+    if [[ $hidden_item -lt 30 ]]; then
       show_header;
       br;
       show_content;
@@ -176,7 +188,6 @@ function cvf() {
   }
   show_all;
 }
-
 
 #this alias to quit
 alias q="clear && exit"
@@ -194,9 +205,17 @@ alias rld="rld"
 
 #this function for rld alias
 function rld(){
-  cat ~/.zshrc > /home/h471x/NTSOA/zshrc/linux/"zshrc[root]" && all /home/h471x/NTSOA/zshrc/linux/"zshrc[root]" && c && echo -e && echo "z s h    s a v e d " | figlet -t -c && echo -e && sleep 0.5 && source ~/.zshrc;
+  clear;
+  source /root/.$(basename $SHELL)rc;
+  local saved_file="zshrc[root]"
+  cat /root/.zshrc > /home/h471x/NTSOA/zshrc/linux/$saved_file;
+  all /home/h471x/NTSOA/zshrc/linux/$saved_file;
+  c && br;
+  echo "z s h    s a v e d " | figlet -t -c;
+  # tlk "saved";
+  br && sleep 0.5;
+  op /home/h471x/NTSOA/zshrc;
 }
-
 
 #this alias to show the welcome message
 alias cvi="cvii"
