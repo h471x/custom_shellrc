@@ -580,7 +580,7 @@ function ei(){
   local input_pdf="$1"
   local output_image="$(basename "$input_pdf" .pdf).jpg";
   local kali_edt_path=/home/h471x/NTSOA/EDT\ ENI/JPG/L2\ 2024;
-  local windows_edt_path=/media/sf_ENI/ENI\ 2024/0\ EDT/L2\ 2024
+  local windows_edt_path=/media/sf_0_ENI/ENI\ 2024/0\ EDT/L2\ 2024
 
   # convert pdf to jpg using imagemagick convert
   convert -density 500 "$input_pdf" "$output_image";
@@ -1138,7 +1138,7 @@ alias dvps="op /home/h471x/NTSOA/COURSE/DEVOPS/NOTES "
 alias awsd="op /home/h471x/NTSOA/COURSE/DEVOPS/AWS "
 
 #this alias to go to the ENI folder
-alias eni="op /home/h471x/NTSOA/COURSE/ENI"
+# alias eni="op /home/h471x/NTSOA/COURSE/ENI"
 
 #this alias to go to the to desktop
 alias dtp="op /home/h471x/Desktop"
@@ -1358,7 +1358,7 @@ alias kali="op /media/sf_KALI_LINUX"
 alias books="op /media/sf_BOOKS"
 
 # this alias to open ENI shared folder
-alias eni="op /media/sf_ENI/ENI\ 2024"
+alias eni="op /media/sf_0_ENI/ENI\ 2024"
 
 
 #this alias to locate packages
