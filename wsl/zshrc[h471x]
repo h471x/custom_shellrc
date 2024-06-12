@@ -1546,7 +1546,7 @@ alias hcrk="hcrk"
 
 # this function for hcrk alias
 function hcrk(){
-  local hackerrank_id="jhcacpbneohogfnaanlbdfpjpfmfmpdk"
+  local hackerrank_id="jlokchaaimeiedjgobonphmigfpingaj"
   local hackerrank_link="hackerrank.com"
   local hackerrank_name="HackerRank"
   open_web_app $hackerrank_link $hackerrank_id $hackerrank_name
@@ -2527,37 +2527,43 @@ function ghv(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    local repo_url=$(git config --get remote.origin.url)
-    local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
-    local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
-
-    if [[ "$repo_owner" != "$current_user" ]]; then
-      echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
-    else
+    if [[ "$#" -eq 0 || "$1" == "show" || "$1" == "owner" ]]; then
+      local repo_url=$(git config --get remote.origin.url)
+      local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+      local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
       local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
-      local isPrivate=$(gh repo view $repo_name --json isPrivate --jq '.isPrivate')
-      local new_visibility=$([[ $isPrivate == "true" ]] && echo "public" || echo "private")
 
-      if [[ "$1" == "show" ]]; then
-        local visibility=$([[ $isPrivate == "true" ]] && echo "private" || echo "public") 
-        echo "${BOLD} This repo ${LIGHT_BLUE}$repo_name ${WHITE}is ${GREEN}$visibility";
+      if [[ "$repo_owner" != "$current_user" && "$1" != "owner" ]]; then
+        echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
+      elif [[ "$1" == "owner" ]]; then
+        echo "${BOLD} The repo ${LIGHT_BLUE}$repo_name ${WHITE}is owned by ${GREEN}$repo_owner";
       else
-        function toggle_visibility(){
-          echo -ne "${BOLD}${WHITE} Make ${LIGHT_BLUE}$repo_name ${WHITE}repo ${GREEN}$new_visibility ${WHITE}? (y/n) ";
-          read change_visibility
-          if [ "$change_visibility" = "y" ]; then
-            # toggle visibility
-            echo -ne "${BOLD} Changing repo visibility to ${GREEN}$new_visibility ${WHITE}... ";
-            gh repo edit "$repo_owner/$repo_name" --visibility "$new_visibility" &>/dev/null;
-            echo "${BOLD}${GREEN} ${WHITE}";
-          elif [ "$change_visibility" = "n" ];then
-            return 0
-          else
-            toggle_visibility
-          fi
-        }
-        toggle_visibility
+        local isPrivate=$(gh repo view $repo_name --json isPrivate --jq '.isPrivate')
+
+        if [[ "$1" == "show" ]]; then
+          local visibility=$([[ $isPrivate == "true" ]] && echo "private" || echo "public")
+          echo "${BOLD} This repo ${LIGHT_BLUE}$repo_name ${WHITE}is ${GREEN}$visibility";
+        else
+          local new_visibility=$([[ $isPrivate == "true" ]] && echo "public" || echo "private")
+          function toggle_visibility(){
+            echo -ne "${BOLD}${WHITE} Make ${LIGHT_BLUE}$repo_name ${WHITE}repo ${GREEN}$new_visibility ${WHITE}? (y/n) ";
+            read change_visibility
+            if [ "$change_visibility" = "y" ]; then
+              # toggle visibility
+              echo -ne "${BOLD} Changing repo visibility to ${GREEN}$new_visibility ${WHITE}... ";
+              gh repo edit "$repo_owner/$repo_name" --visibility "$new_visibility" &>/dev/null;
+              echo "${BOLD}${GREEN} ${WHITE}";
+            elif [ "$change_visibility" = "n" ];then
+              return 0
+            else
+              toggle_visibility
+            fi
+          }
+          toggle_visibility
+        fi
       fi
+    else
+      echo "${BOLD} ■■▶ Sorry, wrong command argument !" && br;
     fi
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
