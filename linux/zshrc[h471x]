@@ -2512,11 +2512,13 @@ function ghv(){
     local repo_url=$(git config --get remote.origin.url)
     local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
     local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+    local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
 
-    if [[ "$repo_owner" != "$current_user" ]]; then
+    if [[ "$repo_owner" != "$current_user" && "$1" != "owner" ]]; then
       echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
+    elif [[ "$1" == "owner" ]]; then
+      echo "${BOLD} The repo ${LIGHT_BLUE}$repo_name ${WHITE}is owned by ${GREEN}$repo_owner";
     else
-      local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
       local isPrivate=$(gh repo view $repo_name --json isPrivate --jq '.isPrivate')
       local new_visibility=$([[ $isPrivate == "true" ]] && echo "public" || echo "private")
 
