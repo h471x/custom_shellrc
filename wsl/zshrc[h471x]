@@ -1739,6 +1739,39 @@ function chat(){
   open_web_app $chat_link $chat_id $chat_name
 }
 
+# this alias to open Virus Total Web App
+alias virustotal="virustotal"
+
+# this function for virustotal alias
+function virustotal(){
+  local virustotal_id="dnopbpmlkabcondfpckfnhgabfcncjmg"
+  local virustotal_link="virustotal.com"
+  local virustotal_name="Virus Total"
+  open_web_app $virustotal_link $virustotal_id $virustotal_name
+}
+
+# this alias to open CodinGame Web App
+alias codingame="codingame"
+
+# this function for codingame alias
+function codingame(){
+  local codingame_id="mdmdhiclipbbmgikhgefloaghajjcheg"
+  local codingame_link="codingame.com"
+  local codingame_name="CodinGame"
+  open_web_app $codingame_link $codingame_id $codingame_name
+}
+
+# this alias to open Cisco Skills For All Web App
+alias cisco="cisco"
+
+# this function for cisco alias
+function cisco(){
+  local cisco_id="imjciepmglgacccklncenjgecohaihcj"
+  local cisco_link="skillsforall.com"
+  local cisco_name="Cisco Skills For All"
+  open_web_app $cisco_link $cisco_id $cisco_name
+}
+
 # this alias to open fast.com
 alias fast="open_web_app fast.com"
 
