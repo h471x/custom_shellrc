@@ -1772,6 +1772,28 @@ function cisco(){
   open_web_app $cisco_link $cisco_id $cisco_name
 }
 
+# this alias to open Hack Tricks Web App
+alias tricks="tricks"
+
+# this function for tricks alias
+function tricks(){
+  local tricks_id="mggngfogmkhbpicjamlefjpciidpodmm"
+  local tricks_link="book.hacktricks.xyz"
+  local tricks_name="Hack Tricks"
+  open_web_app $tricks_link $tricks_id $tricks_name
+}
+
+# this alias to open Try Hack Me Web App
+alias hackme="hackme"
+
+# this function for hackme alias
+function hackme(){
+  local hackme_id="daeaiadaklimdlhhcpgbdkgdkmghbkmf"
+  local hackme_link="tryhackme.com"
+  local hackme_name="Try Hack Me"
+  open_web_app $hackme_link $hackme_id $hackme_name
+}
+
 # this alias to open fast.com
 alias fast="open_web_app fast.com"
 
