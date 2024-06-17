@@ -1020,7 +1020,13 @@ function vf() {
     case "${1##*.}" in
       wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) explorer.exe "$1" ;;
       # open all files that have default app with windows explorer
-      html) bwsop "$1";;
+      html)
+        if [[ "$PWD" == "/mnt/"* ]]; then
+          explorer.exe "$1"
+        else
+          bwsop "$1"
+        fi
+        ;;
       *) nvim "$1" ;;
     esac
     cv
@@ -1792,6 +1798,23 @@ function hackme(){
   local hackme_link="tryhackme.com"
   local hackme_name="Try Hack Me"
   open_web_app $hackme_link $hackme_id $hackme_name
+}
+
+# this alias to open W3SCHOOLS Offline Web App
+alias wscl="wscl"
+
+# this function for wscl alias
+function wscl(){
+  local wscl_id="lcmlmpinhhipbaifakfjccanpehnglei"
+  local wscl_link="localhost"
+  local wscl_name="W3Schools"
+
+  if [[ ! $(pgrep apache2) ]]; then
+    echo "${BOLD}[${GREEN}+${WHITE}]${WHITE} Starting Apache Server ..."; br;
+    sudo service apache2 start &>/dev/null;
+  fi
+
+  open_web_app $wscl_link $wscl_id $wscl_name
 }
 
 # this alias to open fast.com
