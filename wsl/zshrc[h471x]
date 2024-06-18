@@ -1810,7 +1810,7 @@ function wscl(){
   local wscl_name="W3Schools"
 
   if [[ ! $(pgrep apache2) ]]; then
-    echo "${BOLD}[${GREEN}+${WHITE}]${WHITE} Starting Apache Server ..."; br;
+    echo -ne "${BOLD}[${GREEN}+${WHITE}]${WHITE} Starting Apache Server ...";
     sudo service apache2 start &>/dev/null;
   fi
 
@@ -3126,12 +3126,14 @@ function glc(){
     local current_user=$(git config user.name)
     local commits_done_today=$(git log --oneline --since="$(date +"%Y-%m-%d 00:00:00")" --author="$current_user" | wc -l)
     local commits_contrib_today=$(git log --oneline --since="$(date +"%Y-%m-%d 00:00:00")" --author="$last_commit_author" | wc -l)
+
     [[ $commits_num -le 1 ]] && commit_text="commit" || commit_text="commits";
     [[ $commits_done_today -le 1 ]] && commit_done_text="commit" || commit_done_text="commits";
     [[ $commits_contrib_today -le 1 ]] && commit_contrib_text="commit" || commit_contrib_text="commits";
     [[ $commits_done_today -gt 0 ]] &&
       commit_done="${WHITE}Including ${LIGHT_BLUE}$commits_done_today $commit_done_text ${WHITE}by ${GREEN}$current_user ${WHITE}today" ||
       commit_done="${WHITE}Including ${LIGHT_BLUE}$commits_contrib_today $commit_contrib_text ${WHITE}by ${GREEN}$last_commit_author ${WHITE}today"
+
     if [[ "$1" == "show" ]]; then
       git log --oneline --no-decorate;
     else
