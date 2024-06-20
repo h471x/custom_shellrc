@@ -300,11 +300,14 @@ alias bwsop="bwsop"
 # since we only use Windows Explorer to
 # open files according to their default apps
 # and there is no lag like we did here
+# IMPROVED : 06-18-2024 21:44
+# Handled the shell access after launch
 #
 # this function bwsop alias
 function bwsop(){
   local file_name="$1"
   local file_extension="${file_name##*.}"
+  local current_directory="$PWD"
 
   # Replace all Spaces and Back-slashes with %20
   local formatted_path=$(wslpath -m . | sed -e 's/ /%20/g' -e 's/\\//g')
@@ -315,7 +318,23 @@ function bwsop(){
 
   # Open Pdf file with edge and the other files with chrome
   local browser=$( eval $isPdf && echo msedge.exe || echo chrome.exe)
-  $browser file:///$formatted_path/$formatted_file && return 0
+
+  # if the current directory is a WSL
+  # directory then switch to windows
+  # directory before executing the script
+  if [[ "$current_directory" != "/mnt/"* ]]; then
+    cd /mnt/c
+  fi
+
+  # Open the file with the browser
+  cmd.exe /c start $browser file:///$formatted_path/$formatted_file
+
+  # if we changed directory then get back
+  if [[ "$PWD" != "$current_directory" ]]; then
+    cd - &>/dev/null
+  fi
+
+  return 0
 }
 
 # SOLVED : using explorer.exe
@@ -335,7 +354,8 @@ alias ct="nvim ~/.zshrc"
 alias cv="cv"
 
 # this function for cv alias
-# updated today 01/25/2024 to adjust the title
+# UPDATED : 01/25/2024
+# to adjust the title
 # when we have more than 50 visible items
 function cv() {
   local target="$1"
@@ -391,7 +411,8 @@ function cv() {
 alias cvf="cvf"
 
 # this function for cvf alias
-# updated today 01/25/2024 to adjust the title
+# UPDATED : 01/25/2024
+# to adjust the title
 # when we have more than 50 visible items
 function cvf() {
   local target="$1"
@@ -1018,7 +1039,9 @@ alias vf="vf"
 function vf() {
   if [[ -f "$1" ]]; then
     case "${1##*.}" in
-      wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) explorer.exe "$1" ;;
+      xlsx|docx|pptx|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) 
+        explorer.exe "$1" 
+        ;;
       # open all files that have default app with windows explorer
       html)
         if [[ "$PWD" == "/mnt/"* ]]; then
@@ -1309,13 +1332,13 @@ function convert_url(){
 # this alias to open web app
 alias open_web_app="allow_sudo && open_web_app";
 
+# CREATED :  02-11-2024 20:13
 # this function to open chrome based app
 # it uses the Id of the App we created within
 # the Chrome browser, it will take 3 arguments :
 # first the domain of the App
 # then the chrome App Id
 # finally the name of the App (optional)
-# writen today 2024-02-11 20:13
 # IMPROVED : 05-30-2024 18:36
 # Shell access after execution
 function open_web_app(){
@@ -1815,6 +1838,24 @@ function wscl(){
   fi
 
   open_web_app $wscl_link $wscl_id $wscl_name
+}
+
+# this alias to open Cyber Chef Web App
+alias cbr="allow_sudo && cbr"
+
+# this function for cbr alias
+function cbr(){
+  local github_reachable="sudo ping -c 1 -W 5 github.com"
+  if eval $github_reachable; then
+    local cbr_id="laoalcpgflnjimblmgmjfhdfheldnmeo"
+    local cbr_link="gchq.github.io"
+    local cbr_name="Cyber Chef"
+    open_web_app $cbr_link $cbr_id $cbr_name
+  else
+    cd /mnt/d/NTSOA/dev/github_repo/forks/cyber_chef
+    bwsop CyberChef_v10.18.8.html
+    cd -&>/dev/null
+  fi
 }
 
 # this alias to open fast.com
