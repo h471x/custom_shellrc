@@ -1824,7 +1824,7 @@ function hackme(){
 }
 
 # this alias to open W3SCHOOLS Offline Web App
-alias wscl="wscl"
+alias wscl="allow_sudo && wscl"
 
 # this function for wscl alias
 function wscl(){
@@ -2874,11 +2874,16 @@ function ghcls(){
     if [[ "$repo_owner" != "$current_user" ]]; then
       echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
     else
-      echo "${BOLD} ${LIGHT_BLUE}Collaborators ${WHITE}for the ${LIGHT_BLUE}$repo_name ${WHITE}repository "
+      echo -ne "${BOLD} ${LIGHT_BLUE}Collaborators ${WHITE}for the ${LIGHT_BLUE}$repo_name ${WHITE}repository "
 
       # List collaborators using gh api
       local collaborators=$(gh api "repos/$current_user/$repo_name/collaborators" --jq '.[].login')
       local invitations=$(gh api "repos/$current_user/$repo_name/invitations" --jq '.[].invitee.login')
+
+      local collaborators_count=$(echo "$collaborators" | wc -l)
+      local invitations_count=$(echo "$invitations" | wc -l)
+      local collaborators_num=$((collaborators_count + invitations_count))
+      echo "${WHITE}${BOLD}($collaborators_count)"
 
       # Iterate through each collaborator
       if [[ -n "$collaborators" ]]; then
@@ -2947,6 +2952,24 @@ function gck(){
     if [[ $# -eq 0 ]]; then
       if [[ "$current_branch" != "$default_branch" ]]; then
         git checkout "$default_branch"
+      else
+        local user="$(whoami)"
+        if ! git rev-parse --verify "$user" >/dev/null 2>&1; then
+          function check_new_branch(){
+            echo -ne "${BOLD}${WHITE}New branch${GREEN} "$user"${WHITE} ? (y/n) ";
+            read branch
+            if [ "$branch" = "y" ]; then
+              git checkout -b "$user";
+            elif [ "$branch" = "n" ];then
+              return 0
+            else
+              check_new_branch
+            fi
+          }
+          check_new_branch
+        else
+          git checkout "$user"
+        fi
       fi
     elif [[ $# -eq 1 ]]; then
       # check if the branch doesn't exist yet
@@ -3144,6 +3167,20 @@ function gpl(){
   if [[ "$is_a_git_repo" == "true" ]]; then
     local current_branch=$(git branch | awk '/\*/ {print $2}');
     git pull origin $current_branch;
+  else
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
+  fi
+}
+
+# this alias to view git status
+alias gst="gst"
+
+# this function for gst alias
+function gst(){
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    git status -s
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
