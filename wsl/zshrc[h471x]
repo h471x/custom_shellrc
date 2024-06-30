@@ -1449,8 +1449,9 @@ function gthb(){
     local repo_url=$(git config --get remote.origin.url)
     local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
     local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+    local current_branch=$(git branch | awk '/\*/ {print $2}');
 
-    gh repo view $repo_owner/$repo_name --web &>/dev/null
+    gh repo view $repo_owner/$repo_name --web --branch $current_branch &>/dev/null
   else
     local github_id="mjoklplbddabcmpepnokjaffbmgbkkgg"
     local github_link="github.com"
@@ -3041,6 +3042,7 @@ alias gbd="gbd"
 
 # this function for gbd alias
 function gbd() {
+  # local has_remote="-f .git/logs/refs/remotes/origin/h471x"
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
