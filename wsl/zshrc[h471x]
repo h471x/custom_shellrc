@@ -3076,15 +3076,19 @@ function gbd() {
           fi
         }
 
-        check_delete_branch() {
+        function check_delete_branch() {
           local branch_name="$1"
+          local git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+          local has_remote="$git_root/.git/logs/refs/remotes/origin/$branch_name"
+
           echo -ne "${BOLD}${WHITE}Delete branch${GREEN} "$branch_name"${WHITE} ? (y/n) ${RESET}";
           read delete_branch
+
           if [ "$delete_branch" = "y" ]; then
             if [[ "$current_branch" != "$default_branch" ]]; then
               git checkout $default_branch;
             fi
-            if git ls-remote --exit-code --heads origin "$1" >/dev/null 2>&1; then
+            if -f "$has_remote" ; then
               check_delete_remote_branch
             fi
             git branch -D "$1";
@@ -3105,24 +3109,28 @@ function gbd() {
           read delete_branch
           if [ "$delete_branch" = "y" ]; then
             # this to check if we want to delete the remote branch too
-            function check_delete_remote_branch() {
-              if [[ "$current_branch" == "$default_branch" ]]; then
-                echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
-              else
-                echo -ne "${BOLD}${WHITE}Delete remote branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
-                read delete_remote_branch
-                if [ "$delete_remote_branch" = "y" ]; then
-                  git push origin --delete "$current_branch";
-                elif [ "$delete_remote_branch" = "n" ];then
-                  return 0
-                else
-                  check_delete_remote_branch
-                fi
-              fi
-            }
-            if git ls-remote --exit-code origin $current_branch >/dev/null 2>&1; then
-              check_delete_remote_branch
-            fi
+            # function check_delete_remote_branch() {
+            #   if [[ "$current_branch" == "$default_branch" ]]; then
+            #     echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+            #   else
+            #     echo -ne "${BOLD}${WHITE}Delete remote branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
+            #     read delete_remote_branch
+            #     if [ "$delete_remote_branch" = "y" ]; then
+            #       git push origin --delete "$current_branch";
+            #     elif [ "$delete_remote_branch" = "n" ];then
+            #       return 0
+            #     else
+            #       check_delete_remote_branch
+            #     fi
+            #   fi
+            # }
+            # local branch_name="$current_branch"
+            # local git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+            # local has_remote="$git_root/.git/logs/refs/remotes/origin/$branch_name"
+            #
+            # if -f "$has_remote" ; then
+            #   check_delete_remote_branch
+            # fi
             git checkout "$default_branch";
             git branch -D "$current_branch";
           elif [ "$delete_branch" = "n" ];then
