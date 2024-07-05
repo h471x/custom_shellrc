@@ -3042,7 +3042,6 @@ alias gbd="gbd"
 
 # this function for gbd alias
 function gbd() {
-  # local has_remote="-f .git/logs/refs/remotes/origin/h471x"
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
