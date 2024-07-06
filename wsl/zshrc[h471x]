@@ -1714,15 +1714,14 @@ function stck(){
   open_web_app $stck_link $stck_id $stck_name
 }
 
-# this alias to open Canva Web App
+# this alias to open Canva App
 alias canva="canva"
 
 # this function for canva alias
 function canva(){
-  local canva_id="mnnncmnfcndlghkomlbaadoonfnjcadg"
-  local canva_link="canva.com"
-  local canva_name="Canva"
-  open_web_app $canva_link $canva_id $canva_name
+  cd /mnt/c/Users/lab_l/AppData/Local/Programs/Canva
+  cmd.exe /c start Canva.exe
+  cd - &>/dev/null
 }
 
 # this alias to open MuseScore Web App
