@@ -300,11 +300,14 @@ alias bwsop="bwsop"
 # since we only use Windows Explorer to
 # open files according to their default apps
 # and there is no lag like we did here
+# IMPROVED : 06-18-2024 21:44
+# Handled the shell access after launch
 #
 # this function bwsop alias
 function bwsop(){
   local file_name="$1"
   local file_extension="${file_name##*.}"
+  local current_directory="$PWD"
 
   # Replace all Spaces and Back-slashes with %20
   local formatted_path=$(wslpath -m . | sed -e 's/ /%20/g' -e 's/\\//g')
@@ -315,7 +318,23 @@ function bwsop(){
 
   # Open Pdf file with edge and the other files with chrome
   local browser=$( eval $isPdf && echo msedge.exe || echo chrome.exe)
-  $browser file:///$formatted_path/$formatted_file && return 0
+
+  # if the current directory is a WSL
+  # directory then switch to windows
+  # directory before executing the script
+  if [[ "$current_directory" != "/mnt/"* ]]; then
+    cd /mnt/c
+  fi
+
+  # Open the file with the browser
+  cmd.exe /c start $browser file:///$formatted_path/$formatted_file
+
+  # if we changed directory then get back
+  if [[ "$PWD" != "$current_directory" ]]; then
+    cd - &>/dev/null
+  fi
+
+  return 0
 }
 
 # SOLVED : using explorer.exe
@@ -335,7 +354,8 @@ alias ct="nvim ~/.zshrc"
 alias cv="cv"
 
 # this function for cv alias
-# updated today 01/25/2024 to adjust the title
+# UPDATED : 01/25/2024
+# to adjust the title
 # when we have more than 50 visible items
 function cv() {
   local target="$1"
@@ -391,7 +411,8 @@ function cv() {
 alias cvf="cvf"
 
 # this function for cvf alias
-# updated today 01/25/2024 to adjust the title
+# UPDATED : 01/25/2024
+# to adjust the title
 # when we have more than 50 visible items
 function cvf() {
   local target="$1"
@@ -1018,9 +1039,17 @@ alias vf="vf"
 function vf() {
   if [[ -f "$1" ]]; then
     case "${1##*.}" in
-      wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) explorer.exe "$1" ;;
+      xlsx|docx|pptx|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) 
+        explorer.exe "$1" 
+        ;;
       # open all files that have default app with windows explorer
-      html) bwsop "$1";;
+      html)
+        if [[ "$PWD" == "/mnt/"* ]]; then
+          explorer.exe "$1"
+        else
+          bwsop "$1"
+        fi
+        ;;
       *) nvim "$1" ;;
     esac
     cv
@@ -1303,13 +1332,13 @@ function convert_url(){
 # this alias to open web app
 alias open_web_app="allow_sudo && open_web_app";
 
+# CREATED :  02-11-2024 20:13
 # this function to open chrome based app
 # it uses the Id of the App we created within
 # the Chrome browser, it will take 3 arguments :
 # first the domain of the App
 # then the chrome App Id
 # finally the name of the App (optional)
-# writen today 2024-02-11 20:13
 # IMPROVED : 05-30-2024 18:36
 # Shell access after execution
 function open_web_app(){
@@ -1420,8 +1449,9 @@ function gthb(){
     local repo_url=$(git config --get remote.origin.url)
     local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
     local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+    local current_branch=$(git branch | awk '/\*/ {print $2}');
 
-    gh repo view $repo_owner/$repo_name --web &>/dev/null
+    gh repo view $repo_owner/$repo_name --web --branch $current_branch &>/dev/null
   else
     local github_id="mjoklplbddabcmpepnokjaffbmgbkkgg"
     local github_link="github.com"
@@ -1737,6 +1767,96 @@ function chat(){
   local chat_link="mail.google.com"
   local chat_name="Google Chat"
   open_web_app $chat_link $chat_id $chat_name
+}
+
+# this alias to open Virus Total Web App
+alias virustotal="virustotal"
+
+# this function for virustotal alias
+function virustotal(){
+  local virustotal_id="dnopbpmlkabcondfpckfnhgabfcncjmg"
+  local virustotal_link="virustotal.com"
+  local virustotal_name="Virus Total"
+  open_web_app $virustotal_link $virustotal_id $virustotal_name
+}
+
+# this alias to open CodinGame Web App
+alias codingame="codingame"
+
+# this function for codingame alias
+function codingame(){
+  local codingame_id="mdmdhiclipbbmgikhgefloaghajjcheg"
+  local codingame_link="codingame.com"
+  local codingame_name="CodinGame"
+  open_web_app $codingame_link $codingame_id $codingame_name
+}
+
+# this alias to open Cisco Skills For All Web App
+alias cisco="cisco"
+
+# this function for cisco alias
+function cisco(){
+  local cisco_id="imjciepmglgacccklncenjgecohaihcj"
+  local cisco_link="skillsforall.com"
+  local cisco_name="Cisco Skills For All"
+  open_web_app $cisco_link $cisco_id $cisco_name
+}
+
+# this alias to open Hack Tricks Web App
+alias tricks="tricks"
+
+# this function for tricks alias
+function tricks(){
+  local tricks_id="mggngfogmkhbpicjamlefjpciidpodmm"
+  local tricks_link="book.hacktricks.xyz"
+  local tricks_name="Hack Tricks"
+  open_web_app $tricks_link $tricks_id $tricks_name
+}
+
+# this alias to open Try Hack Me Web App
+alias hackme="hackme"
+
+# this function for hackme alias
+function hackme(){
+  local hackme_id="daeaiadaklimdlhhcpgbdkgdkmghbkmf"
+  local hackme_link="tryhackme.com"
+  local hackme_name="Try Hack Me"
+  open_web_app $hackme_link $hackme_id $hackme_name
+}
+
+# this alias to open W3SCHOOLS Offline Web App
+alias wscl="allow_sudo && wscl"
+
+# this function for wscl alias
+function wscl(){
+  local wscl_id="lcmlmpinhhipbaifakfjccanpehnglei"
+  local wscl_link="localhost"
+  local wscl_name="W3Schools"
+
+  if [[ ! $(pgrep apache2) ]]; then
+    echo -ne "${BOLD}[${GREEN}+${WHITE}]${WHITE} Starting Apache Server ...";
+    sudo service apache2 start &>/dev/null;
+  fi
+
+  open_web_app $wscl_link $wscl_id $wscl_name
+}
+
+# this alias to open Cyber Chef Web App
+alias cbr="allow_sudo && cbr"
+
+# this function for cbr alias
+function cbr(){
+  local github_reachable="sudo ping -c 1 -W 5 github.com"
+  if eval $github_reachable; then
+    local cbr_id="laoalcpgflnjimblmgmjfhdfheldnmeo"
+    local cbr_link="gchq.github.io"
+    local cbr_name="Cyber Chef"
+    open_web_app $cbr_link $cbr_id $cbr_name
+  else
+    cd /mnt/d/NTSOA/dev/github_repo/forks/cyber_chef
+    bwsop CyberChef_v10.18.8.html
+    cd -&>/dev/null
+  fi
 }
 
 # this alias to open fast.com
@@ -2755,11 +2875,16 @@ function ghcls(){
     if [[ "$repo_owner" != "$current_user" ]]; then
       echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
     else
-      echo "${BOLD} ${LIGHT_BLUE}Collaborators ${WHITE}for the ${LIGHT_BLUE}$repo_name ${WHITE}repository "
+      echo -ne "${BOLD} ${LIGHT_BLUE}Collaborators ${WHITE}for the ${LIGHT_BLUE}$repo_name ${WHITE}repository "
 
       # List collaborators using gh api
       local collaborators=$(gh api "repos/$current_user/$repo_name/collaborators" --jq '.[].login')
       local invitations=$(gh api "repos/$current_user/$repo_name/invitations" --jq '.[].invitee.login')
+
+      local collaborators_count=$(echo "$collaborators" | wc -l)
+      local invitations_count=$(echo "$invitations" | wc -l)
+      local collaborators_num=$((collaborators_count + invitations_count))
+      echo "${WHITE}${BOLD}($collaborators_count)"
 
       # Iterate through each collaborator
       if [[ -n "$collaborators" ]]; then
@@ -2828,6 +2953,24 @@ function gck(){
     if [[ $# -eq 0 ]]; then
       if [[ "$current_branch" != "$default_branch" ]]; then
         git checkout "$default_branch"
+      else
+        local user="$(whoami)"
+        if ! git rev-parse --verify "$user" >/dev/null 2>&1; then
+          function check_new_branch(){
+            echo -ne "${BOLD}${WHITE}New branch${GREEN} "$user"${WHITE} ? (y/n) ";
+            read branch
+            if [ "$branch" = "y" ]; then
+              git checkout -b "$user";
+            elif [ "$branch" = "n" ];then
+              return 0
+            else
+              check_new_branch
+            fi
+          }
+          check_new_branch
+        else
+          git checkout "$user"
+        fi
       fi
     elif [[ $# -eq 1 ]]; then
       # check if the branch doesn't exist yet
@@ -2932,15 +3075,19 @@ function gbd() {
           fi
         }
 
-        check_delete_branch() {
+        function check_delete_branch() {
           local branch_name="$1"
+          local git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+          local has_remote="$git_root/.git/logs/refs/remotes/origin/$branch_name"
+
           echo -ne "${BOLD}${WHITE}Delete branch${GREEN} "$branch_name"${WHITE} ? (y/n) ${RESET}";
           read delete_branch
+
           if [ "$delete_branch" = "y" ]; then
             if [[ "$current_branch" != "$default_branch" ]]; then
               git checkout $default_branch;
             fi
-            if git ls-remote --exit-code --heads origin "$1" >/dev/null 2>&1; then
+            if -f "$has_remote" ; then
               check_delete_remote_branch
             fi
             git branch -D "$1";
@@ -2961,24 +3108,28 @@ function gbd() {
           read delete_branch
           if [ "$delete_branch" = "y" ]; then
             # this to check if we want to delete the remote branch too
-            function check_delete_remote_branch() {
-              if [[ "$current_branch" == "$default_branch" ]]; then
-                echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
-              else
-                echo -ne "${BOLD}${WHITE}Delete remote branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
-                read delete_remote_branch
-                if [ "$delete_remote_branch" = "y" ]; then
-                  git push origin --delete "$current_branch";
-                elif [ "$delete_remote_branch" = "n" ];then
-                  return 0
-                else
-                  check_delete_remote_branch
-                fi
-              fi
-            }
-            if git ls-remote --exit-code origin $current_branch >/dev/null 2>&1; then
-              check_delete_remote_branch
-            fi
+            # function check_delete_remote_branch() {
+            #   if [[ "$current_branch" == "$default_branch" ]]; then
+            #     echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+            #   else
+            #     echo -ne "${BOLD}${WHITE}Delete remote branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
+            #     read delete_remote_branch
+            #     if [ "$delete_remote_branch" = "y" ]; then
+            #       git push origin --delete "$current_branch";
+            #     elif [ "$delete_remote_branch" = "n" ];then
+            #       return 0
+            #     else
+            #       check_delete_remote_branch
+            #     fi
+            #   fi
+            # }
+            # local branch_name="$current_branch"
+            # local git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+            # local has_remote="$git_root/.git/logs/refs/remotes/origin/$branch_name"
+            #
+            # if -f "$has_remote" ; then
+            #   check_delete_remote_branch
+            # fi
             git checkout "$default_branch";
             git branch -D "$current_branch";
           elif [ "$delete_branch" = "n" ];then
@@ -3030,6 +3181,34 @@ function gpl(){
   fi
 }
 
+# this alias to view git status
+alias gst="gst"
+
+# this function for gst alias
+function gst(){
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    git status -s
+  else
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
+  fi
+}
+
+# this alias to view git diff
+alias gdf="gdf"
+
+# this function for gdf alias
+function gdf(){
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    git diff
+  else
+    echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
+  fi
+}
+
 # this alias to view the git log commits number
 alias glc="glc"
 
@@ -3048,12 +3227,14 @@ function glc(){
     local current_user=$(git config user.name)
     local commits_done_today=$(git log --oneline --since="$(date +"%Y-%m-%d 00:00:00")" --author="$current_user" | wc -l)
     local commits_contrib_today=$(git log --oneline --since="$(date +"%Y-%m-%d 00:00:00")" --author="$last_commit_author" | wc -l)
+
     [[ $commits_num -le 1 ]] && commit_text="commit" || commit_text="commits";
     [[ $commits_done_today -le 1 ]] && commit_done_text="commit" || commit_done_text="commits";
     [[ $commits_contrib_today -le 1 ]] && commit_contrib_text="commit" || commit_contrib_text="commits";
     [[ $commits_done_today -gt 0 ]] &&
       commit_done="${WHITE}Including ${LIGHT_BLUE}$commits_done_today $commit_done_text ${WHITE}by ${GREEN}$current_user ${WHITE}today" ||
       commit_done="${WHITE}Including ${LIGHT_BLUE}$commits_contrib_today $commit_contrib_text ${WHITE}by ${GREEN}$last_commit_author ${WHITE}today"
+
     if [[ "$1" == "show" ]]; then
       git log --oneline --no-decorate;
     else
