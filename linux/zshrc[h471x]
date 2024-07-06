@@ -2807,6 +2807,24 @@ function gck(){
     if [[ $# -eq 0 ]]; then
       if [[ "$current_branch" != "$default_branch" ]]; then
         git checkout "$default_branch"
+      else
+        local user="$(whoami)"
+        if ! git rev-parse --verify "$user" >/dev/null 2>&1; then
+          function check_new_branch(){
+            echo -ne "${BOLD}${WHITE}New branch${GREEN} "$user"${WHITE} ? (y/n) ";
+            read branch
+            if [ "$branch" = "y" ]; then
+              git checkout -b "$user";
+            elif [ "$branch" = "n" ];then
+              return 0
+            else
+              check_new_branch
+            fi
+          }
+          check_new_branch
+        else
+          git checkout "$user"
+        fi
       fi
     elif [[ $# -eq 1 ]]; then
       # check if the branch doesn't exist yet
