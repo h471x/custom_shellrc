@@ -12,8 +12,9 @@ setopt promptsubst #enable command substitution in prompt
 CUPP_PATH=/usr/share/cupp
 GO_PATH=/usr/local/go/bin
 HOME_PATH=$HOME/bin
+SCP_PATH=/usr/bin/scp
 
-PATH=$CUPP_PATH:$HOME_PATH:$GO_PATH:$PATH
+PATH=$CUPP_PATH:$HOME_PATH:$GO_PATH:$SCP_PATH:$PATH
 
 fastfile_var_prefix='$'
 
@@ -1725,7 +1726,7 @@ alias deauth="deauth"
 
 # this function for deatuh alias
 function deauth(){
-  if [[ $# -eq 1 ]]; then
+  if [[ $# -ge 1 ]]; then
     if [ -d /sys/class/net/wlan0 ]; then
       c && br 2 && sudo clear;
 
@@ -1734,12 +1735,12 @@ function deauth(){
         wtp wlan0 managed;
       fi
   
-      # kl wpa_supplicant;
-      # kl dhclient;
+      kl wpa_supplicant;
+      kl dhclient;
 
       echo "        D e A u t h" | figlet && br;
-      echo " ==> Target Wi-Fi : $1 " && br;
-      ssid="$1"
+      echo " ==> Target Wi-Fi : '$*' " && br;
+      ssid="$*"
       bssid=$(nmcli -f BSSID,SSID device wifi list | grep "$ssid" | awk '{print $1}')
       # bssid=$(sudo iw dev wlan0 scan | grep -B 8 "SSID: $ssid" | awk -F "(" '/^BSS/{print $1}' | tr '[:lower:]' '[:upper:]' | sed 's/BSS //');
       # here we use the iw dev wlan0 scan to show the wireless networks without using nmcli
@@ -1753,7 +1754,7 @@ function deauth(){
         # if [[ -n $(sudo airmon-ng check wlan0) ]]; then
         #   sudo airmon-ng check kill wlan0;
         # fi
-        sudo aireplay-ng -0 0 -a "$bssid" wlan0;
+        sudo aireplay-ng -0 0 -a "$bssid" wlan0 --ignore-negative-one;
       else
         echo "SSID '$ssid' not found";
         br;
@@ -2910,15 +2911,19 @@ function gbd() {
           fi
         }
 
-        check_delete_branch() {
+        function check_delete_branch() {
           local branch_name="$1"
+          local git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+          local has_remote="$git_root/.git/logs/refs/remotes/origin/$branch_name"
+
           echo -ne "${BOLD}${WHITE}Delete branch${GREEN} "$branch_name"${WHITE} ? (y/n) ${RESET}";
           read delete_branch
+
           if [ "$delete_branch" = "y" ]; then
             if [[ "$current_branch" != "$default_branch" ]]; then
               git checkout $default_branch;
             fi
-            if git ls-remote --exit-code --heads origin "$1" >/dev/null 2>&1; then
+            if -f "$has_remote" ; then
               check_delete_remote_branch
             fi
             git branch -D "$1";
@@ -2939,24 +2944,28 @@ function gbd() {
           read delete_branch
           if [ "$delete_branch" = "y" ]; then
             # this to check if we want to delete the remote branch too
-            function check_delete_remote_branch() {
-              if [[ "$current_branch" == "$default_branch" ]]; then
-                echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
-              else
-                echo -ne "${BOLD}${WHITE}Delete remote branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
-                read delete_remote_branch
-                if [ "$delete_remote_branch" = "y" ]; then
-                  git push origin --delete "$current_branch";
-                elif [ "$delete_remote_branch" = "n" ];then
-                  return 0
-                else
-                  check_delete_remote_branch
-                fi
-              fi
-            }
-            if git ls-remote --exit-code origin $current_branch >/dev/null 2>&1; then
-              check_delete_remote_branch
-            fi
+            # function check_delete_remote_branch() {
+            #   if [[ "$current_branch" == "$default_branch" ]]; then
+            #     echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+            #   else
+            #     echo -ne "${BOLD}${WHITE}Delete remote branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
+            #     read delete_remote_branch
+            #     if [ "$delete_remote_branch" = "y" ]; then
+            #       git push origin --delete "$current_branch";
+            #     elif [ "$delete_remote_branch" = "n" ];then
+            #       return 0
+            #     else
+            #       check_delete_remote_branch
+            #     fi
+            #   fi
+            # }
+            # local branch_name="$current_branch"
+            # local git_root=$(git rev-parse --show-toplevel 2>/dev/null)
+            # local has_remote="$git_root/.git/logs/refs/remotes/origin/$branch_name"
+            #
+            # if -f "$has_remote" ; then
+            #   check_delete_remote_branch
+            # fi
             git checkout "$default_branch";
             git branch -D "$current_branch";
           elif [ "$delete_branch" = "n" ];then
