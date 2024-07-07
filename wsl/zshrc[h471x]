@@ -2012,7 +2012,7 @@ alias wpass="wpass"
 
 # this function for wpass alias
 function wpass(){
-  cd /mnt/d/NTSOA
+  cd /mnt/c
   if [[ $# -eq 0 ]]; then
     # consider all arguments as one string
     local wifi=$(
@@ -2046,7 +2046,7 @@ alias wls="wls"
 
 # this function for wls alias
 function wls(){
-  cd /mnt/d/NTSOA
+  cd /mnt/c
 
   function print_message(){
     wifi="$1"
@@ -2911,10 +2911,10 @@ function ghcls(){
   fi
 }
 
-#this alias to rename a git branch
+# this alias to rename a git branch
 alias gnm="gnm"
 
-#this function for gnm alias
+# this function for gnm alias
 function gnm(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
