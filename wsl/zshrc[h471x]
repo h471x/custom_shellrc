@@ -440,7 +440,7 @@ function cvf() {
 
   # this function to show the content of the cv
   function show_content(){
-    eza --icons=always -a $folder_content;
+    eza --icons=always --no-quotes -a $folder_content;
   }
 
   # this function to show the cv
@@ -731,6 +731,16 @@ alias obs="obs"
 function obs(){
   cd /mnt/d/NTSOA/INSTALLED/OBS\ STUDIO/obs-studio/bin/64bit
   cmd.exe /c start obs64.exe
+  cd - &>/dev/null
+}
+
+# this alias open Bluestacks
+alias android="android"
+
+# this function for android alias
+function android(){
+  cd /mnt/c/Program\ Files/BlueStacks_nxt
+  cmd.exe /c start HD-Player.exe
   cd - &>/dev/null
 }
 
@@ -1040,7 +1050,7 @@ function vf() {
   if [[ -f "$1" ]]; then
     case "${1##*.}" in
       xlsx|docx|pptx|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) 
-        explorer.exe "$1" 
+        explorer.exe "$1"
         ;;
       # open all files that have default app with windows explorer
       html)
@@ -1052,7 +1062,7 @@ function vf() {
         ;;
       *) nvim "$1" ;;
     esac
-    cv
+    return 0
   elif [[ -d "$1" ]]; then
     op "$1"
   fi
