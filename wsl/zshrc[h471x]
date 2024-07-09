@@ -744,6 +744,16 @@ function android(){
   cd - &>/dev/null
 }
 
+# this alias to open Driver Booster 11
+alias boost="boost"
+
+# this function for boost alias
+function boost(){
+  cd "/mnt/d/NTSOA/INSTALLED/DRIVER BOOSTER/11.5.0"
+  cmd.exe /c start DriverBooster.exe
+  cd - &>/dev/null
+}
+
 # this alias to open gns3
 alias gns="gns"
 
