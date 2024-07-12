@@ -712,6 +712,20 @@ function nslookup(){
   fi
 }
 
+# this alias to use windows arp
+alias arp="arp"
+
+# this function for arp alias
+function arp(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c arp "$@"
+  else
+    cd /mnt/d/NTSOA
+    cmd.exe /c arp "$@"
+    cd - &>/dev/null;
+  fi
+}
+
 # this alias to run jupyter notebook
 alias jptr="jptr"
 
@@ -1070,6 +1084,9 @@ function vf() {
           bwsop "$1"
         fi
         ;;
+      fxml)
+        cmd.exe /c start SceneBuilder.exe "$@"
+        ;;
       *) nvim "$1" ;;
     esac
     return 0
@@ -1324,7 +1341,7 @@ alias hm="cd && cv"
 alias whm="cd /mnt/c/Users/lab_l/OneDrive/Bureau && op Home.lnk && nd"
 
 # this alias to open the evangile directory
-alias gospel="op /mnt/d/NTSOA/EVANGILE"
+alias gospel="op /mnt/d/NTSOA/GOSPEL"
 
 #this alias to enter the NTSOA directory
 alias hn="op /mnt/d/NTSOA"
@@ -3329,6 +3346,20 @@ function node(){
   node.exe $@;
 }
 
+# this alias to launch eclipse IDE
+alias eclipse="eclipse"
+
+# this function for eclipse alias
+function eclipse(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start eclipse.exe "$@"
+  else
+    cd /mnt/c
+    cmd.exe /c start eclipse.exe "$@"
+    cd - &>/dev/null
+  fi
+}
+
 # this alias for windows ngrok
 alias ngrok="ngrok"
 
@@ -3356,7 +3387,7 @@ function ngrok(){
   if [[ "$PWD" == "/mnt/"* ]]; then
     eval $ngrok_cmd
   else
-    cd /mnt/d/NTSOA
+    cd /mnt/c
     eval $ngrok_cmd
     cd - &>/dev/null
   fi
