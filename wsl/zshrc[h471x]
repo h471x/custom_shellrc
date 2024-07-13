@@ -3360,6 +3360,34 @@ function eclipse(){
   fi
 }
 
+# this alias to launch iintelijieda
+alias idea="idea"
+
+# this function for idea alias
+function idea(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start idea64.exe $@
+  else
+    cd /mnt/c
+    cmd.exe /c start idea64.exe $@
+    cd - &>/dev/null
+  fi
+}
+
+# this alias to launch ppsspp
+alias psp="psp"
+
+# this function for psp alias
+function psp(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start PPSSPPWindows.exe $@
+  else
+    cd /mnt/c
+    cmd.exe /c start PPSSPPWindows.exe $@
+    cd - &>/dev/null
+  fi
+}
+
 # this alias for windows ngrok
 alias ngrok="ngrok"
 
