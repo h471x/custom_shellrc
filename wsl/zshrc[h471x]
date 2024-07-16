@@ -3495,14 +3495,6 @@ function vue() {
   fi
 }
 
-# # this alias to run the windows mysql command
-# alias mysql="mysql"
-#
-# # this function for mysql alias
-# function mysql(){
-#   mysql.exe $@;
-# }
-
 kill-line() {
   if [[ $BUFFER == "" ]]; then
     zle backward-kill-line
