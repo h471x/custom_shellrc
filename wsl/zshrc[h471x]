@@ -536,7 +536,7 @@ command_not_found_handler() {
     # echo "n o t     f o u n d " | figlet -t -c | lolcat;
     # br && sleep 0.5 && cv;
     # cv
-    echo "${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Command Not Found ... "
+    echo " ${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Command Not Found"
     # fuck
   fi
 }
@@ -637,6 +637,16 @@ function vm(){
     cmd.exe /c start VirtualBox.exe
     cd - &>/dev/null;
   fi
+}
+
+# this alias to launch ventoy
+alias ventoy="ventoy"
+
+# this function for ventoy alias
+function ventoy(){
+  cd "/mnt/d/NTSOA/INSTALLED/VENTOY/ventoy-1.0.97"
+  explorer.exe Ventoy2Disk.exe
+  cd -&>/dev/null
 }
 
 # this alias to open wireshark
