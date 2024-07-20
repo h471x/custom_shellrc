@@ -975,7 +975,7 @@ function rn(){
   case "${1##*.}" in
     py)
       # all "$1" && c && echo -e && py "$1" && echo -e;;
-      python "$@" return 0;;
+      python "$@" && return 0;;
     c || cpp) #update 07/28/2023
       file="$1";
       out="${file%.*}"
@@ -1079,7 +1079,7 @@ alias vf="vf"
 function vf() {
   if [[ -f "$1" ]]; then
     case "${1##*.}" in
-      xlsx|docx|pptx|ppt|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) 
+      db|sqlite*|xlsx|docx|pptx|ppt|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) 
         explorer.exe "$1"
         ;;
       # open all files that have default app with windows explorer
