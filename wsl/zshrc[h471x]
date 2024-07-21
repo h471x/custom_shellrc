@@ -846,7 +846,6 @@ alias dbg64="dbg64"
 
 # this function for debug alias
 function dbg64(){
-  # powershell.exe -command "Start-Process x64dbg -Verb RunAs"
   cd /mnt/d/NTSOA/INSTALLED/SHORTCUTS/
   explorer.exe x64dbg.lnk
   cd - &>/dev/null
@@ -857,7 +856,6 @@ alias dbg32="dbg32"
 
 # this function for debug alias
 function dbg32(){
-  # powershell.exe -command "Start-Process x32dbg -Verb RunAs"
   cd /mnt/d/NTSOA/INSTALLED/SHORTCUTS/
   explorer.exe x32dbg.lnk
   cd - &>/dev/null
@@ -886,7 +884,6 @@ function edt(){
   local recent_file=$(ls -t . | head -n1)
   explorer.exe $recent_file
 
-  # cv
   cd - &>/dev/null
 }
 
