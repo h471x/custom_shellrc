@@ -3371,10 +3371,10 @@ alias idea="idea"
 # this function for idea alias
 function idea(){
   if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start idea64.exe $@
+    cmd.exe /c start idea64.exe ${@:-.}
   else
     cd /mnt/c
-    cmd.exe /c start idea64.exe $@
+    cmd.exe /c start idea64.exe ${@:-.}
     cd - &>/dev/null
   fi
 }
@@ -3385,10 +3385,10 @@ alias charm="charm"
 # this function for charm alias
 function charm(){
   if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start pycharm64.exe $@
+    cmd.exe /c start pycharm64.exe ${@:-.}
   else
     cd /mnt/c
-    cmd.exe /c start pycharm64.exe $@
+    cmd.exe /c start pycharm64.exe ${@:-.}
     cd - &>/dev/null
   fi
 }
