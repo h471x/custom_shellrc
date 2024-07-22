@@ -1333,6 +1333,8 @@ function rdf(){
 # DIRTY:
 alias pc="c && br 2 && neofetch --source ~/.config/neofetch/htx2.txt"
 
+# alias pc="c && br 2 && neofetch --source /mnt/c/Users/lab_l/OneDrive/Pictures/ntsoa_signature/sign.txt"
+
 #call this pc alias at startup
 #pc
 
