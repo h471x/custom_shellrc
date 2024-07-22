@@ -3365,7 +3365,7 @@ function eclipse(){
   fi
 }
 
-# this alias to launch iintelijieda
+# this alias to launch intelijieda
 alias idea="idea"
 
 # this function for idea alias
@@ -3375,6 +3375,20 @@ function idea(){
   else
     cd /mnt/c
     cmd.exe /c start idea64.exe $@
+    cd - &>/dev/null
+  fi
+}
+
+# this alias to open PyCharm
+alias charm="charm"
+
+# this function for charm alias
+function charm(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start pycharm64.exe $@
+  else
+    cd /mnt/c
+    cmd.exe /c start pycharm64.exe $@
     cd - &>/dev/null
   fi
 }
