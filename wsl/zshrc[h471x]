@@ -726,7 +726,7 @@ function arp(){
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe /c arp "$@"
   else
-    cd /mnt/d/NTSOA
+    cd /mnt/c
     cmd.exe /c arp "$@"
     cd - &>/dev/null;
   fi
@@ -751,6 +751,26 @@ alias obs="obs"
 function obs(){
   cd /mnt/d/NTSOA/INSTALLED/OBS\ STUDIO/obs-studio/bin/64bit
   cmd.exe /c start obs64.exe
+  cd - &>/dev/null
+}
+
+# this alias to launch gta san andreas
+alias gta="gta"
+
+# this function for gta alias
+function gta(){
+  cd /mnt/d/NTSOA/INSTALLED/GTA\ SAN\ ANDREAS
+  cmd.exe /c start /affinity 2 gta_sa.exe
+  cd - &>/dev/null
+}
+
+# this alias to open visual paradigm
+alias paradigm="paradigm"
+
+# this function for paradigm alias
+function paradigm(){
+  cd /mnt/d/NTSOA/INSTALLED/VISUAL\ PARADIGM/Visual\ Paradigm\ CE\ 17.2/bin
+  explorer.exe visual.lnk
   cd - &>/dev/null
 }
 
@@ -3357,10 +3377,24 @@ alias eclipse="eclipse"
 # this function for eclipse alias
 function eclipse(){
   if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start eclipse.exe "$@"
+    cmd.exe /c start eclipse.exe ${@:-.}
   else
     cd /mnt/c
-    cmd.exe /c start eclipse.exe "$@"
+    cmd.exe /c start eclipse.exe ${@:-.}
+    cd - &>/dev/null
+  fi
+}
+
+# this alias to launch Apache NetBeans IDE
+alias beans="beans"
+
+# this function for beans alias
+function beans(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start netbeans64.exe ${@:-.}
+  else
+    cd /mnt/c
+    cmd.exe /c start netbeans64.exe ${@:-.}
     cd - &>/dev/null
   fi
 }
