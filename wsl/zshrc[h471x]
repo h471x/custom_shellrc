@@ -30,9 +30,8 @@ VIRTUAL_BOX_PATH="/mnt/c/'Virtual Box'"
 WIRESHARK_PATH=/mnt/c/Program\ Files/Wireshark
 TOTAL_CMD_PATH=/mnt/c/Program\ Files/totalcmd
 THEME_TOOL_PATH=/mnt/d/NTSOA/INSTALLED/THEME_TOOL
-# OBS_STUDIO_PATH=/mnt/d/NTSOA/INSTALLED/OBS\ STUDIO/obs-studio/bin/64bit
-# GNS3_PATH=/mnt/d/NTSOA/INSTALLED/GNS3
 WINDOWS_APP_PATH=$VIRTUAL_BOX_PATH:$WIRESHARK_PATH:$TOTAL_CMD_PATH:$THEME_TOOL_PATH
+
 BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$WINDOWS_APP_PATH:$PYTHON_PATH
 
 # Browsers
@@ -50,6 +49,7 @@ APP_PATH=$NPM_PATH:$POT_PLAYER_PATH:$FL_STUDIO_PATH:$NGROK_PATH
 # Including all the paths
 PATH=$BINARY_PATH:$BROWSER_PATH:$APP_PATH:$PATH
 
+# SOLVED :
 # this to make Github CLI know which default browser it would use
 # this WSL issue was solved in gh GitHub Repo Pull Request
 export BROWSER="chrome.exe"
@@ -617,10 +617,28 @@ alias pct="op /mnt/c/Users/lab_l/OneDrive/Pictures"
 alias setup="op /mnt/d/NTSOA/SETUP"
 
 # this alias to open FL Studio
-alias fl="FL64.exe; cv"
+alias fl="fl"
+
+# this function for fl alias
+function fl(){
+  cd /mnt/d/NTSOA/INSTALLED/FL\ STUDIO\ 12
+  cmd.exe /c start FL64.exe
+  cd - &>/dev/null;
+}
 
 # this alias to open apple music
-alias music="AppleMusic.exe; cv"
+alias music="music"
+
+# this function for music alias
+function music(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start AppleMusic.exe
+  else
+    cd /mnt/c
+    cmd.exe /c start AppleMusic.exe
+    cd - &>/dev/null;
+  fi
+}
 
 # this alias to open notepad
 alias ntp="notepad.exe && cv"
