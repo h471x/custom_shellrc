@@ -1367,6 +1367,22 @@ function rdf(){
   cv;
 }
 
+# Completion function for rdf
+# _rdf_completion() {
+#   local cur
+#   cur="${COMP_WORDS[COMP_CWORD]}"
+#
+#   # Get the raw output of eza
+#   local files_and_dirs
+#   files_and_dirs=$(eza --icons=always --no-quotes --group-directories-first "$PWD" | awk '{print $NF}')
+#
+#   # Generate completions
+#   COMPREPLY=($(compgen -W "${files_and_dirs}" -- "${cur}"))
+# }
+#
+# # Register the completion function for rdf
+# complete -F _rdf_completion rdf
+
 # this alias to view the pc state
 # DIRTY:
 alias pc="c && br 2 && neofetch --source ~/.config/neofetch/htx2.txt"
@@ -1903,6 +1919,17 @@ function hackme(){
   open_web_app $hackme_link $hackme_id $hackme_name
 }
 
+# this alias to open google translate Web App
+alias translate="translate"
+
+# this function for translate alias
+function translate(){
+  local translate_id="edanbjnaiofggfmimiidpfmhggkbokck"
+  local translate_link="translate.google.com"
+  local translate_name="Google Translate"
+  open_web_app $translate_link $translate_id $translate_name
+}
+
 # this alias to open W3SCHOOLS Offline Web App
 alias wscl="allow_sudo && wscl"
 
@@ -2120,6 +2147,29 @@ function wpass(){
   fi
   cd - &>/dev/null;
 }
+
+# Completion function for wpass
+_wpass_completion() {
+  cd /mnt/c
+  local cur
+
+  # Get the current word being completed
+  cur="${COMP_WORDS[COMP_CWORD]}"
+
+  # Fetch WiFi profiles
+  local profiles=$(cmd.exe /c netsh wlan show profiles |
+    grep -i "All User Profile" |
+    awk '{$1=$2=$3=""; print substr($0, 6)}' |
+    head -n 1000
+  )
+
+  # Generate completions
+  COMPREPLY=($(compgen -W "${profiles}" -- "${cur}"))
+  cd - &>/dev/null
+}
+
+# Register the completion function for wpass
+complete -F _wpass_completion wpass
 
 # this alias to "list known wifi"
 alias wls="wls"
@@ -2769,6 +2819,26 @@ function ghv(){
   fi
 }
 
+# Completion function for ghv
+# 07-31-2024 00:30
+_ghv_completion() {
+  local cur prev opts
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  opts="show owner"
+
+  if [[ ${COMP_CWORD} -eq 1 ]]; then
+      # Complete the options
+      COMPREPLY=($(compgen -W "$opts" -- "$cur"))
+  else
+      # No further completion needed
+      COMPREPLY=()
+  fi
+}
+
+# Register the completion function for ghv
+complete -F _ghv_completion ghv
+
 # this alias to git add and git commit at the same 00:31
 alias gad="gad"
 
@@ -2935,6 +3005,41 @@ function ghdel(){
   fi
 }
 
+# Completion function for ghdel
+_ghdel_completion() {
+    local cur prev opts
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    if [[ ${COMP_CWORD} -eq 1 ]]; then
+        # Ensure we are in a git repository
+        local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+        if [[ "$is_a_git_repo" == "true" ]]; then
+            local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+            local repo_url=$(git config --get remote.origin.url)
+            local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+            local repo_name="$(basename "$repo_url" .git)"
+
+            # Fetch collaborators and invitees
+            local collaborators=$(gh api "repos/$repo_owner/$repo_name/collaborators" --jq '.[].login')
+            local invitations=$(gh api "repos/$repo_owner/$repo_name/invitations" --jq '.[].invitee.login')
+
+            # Combine collaborators and invitees into a single list
+            local all_users=$(echo "$collaborators" "$invitations" | tr ' ' '\n' | sort | uniq)
+
+            # Provide completion suggestions
+            COMPREPLY=($(compgen -W "$all_users" -- "$cur"))
+        else
+            echo "Not inside a git repository."
+        fi
+    else
+        COMPREPLY=()
+    fi
+}
+
+# Register the completion function for ghdel
+# complete -F _ghdel_completion ghdel
+
 # this alias to list all collaborators
 alias ghcls="ghcls"
 
@@ -3014,6 +3119,9 @@ function gnm(){
   fi
 }
 
+# autocomplete gnm
+complete -F branch_auto_complete gnm
+
 # this alias to switch to the last git branch
 alias gck="gck";
 
@@ -3077,6 +3185,24 @@ function gck(){
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
+
+# this function to autocomplete
+# the branches of gck alias
+function branch_auto_complete(){
+  local cur branches
+
+  # Get the current word being completed
+  cur="${COMP_WORDS[COMP_CWORD]}"
+
+  # Get the list of branches from `git branch`
+  branches=$(git branch --format '%(refname:short)')
+
+  # Generate completions
+  COMPREPLY=($(compgen -W "${branches}" -- "${cur}"))
+}
+
+# Register the completion function for `gck`
+complete -F branch_auto_complete gck
 
 # this alias to switch to the last git branch
 alias gcb="gcb";
@@ -3227,8 +3353,38 @@ function gbd() {
   fi
 }
 
+# Register the completion function for `gbd`
+complete -F branch_auto_complete gbd
+
 # this alias to revert back to last commit
-alias grst="git checkout -- ."
+alias grst="grst"
+
+# this function for grst alias
+function grst(){
+  if [[ $# -eq 0 ]]; then
+    git checkout -- .;
+  else
+    git restore "$@";
+  fi
+}
+
+# this function to autocomplete
+# files to reset from git status
+function _grst_completion() {
+  local cur opts
+
+  # Get the current word being completed
+  cur="${COMP_WORDS[COMP_CWORD]}"
+
+  # Get the list of uncommitted changes from `git status -s`
+  opts=$(git status -s | awk '{print $2}')
+
+  # Generate completions
+  COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
+}
+
+# Register the completion function for `grst`
+complete -F _grst_completion grst
 
 # this alias to push changes on current repo to remote repo
 alias gpsh="gpsh"
@@ -3327,6 +3483,24 @@ function glc(){
   fi
 }
 
+# Completion function for glc
+_glc_completion() {
+    local cur prev
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    if [[ ${COMP_CWORD} -eq 1 ]]; then
+        # Only suggest 'show' if no argument is provided
+        COMPREPLY=($(compgen -W "show" -- "$cur"))
+    else
+        # If there are additional arguments, clear completions
+        COMPREPLY=()
+    fi
+}
+
+# Register the completion function for ghv
+complete -F _glc_completion glc
+
 # this alias to merge branches
 alias gmb="gmb"
 
@@ -3354,6 +3528,9 @@ function gmb(){
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
+
+# Register the completion function for `gmb`
+complete -F branch_auto_complete gmb
 
 # this alias to open ThemeTool
 alias thm="thm"
@@ -3459,6 +3636,20 @@ function psp(){
   fi
 }
 
+# this alias to open tor browser
+alias tor="tor"
+
+# this function for tor alias
+function tor(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start tor.exe $@
+  else
+    cd /mnt/c
+    cmd.exe /c start tor.exe $@
+    cd - &>/dev/null
+  fi
+}
+
 # this alias for windows ngrok
 alias ngrok="ngrok"
 
@@ -3491,6 +3682,21 @@ function ngrok(){
     cd - &>/dev/null
   fi
 }
+
+# Completion function for ngrok
+_ngrok_completion() {
+  local cur
+  cur="${COMP_WORDS[COMP_CWORD]}"
+
+  # Define the list of possible completions
+  local commands="api completion config credits diagnose help http service start tcp tls tunnel update version"
+
+  # Provide completion options based on the current word being completed
+  COMPREPLY=($(compgen -W "${commands}" -- "$cur"))
+}
+
+# Register the completion function for ngrok
+complete -F _ngrok_completion ngrok
 
 # this alias to launch process explorer
 alias prex="prex"
