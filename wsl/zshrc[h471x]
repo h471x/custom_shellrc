@@ -385,7 +385,7 @@ function cv() {
   function show_content(){
     # local flag="${1:-}"
     # ls $flag $folder_content;
-    eza --icons=always --no-quotes $folder_content
+    eza --icons=always --no-quotes --group-directories-first $folder_content
   }
 
   # this function to show the all of the cv content
@@ -440,7 +440,7 @@ function cvf() {
 
   # this function to show the content of the cv
   function show_content(){
-    eza --icons=always --no-quotes -a $folder_content;
+    eza --icons=always --no-quotes -a --group-directories-first $folder_content;
   }
 
   # this function to show the cv
@@ -477,7 +477,7 @@ function cvg(){
   }
 
   function show_content(){
-    eza --icons=always --color=always -a | grep "$1";
+    eza --icons=always --color=always -a --group-directories-first | grep "$1";
   }
 
   # this function to show the cv
