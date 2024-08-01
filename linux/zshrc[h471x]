@@ -429,7 +429,7 @@ alias exop="exop"
 # this function for exop alias
 function exop(){
   xdg-open "${1:-.}"
-  cv;
+  # cv;
 }
 
 #here to launch tmux and cv after 1 second
@@ -544,7 +544,7 @@ alias pct="pct"
 
 #this function for pct alias
 function pct(){
-  op /home/h471x/Pictures;
+  op /home/$USER/Pictures;
 }
 
 #this line to directly go to JPG version of the time schedule
@@ -1699,7 +1699,7 @@ function whk(){
         check_quit
       fi
     }
-    check_quit
+    allow_sudo && check_quit
   }
 
   if [ -d /sys/class/net/wlan0 ]; then
@@ -1713,13 +1713,62 @@ function whk(){
 }
 
 # this alias to create a Fake Access Point
-alias facp="facp"
+alias facp="allow_sudo && facp"
 
 # this function for facp alias
 function facp(){
-  c && br 2 && sudo clear;
-  sudo airbase-ng --essid "$*" -c 11 wlan0;
+  if [ -d /sys/class/net/wlan0 ]; then
+    sudo systemctl stop NetworkManager
+    sudo systemctl stop wpa_supplicant
+    sudo ifconfig wlan0 down
+    sudo ifconfig wlan0 up
+    sudo airbase-ng --essid "$*" -c 11 wlan0
+  else
+    echo "No wireless adapter found"
+  fi
+
+  function check_quit(){
+    echo -ne " ${BOLD}${WHITE}[${GREEN}?${WHITE}]${WHITE} ${GREEN}Restart ${WHITE}the Fake Acces Point ? (y/n) ";
+    read wifi
+    if [ "$wifi" = "y" ]; then
+      whk
+    elif [[ "$wifi" = "n" ]]; then
+      echo -ne " ${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Switching to ${GREEN}Managed ${WHITE}Mode  ";
+      downnet eth0 && upnet wlan0;
+      wtp wlan0 managed;
+      echo "${GREEN}  ${WHITE}"
+      echo -ne " ${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Restarting Network Manager "
+      sudo service NetworkManager restart;
+      echo "${GREEN}  ${WHITE}"
+    else
+      check_quit
+    fi
+  }
+  check_quit
 }
+
+# function facp(){
+#   if [ -d /sys/class/net/wlan0 ]; then
+#     sudo systemctl stop NetworkManager
+#     sudo systemctl stop wpa_supplicant
+#     sudo ifconfig wlan0 down
+#     sudo ifconfig wlan0 up
+#
+#     sudo airbase-ng --essid "$*" -c 11 wlan0 &
+#
+#     sleep 5  # Wait for airbase-ng to create the at0 interface
+#
+#     sudo ifconfig at0 up 10.0.0.1 netmask 255.255.255.0
+#     sudo dnsmasq -C /etc/dnsmasq.conf -d &
+#
+#     echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
+#     sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+#     sudo iptables -A FORWARD -i eth0 -o at0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+#     sudo iptables -A FORWARD -i at0 -o eth0 -j ACCEPT
+#   else
+#     echo "No wireless adapter found"
+#   fi
+# }
 
 # this alias to deauth wireless connection
 alias deauth="deauth"
@@ -1734,7 +1783,7 @@ function deauth(){
         sudo systemctl start NetworkManager;
         wtp wlan0 managed;
       fi
-  
+
       kl wpa_supplicant;
       kl dhclient;
 
@@ -1801,7 +1850,8 @@ function wls(){
     downnet eth0 && upnet wlan0;
     c && br 2;
     echo " Wi-Fi connections nearby : " && br;
-    nmcli -f SSID,BSSID,SECURITY,CHAN,SIGNAL,BARS,RATE,MODE device wifi list
+    nmcli device wifi list
+    # nmcli -f SSID,BSSID,SECURITY,CHAN,SIGNAL,BARS,RATE,MODE device wifi list
     # nmcli -f SSID,SECURITY,CHAN,SIGNAL,BARS,RATE,MODE device wifi list
     # wait;
     br;
@@ -1845,7 +1895,7 @@ function cupp(){
 function stap(){
   if [[ $(pgrep apache2) ]]; then
     c && br;
-    echo "${BOLD}Apache Server Active [${GREEN}✓${WHITE}]"
+    echo " ${BOLD}Apache Server Active [${GREEN}✓${WHITE}]"
     br;
 
     local eth_iface="eth0"
@@ -1856,9 +1906,10 @@ function stap(){
       echo "$wifi_iface Interface Connection (Public)  : ${BRIGHT_BLUE}http://$wlan_ip${WHITE}";
     fi
     local loopback_ip=$(ifconfig $loopback_iface | grep "inet " | awk '{print $2}');
+    local eth_ip=$(ifconfig $eth_iface | grep "inet " | awk '{print $2}');
 
-    echo "$loopback_iface    Interface Connection (Private) : ${BRIGHT_BLUE}http://$loopback_ip ${WHITE}";
-    echo "$eth_iface    Interface Connection (Private) : ${BRIGHT_BLUE}http://$eth_ip ${WHITE}";
+    echo " $loopback_iface    Interface Connection (Private) : ${BRIGHT_BLUE}http://$loopback_ip ${WHITE}";
+    echo " $eth_iface  Interface Connection (Private) : ${BRIGHT_BLUE}http://$eth_ip ${WHITE}";
     br;
   else
     c && br;
