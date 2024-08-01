@@ -30,9 +30,8 @@ VIRTUAL_BOX_PATH="/mnt/c/'Virtual Box'"
 WIRESHARK_PATH=/mnt/c/Program\ Files/Wireshark
 TOTAL_CMD_PATH=/mnt/c/Program\ Files/totalcmd
 THEME_TOOL_PATH=/mnt/d/NTSOA/INSTALLED/THEME_TOOL
-# OBS_STUDIO_PATH=/mnt/d/NTSOA/INSTALLED/OBS\ STUDIO/obs-studio/bin/64bit
-# GNS3_PATH=/mnt/d/NTSOA/INSTALLED/GNS3
 WINDOWS_APP_PATH=$VIRTUAL_BOX_PATH:$WIRESHARK_PATH:$TOTAL_CMD_PATH:$THEME_TOOL_PATH
+
 BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$WINDOWS_APP_PATH:$PYTHON_PATH
 
 # Browsers
@@ -50,6 +49,7 @@ APP_PATH=$NPM_PATH:$POT_PLAYER_PATH:$FL_STUDIO_PATH:$NGROK_PATH
 # Including all the paths
 PATH=$BINARY_PATH:$BROWSER_PATH:$APP_PATH:$PATH
 
+# SOLVED :
 # this to make Github CLI know which default browser it would use
 # this WSL issue was solved in gh GitHub Repo Pull Request
 export BROWSER="chrome.exe"
@@ -385,7 +385,7 @@ function cv() {
   function show_content(){
     # local flag="${1:-}"
     # ls $flag $folder_content;
-    eza --icons=always --no-quotes $folder_content
+    eza --icons=always --no-quotes --group-directories-first $folder_content
   }
 
   # this function to show the all of the cv content
@@ -440,7 +440,7 @@ function cvf() {
 
   # this function to show the content of the cv
   function show_content(){
-    eza --icons=always -a $folder_content;
+    eza --icons=always --no-quotes -a --group-directories-first $folder_content;
   }
 
   # this function to show the cv
@@ -477,7 +477,7 @@ function cvg(){
   }
 
   function show_content(){
-    eza --icons=always --color=always -a | grep "$1";
+    eza --icons=always --color=always -a --group-directories-first | grep "$1";
   }
 
   # this function to show the cv
@@ -536,7 +536,7 @@ command_not_found_handler() {
     # echo "n o t     f o u n d " | figlet -t -c | lolcat;
     # br && sleep 0.5 && cv;
     # cv
-    echo "${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Command Not Found ... "
+    echo " ${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Command Not Found"
     # fuck
   fi
 }
@@ -553,10 +553,6 @@ function op(){
       cd "$1" && cvg "$2";
     fi
   elif [[ -f "$1" ]]; then
-    # local file_name="$1"
-    # local file_extension="${file_name##*.}"
-    # local is_site="[[ "$file_extension" == "com" ]]"
-    # local cmd=$(eval $is_site && echo "open_web_app" || echo "vf")
     vf "$1"
   fi
 }
@@ -621,10 +617,28 @@ alias pct="op /mnt/c/Users/lab_l/OneDrive/Pictures"
 alias setup="op /mnt/d/NTSOA/SETUP"
 
 # this alias to open FL Studio
-alias fl="FL64.exe; cv"
+alias fl="fl"
+
+# this function for fl alias
+function fl(){
+  cd /mnt/d/NTSOA/INSTALLED/FL\ STUDIO\ 12
+  cmd.exe /c start FL64.exe
+  cd - &>/dev/null;
+}
 
 # this alias to open apple music
-alias music="AppleMusic.exe; cv"
+alias music="music"
+
+# this function for music alias
+function music(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start AppleMusic.exe
+  else
+    cd /mnt/c
+    cmd.exe /c start AppleMusic.exe
+    cd - &>/dev/null;
+  fi
+}
 
 # this alias to open notepad
 alias ntp="notepad.exe && cv"
@@ -641,6 +655,16 @@ function vm(){
     cmd.exe /c start VirtualBox.exe
     cd - &>/dev/null;
   fi
+}
+
+# this alias to launch ventoy
+alias ventoy="ventoy"
+
+# this function for ventoy alias
+function ventoy(){
+  cd "/mnt/d/NTSOA/INSTALLED/VENTOY/ventoy-1.0.97"
+  explorer.exe Ventoy2Disk.exe
+  cd -&>/dev/null
 }
 
 # this alias to open wireshark
@@ -712,6 +736,20 @@ function nslookup(){
   fi
 }
 
+# this alias to use windows arp
+alias arp="arp"
+
+# this function for arp alias
+function arp(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c arp "$@"
+  else
+    cd /mnt/c
+    cmd.exe /c arp "$@"
+    cd - &>/dev/null;
+  fi
+}
+
 # this alias to run jupyter notebook
 alias jptr="jptr"
 
@@ -731,6 +769,46 @@ alias obs="obs"
 function obs(){
   cd /mnt/d/NTSOA/INSTALLED/OBS\ STUDIO/obs-studio/bin/64bit
   cmd.exe /c start obs64.exe
+  cd - &>/dev/null
+}
+
+# this alias to launch gta san andreas
+alias gta="gta"
+
+# this function for gta alias
+function gta(){
+  cd /mnt/d/NTSOA/INSTALLED/GTA\ SAN\ ANDREAS
+  cmd.exe /c start /affinity 2 gta_sa.exe
+  cd - &>/dev/null
+}
+
+# this alias to open visual paradigm
+alias paradigm="paradigm"
+
+# this function for paradigm alias
+function paradigm(){
+  cd /mnt/d/NTSOA/INSTALLED/VISUAL\ PARADIGM/Visual\ Paradigm\ CE\ 17.2/bin
+  explorer.exe visual.lnk
+  cd - &>/dev/null
+}
+
+# this alias open Bluestacks
+alias android="android"
+
+# this function for android alias
+function android(){
+  cd /mnt/c/Program\ Files/BlueStacks_nxt
+  cmd.exe /c start HD-Player.exe
+  cd - &>/dev/null
+}
+
+# this alias to open Driver Booster 11
+alias boost="boost"
+
+# this function for boost alias
+function boost(){
+  cd "/mnt/d/NTSOA/INSTALLED/DRIVER BOOSTER/11.5.0"
+  cmd.exe /c start DriverBooster.exe
   cd - &>/dev/null
 }
 
@@ -806,7 +884,6 @@ alias dbg64="dbg64"
 
 # this function for debug alias
 function dbg64(){
-  # powershell.exe -command "Start-Process x64dbg -Verb RunAs"
   cd /mnt/d/NTSOA/INSTALLED/SHORTCUTS/
   explorer.exe x64dbg.lnk
   cd - &>/dev/null
@@ -817,7 +894,6 @@ alias dbg32="dbg32"
 
 # this function for debug alias
 function dbg32(){
-  # powershell.exe -command "Start-Process x32dbg -Verb RunAs"
   cd /mnt/d/NTSOA/INSTALLED/SHORTCUTS/
   explorer.exe x32dbg.lnk
   cd - &>/dev/null
@@ -846,7 +922,6 @@ function edt(){
   local recent_file=$(ls -t . | head -n1)
   explorer.exe $recent_file
 
-  # cv
   cd - &>/dev/null
 }
 
@@ -935,7 +1010,7 @@ function rn(){
   case "${1##*.}" in
     py)
       # all "$1" && c && echo -e && py "$1" && echo -e;;
-      python "$@" return 0;;
+      python "$@" && return 0;;
     c || cpp) #update 07/28/2023
       file="$1";
       out="${file%.*}"
@@ -1039,8 +1114,8 @@ alias vf="vf"
 function vf() {
   if [[ -f "$1" ]]; then
     case "${1##*.}" in
-      xlsx|docx|pptx|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) 
-        explorer.exe "$1" 
+      db|sqlite*|xlsx|docx|pptx|ppt|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) 
+        explorer.exe "$1"
         ;;
       # open all files that have default app with windows explorer
       html)
@@ -1050,9 +1125,12 @@ function vf() {
           bwsop "$1"
         fi
         ;;
+      fxml)
+        cmd.exe /c start SceneBuilder.exe "$@"
+        ;;
       *) nvim "$1" ;;
     esac
-    cv
+    return 0
   elif [[ -d "$1" ]]; then
     op "$1"
   fi
@@ -1289,9 +1367,27 @@ function rdf(){
   cv;
 }
 
+# Completion function for rdf
+# _rdf_completion() {
+#   local cur
+#   cur="${COMP_WORDS[COMP_CWORD]}"
+#
+#   # Get the raw output of eza
+#   local files_and_dirs
+#   files_and_dirs=$(eza --icons=always --no-quotes --group-directories-first "$PWD" | awk '{print $NF}')
+#
+#   # Generate completions
+#   COMPREPLY=($(compgen -W "${files_and_dirs}" -- "${cur}"))
+# }
+#
+# # Register the completion function for rdf
+# complete -F _rdf_completion rdf
+
 # this alias to view the pc state
 # DIRTY:
 alias pc="c && br 2 && neofetch --source ~/.config/neofetch/htx2.txt"
+
+# alias pc="c && br 2 && neofetch --source /mnt/c/Users/lab_l/OneDrive/Pictures/ntsoa_signature/sign.txt"
 
 #call this pc alias at startup
 #pc
@@ -1304,7 +1400,7 @@ alias hm="cd && cv"
 alias whm="cd /mnt/c/Users/lab_l/OneDrive/Bureau && op Home.lnk && nd"
 
 # this alias to open the evangile directory
-alias gospel="op /mnt/d/NTSOA/EVANGILE"
+alias gospel="op /mnt/d/NTSOA/GOSPEL"
 
 #this alias to enter the NTSOA directory
 alias hn="op /mnt/d/NTSOA"
@@ -1714,15 +1810,14 @@ function stck(){
   open_web_app $stck_link $stck_id $stck_name
 }
 
-# this alias to open Canva Web App
+# this alias to open Canva App
 alias canva="canva"
 
 # this function for canva alias
 function canva(){
-  local canva_id="mnnncmnfcndlghkomlbaadoonfnjcadg"
-  local canva_link="canva.com"
-  local canva_name="Canva"
-  open_web_app $canva_link $canva_id $canva_name
+  cd /mnt/c/Users/lab_l/AppData/Local/Programs/Canva
+  cmd.exe /c start Canva.exe
+  cd - &>/dev/null
 }
 
 # this alias to open MuseScore Web App
@@ -1822,6 +1917,17 @@ function hackme(){
   local hackme_link="tryhackme.com"
   local hackme_name="Try Hack Me"
   open_web_app $hackme_link $hackme_id $hackme_name
+}
+
+# this alias to open google translate Web App
+alias translate="translate"
+
+# this function for translate alias
+function translate(){
+  local translate_id="edanbjnaiofggfmimiidpfmhggkbokck"
+  local translate_link="translate.google.com"
+  local translate_name="Google Translate"
+  open_web_app $translate_link $translate_id $translate_name
 }
 
 # this alias to open W3SCHOOLS Offline Web App
@@ -2013,7 +2119,7 @@ alias wpass="wpass"
 
 # this function for wpass alias
 function wpass(){
-  cd /mnt/d/NTSOA
+  cd /mnt/c
   if [[ $# -eq 0 ]]; then
     # consider all arguments as one string
     local wifi=$(
@@ -2042,12 +2148,35 @@ function wpass(){
   cd - &>/dev/null;
 }
 
+# Completion function for wpass
+_wpass_completion() {
+  cd /mnt/c
+  local cur
+
+  # Get the current word being completed
+  cur="${COMP_WORDS[COMP_CWORD]}"
+
+  # Fetch WiFi profiles
+  local profiles=$(cmd.exe /c netsh wlan show profiles |
+    grep -i "All User Profile" |
+    awk '{$1=$2=$3=""; print substr($0, 6)}' |
+    head -n 1000
+  )
+
+  # Generate completions
+  COMPREPLY=($(compgen -W "${profiles}" -- "${cur}"))
+  cd - &>/dev/null
+}
+
+# Register the completion function for wpass
+complete -F _wpass_completion wpass
+
 # this alias to "list known wifi"
 alias wls="wls"
 
 # this function for wls alias
 function wls(){
-  cd /mnt/d/NTSOA
+  cd /mnt/c
 
   function print_message(){
     wifi="$1"
@@ -2690,6 +2819,26 @@ function ghv(){
   fi
 }
 
+# Completion function for ghv
+# 07-31-2024 00:30
+_ghv_completion() {
+  local cur prev opts
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+  opts="show owner"
+
+  if [[ ${COMP_CWORD} -eq 1 ]]; then
+      # Complete the options
+      COMPREPLY=($(compgen -W "$opts" -- "$cur"))
+  else
+      # No further completion needed
+      COMPREPLY=()
+  fi
+}
+
+# Register the completion function for ghv
+complete -F _ghv_completion ghv
+
 # this alias to git add and git commit at the same 00:31
 alias gad="gad"
 
@@ -2856,6 +3005,41 @@ function ghdel(){
   fi
 }
 
+# Completion function for ghdel
+_ghdel_completion() {
+    local cur prev opts
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    if [[ ${COMP_CWORD} -eq 1 ]]; then
+        # Ensure we are in a git repository
+        local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+        if [[ "$is_a_git_repo" == "true" ]]; then
+            local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+            local repo_url=$(git config --get remote.origin.url)
+            local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+            local repo_name="$(basename "$repo_url" .git)"
+
+            # Fetch collaborators and invitees
+            local collaborators=$(gh api "repos/$repo_owner/$repo_name/collaborators" --jq '.[].login')
+            local invitations=$(gh api "repos/$repo_owner/$repo_name/invitations" --jq '.[].invitee.login')
+
+            # Combine collaborators and invitees into a single list
+            local all_users=$(echo "$collaborators" "$invitations" | tr ' ' '\n' | sort | uniq)
+
+            # Provide completion suggestions
+            COMPREPLY=($(compgen -W "$all_users" -- "$cur"))
+        else
+            echo "Not inside a git repository."
+        fi
+    else
+        COMPREPLY=()
+    fi
+}
+
+# Register the completion function for ghdel
+# complete -F _ghdel_completion ghdel
+
 # this alias to list all collaborators
 alias ghcls="ghcls"
 
@@ -2912,10 +3096,10 @@ function ghcls(){
   fi
 }
 
-#this alias to rename a git branch
+# this alias to rename a git branch
 alias gnm="gnm"
 
-#this function for gnm alias
+# this function for gnm alias
 function gnm(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
@@ -2934,6 +3118,9 @@ function gnm(){
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
+
+# autocomplete gnm
+complete -F branch_auto_complete gnm
 
 # this alias to switch to the last git branch
 alias gck="gck";
@@ -2998,6 +3185,24 @@ function gck(){
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
+
+# this function to autocomplete
+# the branches of gck alias
+function branch_auto_complete(){
+  local cur branches
+
+  # Get the current word being completed
+  cur="${COMP_WORDS[COMP_CWORD]}"
+
+  # Get the list of branches from `git branch`
+  branches=$(git branch --format '%(refname:short)')
+
+  # Generate completions
+  COMPREPLY=($(compgen -W "${branches}" -- "${cur}"))
+}
+
+# Register the completion function for `gck`
+complete -F branch_auto_complete gck
 
 # this alias to switch to the last git branch
 alias gcb="gcb";
@@ -3148,8 +3353,38 @@ function gbd() {
   fi
 }
 
+# Register the completion function for `gbd`
+complete -F branch_auto_complete gbd
+
 # this alias to revert back to last commit
-alias grst="git checkout -- ."
+alias grst="grst"
+
+# this function for grst alias
+function grst(){
+  if [[ $# -eq 0 ]]; then
+    git checkout -- .;
+  else
+    git restore "$@";
+  fi
+}
+
+# this function to autocomplete
+# files to reset from git status
+function _grst_completion() {
+  local cur opts
+
+  # Get the current word being completed
+  cur="${COMP_WORDS[COMP_CWORD]}"
+
+  # Get the list of uncommitted changes from `git status -s`
+  opts=$(git status -s | awk '{print $2}')
+
+  # Generate completions
+  COMPREPLY=($(compgen -W "${opts}" -- "${cur}"))
+}
+
+# Register the completion function for `grst`
+complete -F _grst_completion grst
 
 # this alias to push changes on current repo to remote repo
 alias gpsh="gpsh"
@@ -3248,6 +3483,24 @@ function glc(){
   fi
 }
 
+# Completion function for glc
+_glc_completion() {
+    local cur prev
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+    if [[ ${COMP_CWORD} -eq 1 ]]; then
+        # Only suggest 'show' if no argument is provided
+        COMPREPLY=($(compgen -W "show" -- "$cur"))
+    else
+        # If there are additional arguments, clear completions
+        COMPREPLY=()
+    fi
+}
+
+# Register the completion function for ghv
+complete -F _glc_completion glc
+
 # this alias to merge branches
 alias gmb="gmb"
 
@@ -3275,6 +3528,9 @@ function gmb(){
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
 }
+
+# Register the completion function for `gmb`
+complete -F branch_auto_complete gmb
 
 # this alias to open ThemeTool
 alias thm="thm"
@@ -3310,6 +3566,90 @@ function node(){
   node.exe $@;
 }
 
+# this alias to launch eclipse IDE
+alias eclipse="eclipse"
+
+# this function for eclipse alias
+function eclipse(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start eclipse.exe ${@:-.}
+  else
+    cd /mnt/c
+    cmd.exe /c start eclipse.exe ${@:-.}
+    cd - &>/dev/null
+  fi
+}
+
+# this alias to launch Apache NetBeans IDE
+alias beans="beans"
+
+# this function for beans alias
+function beans(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start netbeans64.exe ${@:-.}
+  else
+    cd /mnt/c
+    cmd.exe /c start netbeans64.exe ${@:-.}
+    cd - &>/dev/null
+  fi
+}
+
+# this alias to launch intelijieda
+alias idea="idea"
+
+# this function for idea alias
+function idea(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start idea64.exe ${@:-.}
+  else
+    cd /mnt/c
+    cmd.exe /c start idea64.exe ${@:-.}
+    cd - &>/dev/null
+  fi
+}
+
+# this alias to open PyCharm
+alias charm="charm"
+
+# this function for charm alias
+function charm(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start pycharm64.exe ${@:-.}
+  else
+    cd /mnt/c
+    cmd.exe /c start pycharm64.exe ${@:-.}
+    cd - &>/dev/null
+  fi
+}
+
+# this alias to launch ppsspp
+alias psp="psp"
+
+# this function for psp alias
+function psp(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start PPSSPPWindows.exe $@
+  else
+    cd /mnt/c
+    cmd.exe /c start PPSSPPWindows.exe $@
+    cd - &>/dev/null
+  fi
+}
+
+# this alias to open tor browser
+alias tor="tor"
+
+# this function for tor alias
+function tor(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start tor.exe $@
+  else
+    cd /mnt/c
+    cmd.exe /c start tor.exe $@
+    cd - &>/dev/null
+  fi
+}
+
 # this alias for windows ngrok
 alias ngrok="ngrok"
 
@@ -3337,11 +3677,26 @@ function ngrok(){
   if [[ "$PWD" == "/mnt/"* ]]; then
     eval $ngrok_cmd
   else
-    cd /mnt/d/NTSOA
+    cd /mnt/c
     eval $ngrok_cmd
     cd - &>/dev/null
   fi
 }
+
+# Completion function for ngrok
+_ngrok_completion() {
+  local cur
+  cur="${COMP_WORDS[COMP_CWORD]}"
+
+  # Define the list of possible completions
+  local commands="api completion config credits diagnose help http service start tcp tls tunnel update version"
+
+  # Provide completion options based on the current word being completed
+  COMPREPLY=($(compgen -W "${commands}" -- "$cur"))
+}
+
+# Register the completion function for ngrok
+complete -F _ngrok_completion ngrok
 
 # this alias to launch process explorer
 alias prex="prex"
@@ -3417,14 +3772,6 @@ function vue() {
   fi
 }
 
-# # this alias to run the windows mysql command
-# alias mysql="mysql"
-#
-# # this function for mysql alias
-# function mysql(){
-#   mysql.exe $@;
-# }
-
 kill-line() {
   if [[ $BUFFER == "" ]]; then
     zle backward-kill-line
@@ -3438,7 +3785,3 @@ bindkey "²²" kill-line
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-# eval $(thefuck --alias)
-# eval "$(fzf --zsh)"
-# eval "$(fzf --preview 'cat {}')"
