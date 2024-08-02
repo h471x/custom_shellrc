@@ -32,6 +32,8 @@ TOTAL_CMD_PATH=/mnt/c/Program\ Files/totalcmd
 THEME_TOOL_PATH=/mnt/d/NTSOA/INSTALLED/THEME_TOOL
 WINDOWS_APP_PATH=$VIRTUAL_BOX_PATH:$WIRESHARK_PATH:$TOTAL_CMD_PATH:$THEME_TOOL_PATH
 
+# Path to Binaries
+# For better use add to windows path instead
 BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$WINDOWS_APP_PATH:$PYTHON_PATH
 
 # Browsers
@@ -336,15 +338,6 @@ function bwsop(){
 
   return 0
 }
-
-# SOLVED : using explorer.exe
-# this function to open video file
-#
-# function play_video(){
-#   # local video="$1"
-#   # local formatted_video=$(echo "$file" | sed -e 's/ /%20/g' -e 's/\\//g')
-#   PotPlayerMini64.exe "$1"
-# }
 
 # this alias to edit bashrc
 alias ct="nvim ~/.zshrc"
@@ -1367,48 +1360,25 @@ function rdf(){
   cv;
 }
 
-# Completion function for rdf
-# _rdf_completion() {
-#   local cur
-#   cur="${COMP_WORDS[COMP_CWORD]}"
-#
-#   # Get the raw output of eza
-#   local files_and_dirs
-#   files_and_dirs=$(eza --icons=always --no-quotes --group-directories-first "$PWD" | awk '{print $NF}')
-#
-#   # Generate completions
-#   COMPREPLY=($(compgen -W "${files_and_dirs}" -- "${cur}"))
-# }
-#
-# # Register the completion function for rdf
-# complete -F _rdf_completion rdf
-
 # this alias to view the pc state
-# DIRTY:
 alias pc="c && br 2 && neofetch --source ~/.config/neofetch/htx2.txt"
-
-# alias pc="c && br 2 && neofetch --source /mnt/c/Users/lab_l/OneDrive/Pictures/ntsoa_signature/sign.txt"
-
-#call this pc alias at startup
-#pc
 
 # this alias to go to home directory
 alias hm="cd && cv"
 
 # this alias to view the windows explorer
-# DIRTY:
 alias whm="cd /mnt/c/Users/lab_l/OneDrive/Bureau && op Home.lnk && nd"
 
 # this alias to open the evangile directory
 alias gospel="op /mnt/d/NTSOA/GOSPEL"
 
-#this alias to enter the NTSOA directory
+# this alias to enter the NTSOA directory
 alias hn="op /mnt/d/NTSOA"
 
-#this alias to open the dev folder
+# this alias to open the dev folder
 alias dev="op /mnt/d/NTSOA/dev/github_repo/"
 
-#this alias to open the notes folder
+# this alias to open the notes folder
 alias nt="op /mnt/d/NTSOA/dev/0\ NOTES"
 
 # this alias to open the kali linux Vm Shared folder
