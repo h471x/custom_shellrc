@@ -655,7 +655,7 @@ alias ventoy="ventoy"
 
 # this function for ventoy alias
 function ventoy(){
-  cd "/mnt/d/NTSOA/INSTALLED/VENTOY/ventoy-1.0.97"
+  cd "/mnt/d/NTSOA/INSTALLED/VENTOY/ventoy-1.0.99"
   explorer.exe Ventoy2Disk.exe
   cd -&>/dev/null
 }
@@ -1604,16 +1604,15 @@ function itg(){
   open_web_app $insta_link $insta_id
 }
 
-# # this alias to open the discord app
-# alias dsc="dsc"
-#
-# # this function for dsc alias
-# function dsc(){
-#   # local discord_id="magkoliahgffibhgfkmoealggombgknl"
-#   local discord_id="magkoliahgffibhgfkmoealggombgknl"
-#   local discord_link="discord.com"
-#   open_web_app $discord_link $disord_id
-# }
+# this alias to open the discord app
+alias dsc="dsc"
+
+# this function for dsc alias
+function dsc(){
+  local discord_id="magkoliahgffibhgfkmoealggombgknl"
+  local discord_link="discord.com"
+  open_web_app $discord_link $discord_id
+}
 
 # this alias to open Twitter X Web App
 alias twx="twx"
