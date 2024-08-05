@@ -1997,11 +1997,6 @@ function ipsh(){
   c && br;
   echo "  Available IP Adresses : ";
   br;
-  # ifconfig wlan0;
-  # br;
-  # local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
-  # local wifi_ip=$(ifconfig wifi0 | grep "inet " | awk '{print $2}');
-  # improved:
   local eth_ip=$(ip addr show eth0 | grep -oP 'inet \K[\d.]+');
   local wifi_ip=$(ip addr show wifi0 | grep -oP 'inet \K[\d.]+');
 
@@ -2601,44 +2596,6 @@ function reach(){
     echo " $target_IP is not reachable"
   fi
 }
-
-# this variable will store the pixel ssh server IP adress
-# local pxl_ip = 192.168.68.112"
-
-# this alias to connect to the Pixel 3XL ssh server
-# alias cnt="ssh -p 8022 u0_a249@192.168.68.112 && cv"
-#
-# #this alias to download a file from the Pixel 3XL ssh server
-# alias dwld="dwld"
-#
-# #this function for dwld alias
-# function dwld(){
-#   if [[ -f $1 ]]; then #if the argument is a file
-#     scp -P 8022 u0_a249@192.168.68.112:~/"$1" $PWD
-#   else
-#     scp -P 8022 -r u0_a249@192.168.68.112:~/"$1" $PWD
-#   fi
-# }
-#
-# #this alias to upload a file from this PC to the Pixel 3XL ssh server
-# alias upld="upld"
-#
-# #this function for dwld alias
-# function upld(){
-#   if [[ $# -eq 1 ]]; then #if there is only one argument it will upload the file to home directory
-#     if [[ -f $1 ]]; then #if the argument is a file
-#       scp -P 8022 "$1" u0_a249@192.168.68.112:~
-#     else
-#       scp -P 8022 -r "$1" u0_a249@192.168.68.112:~
-#     fi # upload the file / directory in the second argument
-#   elif [[ $# -eq 2 ]]; then
-#     if [[ -f $1 ]]; then #if the argument is a file
-#       scp -P 8022 "$1" u0_a249@192.168.68.112:~/"$2"
-#     else
-#       scp -P 8022 -r "$1" u0_a249@192.168.68.112:~/"$2"
-#     fi
-#   fi
-# }
 
 # this function to sanitize the repository name
 function clean_repo() {
