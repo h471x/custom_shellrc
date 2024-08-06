@@ -33,7 +33,7 @@ THEME_TOOL_PATH=/mnt/d/NTSOA/INSTALLED/THEME_TOOL
 WINDOWS_APP_PATH=$VIRTUAL_BOX_PATH:$WIRESHARK_PATH:$TOTAL_CMD_PATH:$THEME_TOOL_PATH
 
 # Path to Binaries
-# For better use add to windows path instead
+# For better use : add to windows path instead
 BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$WINDOWS_APP_PATH:$PYTHON_PATH
 
 # Browsers
@@ -195,10 +195,7 @@ function cvii(){
   br 2;
 }
 
-# clear && echo -e && echo -e && echo -e && echo -e
 x;
-# sleep 0.5 && cvi;
-
 
 # this alias to exit
 alias q='exit'
@@ -515,6 +512,7 @@ function flc(){
 
 # call the cv alias whenever a wrong command is typed
 # which doesn't surely exist
+# Nah just printing command not found instead
 command_not_found_handler() {
   local command=$1
   local command_found=0
@@ -589,11 +587,13 @@ alias clock="clock"
 function clock(){
   cd /mnt/d/NTSOA/Desktop/DIGITAL\ CLOCK
 
-  # Replace all Spaces and Back-slashes with %20
-  local formatted_path=$(wslpath -m . | sed -e 's/ /%20/g' -e 's/\\//g')
+  # # Replace all Spaces and Back-slashes with %20
+  # local formatted_path=$(wslpath -m . | sed -e 's/ /%20/g' -e 's/\\//g')
+  #
+  # # Open Pdf file with edge and the other files with chrome
+  # cmd.exe /c start chrome "file:///$formatted_path/clock.html"
 
-  # Open Pdf file with edge and the other files with chrome
-  cmd.exe /c start chrome "file:///$formatted_path/clock.html"
+  op clock.html
 
   # return to the previous directory
   cd - &>/dev/null
