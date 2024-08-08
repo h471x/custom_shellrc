@@ -709,7 +709,7 @@ function pip() {
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe /c pip "$@"
   else
-    cd /mnt/d/NTSOA
+    cd /mnt/c
     cmd.exe /c pip "$@"
     cd - &>/dev/null;
   fi
