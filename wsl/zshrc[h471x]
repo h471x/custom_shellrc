@@ -633,6 +633,20 @@ function music(){
   fi
 }
 
+# this alias to launch xampp
+alias xampp="xampp"
+
+# this function for xampp alias
+function xampp(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start xampp-control.exe
+  else
+    cd /mnt/c
+    cmd.exe /c start xampp-control.exe
+    cd - &>/dev/null;
+  fi
+}
+
 # this alias to open notepad
 alias ntp="notepad.exe && cv"
 
