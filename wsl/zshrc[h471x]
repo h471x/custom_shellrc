@@ -1384,7 +1384,7 @@ alias hm="cd && cv"
 alias whm="cd /mnt/c/Users/lab_l/OneDrive/Bureau && op Home.lnk && nd"
 
 # this alias to open the evangile directory
-alias gospel="op /mnt/d/NTSOA/GOSPEL"
+alias gospel="op /mnt/d/NTSOA/gospel"
 
 # this alias to enter the NTSOA directory
 alias hn="op /mnt/d/NTSOA"
