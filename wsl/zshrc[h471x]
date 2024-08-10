@@ -648,7 +648,19 @@ function xampp(){
 }
 
 # this alias to open notepad
-alias ntp="notepad.exe && cv"
+alias ntp="ntp"
+
+# this function for ntp alias
+function ntp(){
+  if [[ $# -eq 0 ]]; then
+    notepad.exe
+  elif [[ $# -eq 1 ]]; then
+    local formatted_path=$(wslpath -w .)
+    notepad.exe "$formatted_path\\$1"
+  else
+    echo "${BOLD} ■■▶ Usage : ntp file_to_open" && br;
+  fi
+}
 
 # this alias to open VirtualBox
 alias vm="vm"
@@ -658,7 +670,7 @@ function vm(){
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe /c start VirtualBox.exe
   else
-    cd /mnt/d/NTSOA
+    cd /mnt/c
     cmd.exe /c start VirtualBox.exe
     cd - &>/dev/null;
   fi
@@ -682,7 +694,7 @@ function wsh(){
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe /c start wireshark.exe
   else
-    cd /mnt/d/NTSOA
+    cd /mnt/c
     cmd.exe /c start wireshark.exe
     cd - &>/dev/null;
   fi
@@ -737,7 +749,7 @@ function nslookup(){
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe /c nslookup "$@"
   else
-    cd /mnt/d/NTSOA
+    cd /mnt/c
     cmd.exe /c nslookup "$@"
     cd - &>/dev/null;
   fi
@@ -1435,7 +1447,7 @@ function open_web_app(){
   # directory then switch to windows
   # directory before executing the script
   if [[ "$current_directory" != "/mnt/"* ]]; then
-    cd /mnt/d/NTSOA
+    cd /mnt/c
   fi
 
   # if there is an app ID open
@@ -3646,7 +3658,7 @@ function prex(){
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe /c start procexp64
   else
-    cd /mnt/d/NTSOA
+    cd /mnt/c
     cmd.exe /c start procexp64
     cd - &>/dev/null
   fi
