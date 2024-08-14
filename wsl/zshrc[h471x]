@@ -718,6 +718,30 @@ function go(){
   fi
 }
 
+# this alias to run rustc
+alias rustc="rustc"
+
+# this function for rustc alias
+function rustc(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c rustc $@
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
+  fi
+}
+
+# this alias to run cargo
+alias cargo="cargo"
+
+# this function for cargo alias
+function cargo(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c cargo $@
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
+  fi
+}
+
 # this alias to launch windows java
 alias java="java.exe"
 
@@ -1586,6 +1610,16 @@ function testpypi(){
   local test_pypi_link="test.pypi.org"
   local test_pypi_name="Test PyPi"
   open_web_app $test_pypi_link $test_pypi_id $test_pypi_name
+}
+# this alias to open crates Web App
+alias crates="crates"
+
+# this function for crates alias
+function crates(){
+  local crates_id="jeibpciabahgpgbljbmbkjgkkmjcfhdp"
+  local crates_link="crates.io"
+  local crates_name="Crates"
+  open_web_app $crates_link $crates_id $crates_name
 }
 
 
