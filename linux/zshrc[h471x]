@@ -24,6 +24,7 @@ unset _JAVA_OPTIONS
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="powerlevel10k/powerlevel10k"
+# ZSH_THEME="archcraft"
 
 # Declare the variable for zsh-syntax-highlighting 
 # styles configurations 
@@ -44,7 +45,8 @@ ZSH_HIGHLIGHT_STYLES[globbing]='fg=#ff9000,bold'
 ZSH_HIGHLIGHT_STYLES[command-substitution-unquoted]='fg=#d30ccf,bold'
 ZSH_HIGHLIGHT_STYLES[command-substitution-delimiter]='fg=#d30ccf,bold'
 # ZSH_HIGHLIGHT_MAXLENGTH=0
-#Here to launch tmux as default
+
+# Here to launch tmux as default
 # case $TERM in
 #   screen|tmux-256color);;
 #   *)tmux att -t 0 2>/dev/null|| tmux;;
@@ -178,7 +180,7 @@ function cv() {
   #this function to show the content of the cv
   function show_content(){
     # ls "$folder_content";
-    eza --icons=always --no-quotes $folder_content
+    eza --icons=always --no-quotes --group-directories-first $folder_content
   }
 
   #this function to show the cv
@@ -233,7 +235,7 @@ function cvf() {
   # this function to show the content of the cv
   function show_content(){
     # ls -a $folder_content;
-    eza --icons=always --no-quotes -a $folder_content
+    eza --icons=always --no-quotes -a --group-directories-first $folder_content
   }
 
   # this function to show the cv
@@ -270,7 +272,7 @@ function cvg(){
   }
 
   function show_content(){
-    eza --icons=always --color=always | grep "$1";
+    eza --icons=always --color=always --group-directories-first | grep "$1";
   }
 
   # this function to show the cv
@@ -3151,7 +3153,7 @@ function gmb(){
   fi
 }
 
-#this function to switch from ethernet to wireless connection
+# this function to switch from ethernet to wireless connection
 function wf(){
   c && br 2;
   sudo clear;
@@ -3167,7 +3169,7 @@ function wf(){
   fi
 }
 
-#this function to switch from wireless to ethernet connection
+# this function to switch from wireless to ethernet connection
 function rj(){
   c && br 2;
   sudo clear;
@@ -3183,20 +3185,8 @@ function rj(){
   br && sleep 1 && cv;
 }
 
-#this alias to connect directly to the Pixel 3XL ssh server
+# this alias to connect directly to the Pixel 3XL ssh server
 alias cnt="cnt"
-
-#this function for cnt alias
-# 2023-10-13
-# for now that My PIXEL 3XL is lost, I will change the function
-# function cnt(){
-#   clear;
-#   br;
-#   #echo s s h   c o n n e c t i o n' | figlet -t -c;
-#   #sleep 0.5;
-#   ssh u0_a55@192.168.68.112 -p 8022;
-#   cv;
-# }
 
 function cnt(){
   c && br;
@@ -3212,45 +3202,8 @@ function cnt(){
   fi
 }
 
-# #this alias to download a file from the Pixel 3XL ssh server
-# alias dwld="dwld"
-#
-# #this function for dwld alias
-# function dwld() {
-#   local src hst dest
-#   src="$1"
-#   hst="h471x@192.168.68.112"
-#   dest="${2:-$PWD}"
-#
-#   scp -P 8022 -r "$hst":~/"$src" "$dest"
-# }
-
-# #this alias to upload a file from this PC to the Pixel 3XL ssh server
-# alias upld="upld"
-#
-# #this function for dwld alias
-# function upld(){
-#   if [[ $# -eq 1 ]]; then #if there is only one argument it will upload the file to home directory
-#     if [[ -f $1 ]]; then #if the argument is a file
-#       scp -P 8022 "$1" u0_a249@192.168.68.112:~
-#     else
-#       scp -P 8022 -r "$1" u0_a249@192.168.68.112:~
-#     fi # upload the file / directory in the second argument
-#   elif [[ $# -eq 2 ]]; then
-#     if [[ -f $1 ]]; then #if the argument is a file
-#       scp -P 8022 "$1" u0_a249@192.168.68.112:~/"$2"
-#     else
-#       scp -P 8022 -r "$1" u0_a249@192.168.68.112:~/"$2"
-#     fi
-#   fi
-# }
-
-
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
-
-#session_open, variable to check if there is already a terminal session
-#session_open=0
 
 kill-line() {
   if [[ $BUFFER == "" ]]; then
