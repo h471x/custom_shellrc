@@ -32,6 +32,8 @@ TOTAL_CMD_PATH=/mnt/c/Program\ Files/totalcmd
 THEME_TOOL_PATH=/mnt/d/NTSOA/INSTALLED/THEME_TOOL
 WINDOWS_APP_PATH=$VIRTUAL_BOX_PATH:$WIRESHARK_PATH:$TOTAL_CMD_PATH:$THEME_TOOL_PATH
 
+# Path to Binaries
+# For better use : add to windows path instead
 BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$WINDOWS_APP_PATH:$PYTHON_PATH
 
 # Browsers
@@ -193,10 +195,7 @@ function cvii(){
   br 2;
 }
 
-# clear && echo -e && echo -e && echo -e && echo -e
 x;
-# sleep 0.5 && cvi;
-
 
 # this alias to exit
 alias q='exit'
@@ -336,15 +335,6 @@ function bwsop(){
 
   return 0
 }
-
-# SOLVED : using explorer.exe
-# this function to open video file
-#
-# function play_video(){
-#   # local video="$1"
-#   # local formatted_video=$(echo "$file" | sed -e 's/ /%20/g' -e 's/\\//g')
-#   PotPlayerMini64.exe "$1"
-# }
 
 # this alias to edit bashrc
 alias ct="nvim ~/.zshrc"
@@ -522,6 +512,7 @@ function flc(){
 
 # call the cv alias whenever a wrong command is typed
 # which doesn't surely exist
+# Nah just printing command not found instead
 command_not_found_handler() {
   local command=$1
   local command_found=0
@@ -596,11 +587,13 @@ alias clock="clock"
 function clock(){
   cd /mnt/d/NTSOA/Desktop/DIGITAL\ CLOCK
 
-  # Replace all Spaces and Back-slashes with %20
-  local formatted_path=$(wslpath -m . | sed -e 's/ /%20/g' -e 's/\\//g')
+  # # Replace all Spaces and Back-slashes with %20
+  # local formatted_path=$(wslpath -m . | sed -e 's/ /%20/g' -e 's/\\//g')
+  #
+  # # Open Pdf file with edge and the other files with chrome
+  # cmd.exe /c start chrome "file:///$formatted_path/clock.html"
 
-  # Open Pdf file with edge and the other files with chrome
-  cmd.exe /c start chrome "file:///$formatted_path/clock.html"
+  op clock.html
 
   # return to the previous directory
   cd - &>/dev/null
@@ -640,8 +633,34 @@ function music(){
   fi
 }
 
+# this alias to launch xampp
+alias xampp="xampp"
+
+# this function for xampp alias
+function xampp(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start xampp-control.exe
+  else
+    cd /mnt/c
+    cmd.exe /c start xampp-control.exe
+    cd - &>/dev/null;
+  fi
+}
+
 # this alias to open notepad
-alias ntp="notepad.exe && cv"
+alias ntp="ntp"
+
+# this function for ntp alias
+function ntp(){
+  if [[ $# -eq 0 ]]; then
+    notepad.exe
+  elif [[ $# -eq 1 ]]; then
+    local formatted_path=$(wslpath -w .)
+    notepad.exe "$formatted_path\\$1"
+  else
+    echo "${BOLD} ■■▶ Usage : ntp file_to_open" && br;
+  fi
+}
 
 # this alias to open VirtualBox
 alias vm="vm"
@@ -651,7 +670,7 @@ function vm(){
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe /c start VirtualBox.exe
   else
-    cd /mnt/d/NTSOA
+    cd /mnt/c
     cmd.exe /c start VirtualBox.exe
     cd - &>/dev/null;
   fi
@@ -662,7 +681,7 @@ alias ventoy="ventoy"
 
 # this function for ventoy alias
 function ventoy(){
-  cd "/mnt/d/NTSOA/INSTALLED/VENTOY/ventoy-1.0.97"
+  cd "/mnt/d/NTSOA/INSTALLED/VENTOY/ventoy-1.0.99"
   explorer.exe Ventoy2Disk.exe
   cd -&>/dev/null
 }
@@ -675,7 +694,7 @@ function wsh(){
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe /c start wireshark.exe
   else
-    cd /mnt/d/NTSOA
+    cd /mnt/c
     cmd.exe /c start wireshark.exe
     cd - &>/dev/null;
   fi
@@ -716,7 +735,7 @@ function pip() {
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe /c pip "$@"
   else
-    cd /mnt/d/NTSOA
+    cd /mnt/c
     cmd.exe /c pip "$@"
     cd - &>/dev/null;
   fi
@@ -730,7 +749,7 @@ function nslookup(){
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe /c nslookup "$@"
   else
-    cd /mnt/d/NTSOA
+    cd /mnt/c
     cmd.exe /c nslookup "$@"
     cd - &>/dev/null;
   fi
@@ -1367,48 +1386,25 @@ function rdf(){
   cv;
 }
 
-# Completion function for rdf
-# _rdf_completion() {
-#   local cur
-#   cur="${COMP_WORDS[COMP_CWORD]}"
-#
-#   # Get the raw output of eza
-#   local files_and_dirs
-#   files_and_dirs=$(eza --icons=always --no-quotes --group-directories-first "$PWD" | awk '{print $NF}')
-#
-#   # Generate completions
-#   COMPREPLY=($(compgen -W "${files_and_dirs}" -- "${cur}"))
-# }
-#
-# # Register the completion function for rdf
-# complete -F _rdf_completion rdf
-
 # this alias to view the pc state
-# DIRTY:
 alias pc="c && br 2 && neofetch --source ~/.config/neofetch/htx2.txt"
-
-# alias pc="c && br 2 && neofetch --source /mnt/c/Users/lab_l/OneDrive/Pictures/ntsoa_signature/sign.txt"
-
-#call this pc alias at startup
-#pc
 
 # this alias to go to home directory
 alias hm="cd && cv"
 
 # this alias to view the windows explorer
-# DIRTY:
 alias whm="cd /mnt/c/Users/lab_l/OneDrive/Bureau && op Home.lnk && nd"
 
 # this alias to open the evangile directory
-alias gospel="op /mnt/d/NTSOA/GOSPEL"
+alias gospel="op /mnt/d/NTSOA/gospel"
 
-#this alias to enter the NTSOA directory
+# this alias to enter the NTSOA directory
 alias hn="op /mnt/d/NTSOA"
 
-#this alias to open the dev folder
+# this alias to open the dev folder
 alias dev="op /mnt/d/NTSOA/dev/github_repo/"
 
-#this alias to open the notes folder
+# this alias to open the notes folder
 alias nt="op /mnt/d/NTSOA/dev/0\ NOTES"
 
 # this alias to open the kali linux Vm Shared folder
@@ -1451,7 +1447,7 @@ function open_web_app(){
   # directory then switch to windows
   # directory before executing the script
   if [[ "$current_directory" != "/mnt/"* ]]; then
-    cd /mnt/d/NTSOA
+    cd /mnt/c
   fi
 
   # if there is an app ID open
@@ -1634,16 +1630,15 @@ function itg(){
   open_web_app $insta_link $insta_id
 }
 
-# # this alias to open the discord app
-# alias dsc="dsc"
-#
-# # this function for dsc alias
-# function dsc(){
-#   # local discord_id="magkoliahgffibhgfkmoealggombgknl"
-#   local discord_id="magkoliahgffibhgfkmoealggombgknl"
-#   local discord_link="discord.com"
-#   open_web_app $discord_link $disord_id
-# }
+# this alias to open the discord app
+alias dsc="dsc"
+
+# this function for dsc alias
+function dsc(){
+  local discord_id="magkoliahgffibhgfkmoealggombgknl"
+  local discord_link="discord.com"
+  open_web_app $discord_link $discord_id
+}
 
 # this alias to open Twitter X Web App
 alias twx="twx"
@@ -2028,11 +2023,6 @@ function ipsh(){
   c && br;
   echo "  Available IP Adresses : ";
   br;
-  # ifconfig wlan0;
-  # br;
-  # local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
-  # local wifi_ip=$(ifconfig wifi0 | grep "inet " | awk '{print $2}');
-  # improved:
   local eth_ip=$(ip addr show eth0 | grep -oP 'inet \K[\d.]+');
   local wifi_ip=$(ip addr show wifi0 | grep -oP 'inet \K[\d.]+');
 
@@ -2632,44 +2622,6 @@ function reach(){
     echo " $target_IP is not reachable"
   fi
 }
-
-# this variable will store the pixel ssh server IP adress
-# local pxl_ip = 192.168.68.112"
-
-# this alias to connect to the Pixel 3XL ssh server
-# alias cnt="ssh -p 8022 u0_a249@192.168.68.112 && cv"
-#
-# #this alias to download a file from the Pixel 3XL ssh server
-# alias dwld="dwld"
-#
-# #this function for dwld alias
-# function dwld(){
-#   if [[ -f $1 ]]; then #if the argument is a file
-#     scp -P 8022 u0_a249@192.168.68.112:~/"$1" $PWD
-#   else
-#     scp -P 8022 -r u0_a249@192.168.68.112:~/"$1" $PWD
-#   fi
-# }
-#
-# #this alias to upload a file from this PC to the Pixel 3XL ssh server
-# alias upld="upld"
-#
-# #this function for dwld alias
-# function upld(){
-#   if [[ $# -eq 1 ]]; then #if there is only one argument it will upload the file to home directory
-#     if [[ -f $1 ]]; then #if the argument is a file
-#       scp -P 8022 "$1" u0_a249@192.168.68.112:~
-#     else
-#       scp -P 8022 -r "$1" u0_a249@192.168.68.112:~
-#     fi # upload the file / directory in the second argument
-#   elif [[ $# -eq 2 ]]; then
-#     if [[ -f $1 ]]; then #if the argument is a file
-#       scp -P 8022 "$1" u0_a249@192.168.68.112:~/"$2"
-#     else
-#       scp -P 8022 -r "$1" u0_a249@192.168.68.112:~/"$2"
-#     fi
-#   fi
-# }
 
 # this function to sanitize the repository name
 function clean_repo() {
@@ -3706,7 +3658,7 @@ function prex(){
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe /c start procexp64
   else
-    cd /mnt/d/NTSOA
+    cd /mnt/c
     cmd.exe /c start procexp64
     cd - &>/dev/null
   fi
