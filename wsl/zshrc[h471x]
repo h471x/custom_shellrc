@@ -2694,22 +2694,63 @@ function ghc() {
   local repo_name="$(clean_repo "$repo")"
   local repo_visibility=$([[ $isPrivate == "private" ]] && echo "private" || echo "public")
 
-  function check_create_repo(){
-    echo -ne "${BOLD}${WHITE} Create ${GREEN}$repo_visibility ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
-    read create_repo
-    if [ "$create_repo" = "y" ]; then
-      # create the repo & clone it locally
-      echo -ne "${BOLD} New repository ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ... "
-      gh repo create "$repo_name" --$repo_visibility -c &>/dev/null;
-      mv "$repo_name/.git" . && rm -rf "$repo_name";
-      echo "${BOLD}${GREEN} ${WHITE}"
-    elif [ "$create_repo" = "n" ];then
-      return 0
-    else
-      check_create_repo
-    fi
-  }
-  check_create_repo
+  if [ -d ".git" ]; then
+    local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+
+    function check_set_repo(){
+      echo -ne "${BOLD}${WHITE} Create ${GREEN}$repo_visibility ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
+      read set_repo
+      if [ "$set_repo" = "y" ]; then
+        # create the repo & set it as remote of the local one
+        echo -ne "${BOLD} New repository ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ... "
+        gh repo create "$repo_name" --$repo_visibility &>/dev/null;
+        git remote add origin "git@github.com:$current_user/$repo_name.git";
+        echo "${BOLD}${GREEN} ${WHITE}"
+
+        function check_push(){
+          echo -ne "${BOLD}${WHITE} Push local commits to ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
+          read check_push_commit
+
+          if [ "$check_push_commit" = "y" ]; then
+            local current_branch=$(git branch | awk '/\*/ {print $2}');
+            git push origin $current_branch;
+          elif [ "$check_push_commit" = "n" ];then
+            return 0
+          else
+            check_push
+          fi
+        }
+
+        local current_branch=$(git branch | awk '/\*/ {print $2}');
+
+        if git rev-list --count "$current_branch" 2>/dev/null | grep -q '^[1-9]'; then
+          check_push
+        fi
+      elif [ "$set_repo" = "n" ];then
+        return 0
+      else
+        check_set_repo
+      fi
+    }
+    check_set_repo
+  else
+    function check_create_repo(){
+      echo -ne "${BOLD}${WHITE} Create ${GREEN}$repo_visibility ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
+      read create_repo
+      if [ "$create_repo" = "y" ]; then
+        # create the repo & clone it locally
+        echo -ne "${BOLD} New repository ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ... "
+        gh repo create "$repo_name" --$repo_visibility -c &>/dev/null;
+        mv "$repo_name/.git" . && rm -rf "$repo_name";
+        echo "${BOLD}${GREEN} ${WHITE}"
+      elif [ "$create_repo" = "n" ];then
+        return 0
+      else
+        check_create_repo
+      fi
+    }
+    check_create_repo
+  fi
 }
 
 # this alias to delete a github repo via Github CLI
