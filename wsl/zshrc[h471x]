@@ -1612,6 +1612,7 @@ function testpypi(){
   open_web_app $test_pypi_link $test_pypi_id $test_pypi_name
 }
 # this alias to open crates Web App
+# crates.io is the official rust package repo
 alias crates="crates"
 
 # this function for crates alias
@@ -1621,7 +1622,6 @@ function crates(){
   local crates_name="Crates"
   open_web_app $crates_link $crates_id $crates_name
 }
-
 
 # this alias to open cloud convert
 alias conv="conv"
@@ -1957,6 +1957,43 @@ function translate(){
   local translate_link="translate.google.com"
   local translate_name="Google Translate"
   open_web_app $translate_link $translate_id $translate_name
+}
+
+
+# this alias to open Marvell Web App
+alias marvell="marvell"
+
+# this function for marvell alias
+function marvell(){
+  local marvell_id="fdleagllbcbhmlabenhdmdddefhohnbb"
+  local marvell_link="marvell.com"
+  local marvell_name="Marvell"
+  open_web_app $marvell_link $marvell_id $marvell_name
+}
+
+# this alias to open DhIWise Web App
+# N.B. this is an app that have templates
+# for web and mobile app ready for production
+# 08-16-2024 19:11
+alias dhiwise="dhiwise"
+
+# this function for dhiwise alias
+function dhiwise(){
+  local dhiwise_id="dcinmcknnkhikonobhpniddjnehmnkac"
+  local dhiwise_link="app.dhiwise.com"
+  local dhiwise_name="DhiWise"
+  open_web_app $dhiwise_link $dhiwise_id $dhiwise_name
+}
+
+# this alias to open npmjs Web App
+alias npmjs="npmjs"
+
+# this function for npmjs alias
+function npmjs(){
+  local npmjs_id="foijodnoknckfliaajfnihbonnniljbe"
+  local npmjs_link="npmjs.com"
+  local npmjs_name="Npm JS"
+  open_web_app $npmjs_link $npmjs_id $npmjs_name
 }
 
 # this alias to open W3SCHOOLS Offline Web App
