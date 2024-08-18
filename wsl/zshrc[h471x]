@@ -653,10 +653,10 @@ alias ntp="ntp"
 # this function for ntp alias
 function ntp(){
   if [[ $# -eq 0 ]]; then
-    notepad.exe
+    cmd.exe /c start notepad.exe 2>/dev/null
   elif [[ $# -eq 1 ]]; then
     local formatted_path=$(wslpath -w .)
-    notepad.exe "$formatted_path\\$1"
+    cmd.exe /c start notepad.exe "$formatted_path\\$1" 2>/dev/null
   else
     echo "${BOLD} ■■▶ Usage : ntp file_to_open" && br;
   fi
