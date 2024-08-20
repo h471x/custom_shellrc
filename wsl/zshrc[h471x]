@@ -58,6 +58,7 @@ export BROWSER="chrome.exe"
 
 # Oh-My-Zsh custom theme
 ZSH_THEME="powerlevel10k/powerlevel10k"
+# ZSH_THEME="archcraft"
 
 # Declare the variable for zsh-syntax-highlighting styles
 typeset -A ZSH_HIGHLIGHT_STYLES
@@ -1994,6 +1995,17 @@ function npmjs(){
   local npmjs_link="npmjs.com"
   local npmjs_name="Npm JS"
   open_web_app $npmjs_link $npmjs_id $npmjs_name
+}
+
+# this alias to open Flux AI Web App
+alias fluxai="fluxai"
+
+# this function for fluxai alias
+function fluxai(){
+  local fluxai_id="mlmnaccmlmoihcobbmciddblmpjjaacp"
+  local fluxai_link="www.fluxpro.ai"
+  local fluxai_name="Flux AI"
+  open_web_app $fluxai_link $fluxai_id $fluxai_name
 }
 
 # this alias to open W3SCHOOLS Offline Web App
