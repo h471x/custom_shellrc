@@ -581,24 +581,25 @@ function typing(){
   cd - &>/dev/null
 }
 
-# this alias to show the HTML clock
+# this alias to open Digital Clock Web App
 alias clock="clock"
 
 # this function for clock alias
 function clock(){
-  cd /mnt/d/NTSOA/Desktop/DIGITAL\ CLOCK
+  local clock_id="imeikcnlcjgdaiapbbhnpboijgdlgamn"
+  local clock_link="localhost"
+  local clock_name="Digital Clock"
 
-  # # Replace all Spaces and Back-slashes with %20
-  # local formatted_path=$(wslpath -m . | sed -e 's/ /%20/g' -e 's/\\//g')
-  #
-  # # Open Pdf file with edge and the other files with chrome
-  # cmd.exe /c start chrome "file:///$formatted_path/clock.html"
+  # start apache server if not running
+  if ! pgrep apache2 > /dev/null; then
+    sudo service apache2 start &>/dev/null;
+  fi
 
-  op clock.html
+  # open clock PWA or Progressive Web App
+  open_web_app $clock_link $clock_id $clock_name;
 
-  # return to the previous directory
-  cd - &>/dev/null
-  return 0
+  # stop apache server
+  sudo service apache2 stop &>/dev/null;
 }
 
 # this alias to access my musics
@@ -2062,10 +2063,20 @@ alias htx="htx"
 
 # this function for htx alias
 function htx(){
-  local router_id="kmkglniimomjkiakgepingonppimlibg"
-  local router_IP="192.168.19.1"
+  local router_id="fcecbfgdamkglkbpdcandefokgomhpli"
+  local router_IP="192.168.8.1"
   local router_name="h471x Router"
-  open_web_app $router_IP $router_id $router_name
+
+  # start apache server if not running
+  if ! pgrep apache2 > /dev/null; then
+    sudo service apache2 start &>/dev/null;
+  fi
+
+  # open clock PWA or Progressive Web App
+  open_web_app $router_IP $router_id $router_name;
+
+  # stop apache server
+  sudo service apache2 stop &>/dev/null;
 }
 
 # this alias to view the history
