@@ -1998,6 +1998,17 @@ function npmjs(){
   open_web_app $npmjs_link $npmjs_id $npmjs_name
 }
 
+# this alias to open BitLy Web App
+alias bitly="bitly"
+
+# this function for bitly alias
+function bitly(){
+  local bitly_id="iojpgkodflboefdoklfpbegdhbhmcjhe"
+  local bitly_link="app.bitly.com"
+  local bitly_name="BitLy"
+  open_web_app $bitly_link $bitly_id $bitly_name
+}
+
 # this alias to open Flux AI Web App
 alias fluxai="fluxai"
 
