@@ -586,7 +586,7 @@ alias clock="clock"
 
 # this function for clock alias
 function clock(){
-  local clock_id="imeikcnlcjgdaiapbbhnpboijgdlgamn"
+  local clock_id="pgoffdmnhcendlolaaobdojhhdnkfdlj"
   local clock_link="localhost"
   local clock_name="Digital Clock"
 
