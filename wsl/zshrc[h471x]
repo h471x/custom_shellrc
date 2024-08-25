@@ -2009,6 +2009,20 @@ function bitly(){
   open_web_app $bitly_link $bitly_id $bitly_name
 }
 
+# this alias to open Binance Web App
+# NOTE : Binance is used for
+# Cryptocurrency Exchange for Bitcoin,
+# Ethereum & Altcoins
+alias binance="binance"
+
+# this function for binance alias
+function binance(){
+  local binance_id="cnncjkiomekpjaednmgfcfiommnjogjo"
+  local binance_link="binance.com"
+  local binance_name="Binance"
+  open_web_app $binance_link $binance_id $binance_name
+}
+
 # this alias to open Flux AI Web App
 alias fluxai="fluxai"
 
