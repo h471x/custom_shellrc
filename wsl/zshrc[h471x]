@@ -713,7 +713,9 @@ alias go="go"
 
 # this function for go alias
 function go(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
+  # check if we are inside wsl directory
+  # or inside a symbolic link
+  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
     cmd.exe /c go $@
   else
     echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
@@ -725,7 +727,9 @@ alias rustc="rustc"
 
 # this function for rustc alias
 function rustc(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
+  # check if we are inside wsl directory
+  # or inside a symbolic link
+  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
     cmd.exe /c rustc $@
   else
     echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
@@ -737,7 +741,9 @@ alias cargo="cargo"
 
 # this function for cargo alias
 function cargo(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
+  # check if we are inside wsl directory
+  # or inside a symbolic link
+  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
     cmd.exe /c cargo $@
   else
     echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
@@ -758,7 +764,9 @@ alias pip="pip"
 
 # Function for pip alias
 function pip() {
-  if [[ "$PWD" == "/mnt/"* ]]; then
+  # check if we are inside wsl directory
+  # or inside a symbolic link
+  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
     cmd.exe /c pip "$@"
   else
     cd /mnt/c
@@ -800,7 +808,9 @@ alias jptr="jptr"
 
 # this function for jptr alias
 function jptr(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
+  # check if we are inside wsl directory
+  # or inside a symbolic link
+  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
     cmd.exe /c start jupyter notebook
   else
     echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
@@ -874,13 +884,13 @@ alias wds="wds"
 function wds(){
   c && br 2;
   # Check the current directory
-  # because ngrok will work only
+  # because cmd will work only
   # on windows'directory rather
   # than WSL's one so we move
   if [[ "$PWD" == "/mnt/"* ]]; then
     cmd.exe;
   else
-    cd /mnt/c/Windows/
+    cd /mnt/c
     cmd.exe;
     cd - &>/dev/null
   fi
@@ -1457,6 +1467,9 @@ alias open_web_app="allow_sudo && open_web_app";
 # first the domain of the App
 # then the chrome App Id
 # finally the name of the App (optional)
+# NOTE : 08-26-2024 11:28
+# This is just PWA that can
+# be installed in whatever browser
 # IMPROVED : 05-30-2024 18:36
 # Shell access after execution
 function open_web_app(){
