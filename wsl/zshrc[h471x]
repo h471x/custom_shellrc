@@ -2101,7 +2101,7 @@ alias htx="htx"
 
 # this function for htx alias
 function htx(){
-  local router_id="fcecbfgdamkglkbpdcandefokgomhpli"
+  local router_id="mgnpfopekbaehajaakfppclfjmcpceke"
   local router_IP="192.168.8.1"
   local router_name="h471x Router"
 
