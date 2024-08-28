@@ -2036,6 +2036,17 @@ function binance(){
   open_web_app $binance_link $binance_id $binance_name
 }
 
+# this alias to open Wikipedia Web App
+alias wiki="wiki"
+
+# this function for wiki alias
+function wiki(){
+  local wiki_id="mabbogacohpoeacebobbecclmpanobce"
+  local wiki_link="wikipedia.org"
+  local wiki_name="Wikipedia"
+  open_web_app $wiki_link $wiki_id $wiki_name
+}
+
 # this alias to open Flux AI Web App
 alias fluxai="fluxai"
 
