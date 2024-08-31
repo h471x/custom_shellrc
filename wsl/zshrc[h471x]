@@ -2000,6 +2000,17 @@ function dhiwise(){
   open_web_app $dhiwise_link $dhiwise_id $dhiwise_name
 }
 
+# this alias to open Quora Forum Web App
+alias quora="quora"
+
+# this function for quora alias
+function quora(){
+  local quora_id="cechoboadpfjgoaooidphlandgelehhi"
+  local quora_link="quora.com"
+  local quora_name="Quora"
+  open_web_app $quora_link $quora_id $quora_name
+}
+
 # this alias to open npmjs Web App
 alias npmjs="npmjs"
 
