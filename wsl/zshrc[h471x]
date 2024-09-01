@@ -2179,15 +2179,8 @@ function ipsh(){
   br;
   local eth_ip=$(ip addr show eth0 | grep -oP 'inet \K[\d.]+');
   local wifi_ip=$(ip addr show wifi0 | grep -oP 'inet \K[\d.]+');
-
-  # if [ -d /sys/class/net/wlan0 ]; then
-  #   local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
-  #   echo " wlan0 ==> $wlan_ip";
-  #   echo " eth0  ==> $eth_ip" && br;
-  # else
-    echo " eth0  ==> $eth_ip" && br;
-    echo " wifi0  ==> $wifi_ip" && br;
-  # fi
+  echo " eth0  ==> $eth_ip" && br;
+  echo " wifi0  ==> $wifi_ip" && br;
 }
 
 # this alias to start services
