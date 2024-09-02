@@ -2022,6 +2022,17 @@ function npmjs(){
   open_web_app $npmjs_link $npmjs_id $npmjs_name
 }
 
+# this alias to open LolBas Web App
+alias lolbas="lolbas"
+
+# this function for lolbas alias
+function lolbas(){
+  local lolbas_id="jlhledfapfgaeockhmjniedihamlliga"
+  local lolbas_link="lolbas-project.github.io"
+  local lolbas_name="LolBas"
+  open_web_app $lolbas_link $lolbas_id $lolbas_name
+}
+
 # this alias to open BitLy Web App
 alias bitly="bitly"
 
