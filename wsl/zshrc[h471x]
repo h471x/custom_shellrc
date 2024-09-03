@@ -570,6 +570,9 @@ function dtp(){
 # this alias to view the books
 alias books='exop /mnt/d/NTSOA/"0 ENI"/"ENI 2023"/"ENI L1 LESSONS"/BOOKS'
 
+# this alias to enter internship_report
+alias intern='op /mnt/d/NTSOA/"0 ENI"/"ENI 2024"/"STAGE 2024"/internship_report'
+
 # this alias to play directly the typing game
 alias typing="typing"
 
@@ -2031,6 +2034,17 @@ function lolbas(){
   local lolbas_link="lolbas-project.github.io"
   local lolbas_name="LolBas"
   open_web_app $lolbas_link $lolbas_id $lolbas_name
+}
+
+# this alias to open itch games Web App
+alias itch="itch"
+
+# this function for itch alias
+function itch(){
+  local itch_id="bhgdfnaojobmidmdmdipcadlijbopndi"
+  local itch_link="itch.io"
+  local itch_name="Itch Games"
+  open_web_app $itch_link $itch_id $itch_name
 }
 
 # this alias to open BitLy Web App
