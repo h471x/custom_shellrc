@@ -537,13 +537,30 @@ command_not_found_handler() {
 alias op="op"
 
 # this function for op alias
-function op(){
-  if [[ -d "$1" ]]; then
-    if [[ $# -eq 1 ]]; then
-      cd "$1" && cv;
-    elif [[ $# -eq 2 ]]; then
-      cd "$1" && cvg "$2";
+function op() {
+  # Check if $1 is a symbolic link
+  if [[ -L "$1" ]]; then
+    # Resolve the real path of the symbolic link
+    real_path=$(readlink -f "$1")
+    # Check if the resolved path is a directory
+    if [[ -d "$real_path" ]]; then
+      if [[ $# -eq 1 ]]; then
+        cd "$real_path" && cv
+      elif [[ $# -eq 2 ]]; then
+        cd "$real_path" && cvg "$2"
+      fi
+    # Check if the resolved path is a file
+    elif [[ -f "$real_path" ]]; then
+      vf "$real_path"
     fi
+  # If $1 is a directory (but not a symbolic link)
+  elif [[ -d "$1" ]]; then
+    if [[ $# -eq 1 ]]; then
+      cd "$1" && cv
+    elif [[ $# -eq 2 ]]; then
+      cd "$1" && cvg "$2"
+    fi
+  # If $1 is a file (but not a symbolic link)
   elif [[ -f "$1" ]]; then
     vf "$1"
   fi
@@ -2034,6 +2051,17 @@ function lolbas(){
   local lolbas_link="lolbas-project.github.io"
   local lolbas_name="LolBas"
   open_web_app $lolbas_link $lolbas_id $lolbas_name
+}
+
+# this alias to open Loud Me Web App
+alias loudme="loudme"
+
+# this function for loudme alias
+function loudme(){
+  local loudme_id="iancljhjkfkhobcfkijolghiieciilka"
+  local loudme_link="loudme.ai"
+  local loudme_name="LoudMe"
+  open_web_app $loudme_link $loudme_id $loudme_name
 }
 
 # this alias to open itch games Web App
