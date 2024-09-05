@@ -154,7 +154,9 @@ plugins=(
 
 # here the color of the auto-suggestion
 # ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE=fg=#0000ff"
-DISABLE_AUTO_UPDATE="true" #here to disable oh-my-zsh auto update  
+
+# Here to disable oh-my-zsh auto update
+DISABLE_AUTO_UPDATE="true"
 source $ZSH/oh-my-zsh.sh
 
 # this alias to list
@@ -283,7 +285,8 @@ function nvmr(){
   sudo nvim "${1:-.}";
 }
 
-# this alias to open the current directory in windows explorer
+# this alias to open the current
+# directory in windows explorer
 alias exop="exop"
 
 # this function for exop alias
@@ -524,12 +527,7 @@ command_not_found_handler() {
   fi
 
   if [[ $command_found -eq 0 ]]; then
-    # c && br;
-    # echo "n o t     f o u n d " | figlet -t -c | lolcat;
-    # br && sleep 0.5 && cv;
-    # cv
     echo " ${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Command Not Found"
-    # fuck
   fi
 }
 
@@ -1259,9 +1257,6 @@ function mns(){
     cv;
   else
     cv
-    # c && br;
-    # echo "n o t     f o u n d " | figlet -t -c | lolcat;
-    # br && sleep 0.5 && cv;
   fi
 }
 
@@ -2062,6 +2057,17 @@ function loudme(){
   local loudme_link="loudme.ai"
   local loudme_name="LoudMe"
   open_web_app $loudme_link $loudme_id $loudme_name
+}
+
+# this alias to open Suno Web App
+alias suno="suno"
+
+# this function for suno alias
+function suno(){
+  local suno_id="poemkolicenobkfdpoibhjjbgmjnlnpj"
+  local suno_link="suno.com"
+  local suno_name="Suno"
+  open_web_app $suno_link $suno_id $suno_name
 }
 
 # this alias to open itch games Web App
