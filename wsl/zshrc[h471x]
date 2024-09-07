@@ -12,8 +12,8 @@ set autocd         # change directory just by typing his name
 setopt promptsubst # enable command substitution in prompt
 
 # configure keybindings
-bindkey -e #emacs keybindings
-bindkey ' ' magic-space #do history expansion on space
+bindkey -e # emacs keybindings
+bindkey ' ' magic-space # do history expansion on space
 
 # This is for fastfile Oh-My-Zsh Plugin
 fastfile_var_prefix='$'
@@ -1590,6 +1590,9 @@ alias gthb="gthb"
 # this function for gthb alias
 function gthb(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+  local github_id="mjoklplbddabcmpepnokjaffbmgbkkgg"
+  local github_link="github.com"
+  local github_name="GitHub"
 
   if [[ "$is_a_git_repo" == "true" ]]; then
     local repo_url=$(git config --get remote.origin.url)
@@ -1597,12 +1600,20 @@ function gthb(){
     local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
     local current_branch=$(git branch | awk '/\*/ {print $2}');
 
-    gh repo view $repo_owner/$repo_name --web --branch $current_branch &>/dev/null
-  else
-    local github_id="mjoklplbddabcmpepnokjaffbmgbkkgg"
-    local github_link="github.com"
-    local github_name="GitHub"
+    function check_view(){
+      echo -ne "${BOLD}${WHITE} Open the repo ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ? (y/n) ";
+      read check_view
 
+      if [ "$check_view" = "y" ]; then
+        gh repo view $repo_owner/$repo_name --web --branch $current_branch &>/dev/null
+      elif [ "$check_view" = "n" ];then
+        open_web_app $github_link $github_id $github_name
+      else
+        check_view
+      fi
+    }
+    check_view
+  else
     if [[ $# -eq 0 ]]; then
       open_web_app $github_link $github_id $github_name
     fi
