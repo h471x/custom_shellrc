@@ -131,11 +131,11 @@ RESETBG="\e[49m\n"
 CHECKMARK="$(printf '\xE2\x9C\x94')"
 QUESTION_MARK="$(printf '\xE2\x9D\x93')"
 
-# Here to launch tmux as default
-# case $TERM in
-#   screen|tmux-256color);;
-#   *)tmux att -t 0 2>/dev/null|| tmux;;
-# esac;
+#Here to launch tmux as default
+#case $TERM in
+#        screen|tmux-256color);;
+#        *)tmux att -t 0 2>/dev/null|| tmux;;
+#esac;
 
 # Uncomment the following line to use case-sensitive completion.
 CASE_SENSITIVE="true"
@@ -1600,8 +1600,9 @@ function gthb(){
     local current_branch=$(git branch | awk '/\*/ {print $2}');
 
     function check_view(){
-      echo -ne "${BOLD}${WHITE} Open the repo ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ? (y/n) ";
+      echo -ne "${BOLD}${GREEN}Open ${WHITE}the repo ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ? (y/n) ";
       read check_view
+      echo ${RESET}
 
       if [ "$check_view" = "y" ]; then
         gh repo view $repo_owner/$repo_name --web --branch $current_branch &>/dev/null
