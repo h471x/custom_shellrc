@@ -63,8 +63,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Declare the variable for zsh-syntax-highlighting styles
 typeset -A ZSH_HIGHLIGHT_STYLES
 
-# I found those from ~/.oh-my-zsh/plugins/zsh-syntax-highlighting/highlighters/main/README.md
-# ZSH_HIGHLIGHT_STYLES[path]='fg=#3B78FF,bold'
+# From ~/.oh-my-zsh/plugins/zsh-syntax-highlighting/highlighters/main/README.md
 ZSH_HIGHLIGHT_STYLES[path]='none'
 ZSH_HIGHLIGHT_STYLES[autodirectory]=fg='#ffffff'
 ZSH_HIGHLIGHT_STYLES[suffix-alias]=fg='none'
@@ -132,11 +131,11 @@ RESETBG="\e[49m\n"
 CHECKMARK="$(printf '\xE2\x9C\x94')"
 QUESTION_MARK="$(printf '\xE2\x9D\x93')"
 
-#Here to launch tmux as default
-#case $TERM in
-#        screen|tmux-256color);;
-#        *)tmux att -t 0 2>/dev/null|| tmux;;
-#esac;
+# Here to launch tmux as default
+# case $TERM in
+#   screen|tmux-256color);;
+#   *)tmux att -t 0 2>/dev/null|| tmux;;
+# esac;
 
 # Uncomment the following line to use case-sensitive completion.
 CASE_SENSITIVE="true"
@@ -3217,34 +3216,34 @@ function ghdel(){
 
 # Completion function for ghdel
 _ghdel_completion() {
-    local cur prev opts
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
+  local cur prev opts
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
 
-    if [[ ${COMP_CWORD} -eq 1 ]]; then
-        # Ensure we are in a git repository
-        local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
-        if [[ "$is_a_git_repo" == "true" ]]; then
-            local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
-            local repo_url=$(git config --get remote.origin.url)
-            local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
-            local repo_name="$(basename "$repo_url" .git)"
+  if [[ ${COMP_CWORD} -eq 1 ]]; then
+    # Ensure we are in a git repository
+    local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+    if [[ "$is_a_git_repo" == "true" ]]; then
+      local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+      local repo_url=$(git config --get remote.origin.url)
+      local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+      local repo_name="$(basename "$repo_url" .git)"
 
-            # Fetch collaborators and invitees
-            local collaborators=$(gh api "repos/$repo_owner/$repo_name/collaborators" --jq '.[].login')
-            local invitations=$(gh api "repos/$repo_owner/$repo_name/invitations" --jq '.[].invitee.login')
+      # Fetch collaborators and invitees
+      local collaborators=$(gh api "repos/$repo_owner/$repo_name/collaborators" --jq '.[].login')
+      local invitations=$(gh api "repos/$repo_owner/$repo_name/invitations" --jq '.[].invitee.login')
 
-            # Combine collaborators and invitees into a single list
-            local all_users=$(echo "$collaborators" "$invitations" | tr ' ' '\n' | sort | uniq)
+      # Combine collaborators and invitees into a single list
+      local all_users=$(echo "$collaborators" "$invitations" | tr ' ' '\n' | sort | uniq)
 
-            # Provide completion suggestions
-            COMPREPLY=($(compgen -W "$all_users" -- "$cur"))
-        else
-            echo "Not inside a git repository."
-        fi
+      # Provide completion suggestions
+      COMPREPLY=($(compgen -W "$all_users" -- "$cur"))
     else
-        COMPREPLY=()
+      echo "Not inside a git repository."
     fi
+  else
+    COMPREPLY=()
+  fi
 }
 
 # Register the completion function for ghdel
@@ -3673,17 +3672,17 @@ function glc(){
 
 # Completion function for glc
 _glc_completion() {
-    local cur prev
-    cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
+  local cur prev
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
 
-    if [[ ${COMP_CWORD} -eq 1 ]]; then
-        # Only suggest 'show' if no argument is provided
-        COMPREPLY=($(compgen -W "show" -- "$cur"))
-    else
-        # If there are additional arguments, clear completions
-        COMPREPLY=()
-    fi
+  if [[ ${COMP_CWORD} -eq 1 ]]; then
+    # Only suggest 'show' if no argument is provided
+    COMPREPLY=($(compgen -W "show" -- "$cur"))
+  else
+    # If there are additional arguments, clear completions
+    COMPREPLY=()
+  fi
 }
 
 # Register the completion function for ghv
