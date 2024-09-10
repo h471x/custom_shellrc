@@ -131,11 +131,11 @@ RESETBG="\e[49m\n"
 CHECKMARK="$(printf '\xE2\x9C\x94')"
 QUESTION_MARK="$(printf '\xE2\x9D\x93')"
 
-#Here to launch tmux as default
-#case $TERM in
-#        screen|tmux-256color);;
-#        *)tmux att -t 0 2>/dev/null|| tmux;;
-#esac;
+# Here to launch tmux as default
+# case $TERM in
+#   screen|tmux-256color);;
+#   *)tmux att -t 0 2>/dev/null|| tmux;;
+# esac;
 
 # Uncomment the following line to use case-sensitive completion.
 CASE_SENSITIVE="true"
@@ -2068,6 +2068,18 @@ function loudme(){
   local loudme_link="loudme.ai"
   local loudme_name="LoudMe"
   open_web_app $loudme_link $loudme_id $loudme_name
+}
+
+# this alias to open Snap Save
+# Facebook Video Downloader Web App
+alias snap="snap"
+
+# this function for snap alias
+function snap(){
+  local snap_id="caepnkackbfnijpgljjkjfjhoiodmdek"
+  local snap_link="snapsave.app"
+  local snap_name="Snap Save"
+  open_web_app $snap_link $snap_id $snap_name
 }
 
 # this alias to open Suno Web App
