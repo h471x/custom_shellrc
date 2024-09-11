@@ -1605,7 +1605,16 @@ function gthb(){
       echo ${RESET}
 
       if [ "$check_view" = "y" ]; then
-        gh repo view $repo_owner/$repo_name --web --branch $current_branch &>/dev/null
+        cd /mnt/c
+
+        cmd.exe /c start chrome.exe \
+          --profile-directory=Default --app-id=$github_id \
+          --app=https://github.com/$repo_owner/$repo_name/tree/$current_branch \
+
+        cd - &>/dev/null
+        # gh repo view $repo_owner/$repo_name \
+        #   --web --branch $current_branch \
+        #   &>/dev/null
       elif [ "$check_view" = "n" ];then
         open_web_app $github_link $github_id $github_name
       else
