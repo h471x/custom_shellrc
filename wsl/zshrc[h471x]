@@ -3023,13 +3023,6 @@ function ghd(){
         local isPrivate=$(gh repo view $repo_name --json isPrivate --jq '.isPrivate')
         local repo_visibility=$([[ $isPrivate == "true" ]] && echo "private" || echo "public")
 
-        # check the existence of the repo on GitHub
-        # if gh repo view "$repo_owner/$repo_name" --json name -q ".name" >/dev/null 2>&1; then
-        #   repo_exists="true"
-        # else
-        #   repo_exists="false"
-        # fi
-
         function check_delete_local_repo(){
           echo -ne "${BOLD}${WHITE} Delete ${GREEN}local ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
           read delete_local_repo
@@ -3038,15 +3031,9 @@ function ghd(){
             local repo_source=$(git rev-parse --show-toplevel)
             # delete the repo
             echo -ne "${BOLD} Deleting ${GREEN}local ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}... ";
-            # remove the remote since we already
-            # deleted it in GitHub
-            git remote remove origin
             rm -rf $repo_source/.git;
             echo "${BOLD}${GREEN} ${WHITE}";
           elif [ "$delete_local_repo" = "n" ];then
-            # remove the remote since we already
-            # deleted it in GitHub
-            git remote remove origin
             return 0
           else
             check_delete_local_repo
@@ -3060,6 +3047,10 @@ function ghd(){
             # delete the repo
             echo -ne "${BOLD} Deleting repository ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ... ";
             gh repo delete "$repo_name" --yes &>/dev/null;
+
+            # remove the remote since we already
+            # deleted it in GitHub
+            git remote remove origin
             echo "${BOLD}${GREEN} ${WHITE}";
             echo -e;
             check_delete_local_repo
@@ -3069,13 +3060,7 @@ function ghd(){
             check_delete_repo
           fi
         }
-
-        # Use the variable in an if statement
-        # if [ "$repo_exists" = "true" ]; then
-          check_delete_repo
-        # else
-          # check_delete_local_repo
-        # fi
+        check_delete_repo
       fi
     else
       local repo_name=$(basename "$(git rev-parse --show-toplevel)")
