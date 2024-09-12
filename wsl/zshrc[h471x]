@@ -1589,14 +1589,22 @@ alias gthb="gthb"
 # this function for gthb alias
 function gthb(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
   local github_id="mjoklplbddabcmpepnokjaffbmgbkkgg"
   local github_link="github.com"
   local github_name="GitHub"
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    local repo_url=$(git config --get remote.origin.url)
-    local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
-    local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+    local has_remote=$(git remote -v)
+    if [ "$has_remote" ]; then
+      local repo_url=$(git config --get remote.origin.url)
+      local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+      local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+    else
+      local repo_owner=$(git config user.username)
+      local repo_name=$(basename "$(git rev-parse --show-toplevel)")
+    fi
+
     local current_branch=$(git branch | awk '/\*/ {print $2}');
 
     function check_view(){
@@ -1621,7 +1629,21 @@ function gthb(){
         check_view
       fi
     }
-    check_view
+
+    # check if the repo has a remote
+    # on github otherwise open the pwa
+    if [ "$has_remote" ]; then
+      local is_remote_branch=$(git branch -r | grep "origin/$current_branch")
+
+      # check if the current branch has remote
+      if [ -n "$is_remote_branch" ]; then
+        check_view
+      else
+        echo "${BOLD} ■■▶ The remote repo ${LIGHT_BLUE}$repo_name ${WHITE}has no branch named ${GREEN}$current_branch ${WHITE}!" && br;
+      fi
+    else
+      open_web_app $github_link $github_id $github_name
+    fi
   else
     if [[ $# -eq 0 ]]; then
       open_web_app $github_link $github_id $github_name
@@ -2897,46 +2919,53 @@ function ghc() {
 
   local repo_name="$(clean_repo "$repo")"
   local repo_visibility=$([[ $isPrivate == "private" ]] && echo "private" || echo "public")
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
-  if [ -d ".git" ]; then
-    local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    local has_remote=$(git remote -v)
 
-    function check_set_repo(){
-      echo -ne "${BOLD}${WHITE} Create ${GREEN}$repo_visibility ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
-      read set_repo
-      if [ "$set_repo" = "y" ]; then
-        # create the repo & set it as remote of the local one
-        echo -ne "${BOLD} New repository ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ... "
-        gh repo create "$repo_name" --$repo_visibility &>/dev/null;
-        git remote add origin "git@github.com:$current_user/$repo_name.git";
-        echo "${BOLD}${GREEN} ${WHITE}"
+    if [ "$has_remote" ]; then
+      echo "${BOLD} ■■▶ This repo has already a remote on GitHub !" && br;
+    else
+      local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
 
-        function check_push(){
-          echo -ne "${BOLD}${WHITE} Push local commits to ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
-          read check_push_commit
+      function check_set_repo(){
+        echo -ne "${BOLD}${WHITE} Create ${GREEN}$repo_visibility ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
+        read set_repo
+        if [ "$set_repo" = "y" ]; then
+          # create the repo & set it as remote of the local one
+          echo -ne "${BOLD} New repository ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ... "
+          gh repo create "$repo_name" --$repo_visibility &>/dev/null;
+          git remote add origin "git@github.com:$current_user/$repo_name.git";
+          echo "${BOLD}${GREEN} ${WHITE}"
 
-          if [ "$check_push_commit" = "y" ]; then
-            local current_branch=$(git branch | awk '/\*/ {print $2}');
-            git push origin $current_branch;
-          elif [ "$check_push_commit" = "n" ];then
-            return 0
-          else
+          function check_push(){
+            echo -ne "${BOLD}${WHITE} Push local commits to ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
+            read check_push_commit
+
+            if [ "$check_push_commit" = "y" ]; then
+              local current_branch=$(git branch | awk '/\*/ {print $2}');
+              git push origin $current_branch;
+            elif [ "$check_push_commit" = "n" ];then
+              return 0
+            else
+              check_push
+            fi
+          }
+
+          local current_branch=$(git branch | awk '/\*/ {print $2}');
+
+          if git rev-list --count "$current_branch" 2>/dev/null | grep -q '^[1-9]'; then
             check_push
           fi
-        }
-
-        local current_branch=$(git branch | awk '/\*/ {print $2}');
-
-        if git rev-list --count "$current_branch" 2>/dev/null | grep -q '^[1-9]'; then
-          check_push
+        elif [ "$set_repo" = "n" ];then
+          return 0;
+        else
+          check_set_repo
         fi
-      elif [ "$set_repo" = "n" ];then
-        return 0
-      else
-        check_set_repo
-      fi
-    }
-    check_set_repo
+      }
+      check_set_repo
+    fi
   else
     function check_create_repo(){
       echo -ne "${BOLD}${WHITE} Create ${GREEN}$repo_visibility ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
@@ -2948,7 +2977,20 @@ function ghc() {
         mv "$repo_name/.git" . && rm -rf "$repo_name";
         echo "${BOLD}${GREEN} ${WHITE}"
       elif [ "$create_repo" = "n" ];then
-        return 0
+        function check_local(){
+          echo -ne "${BOLD}${WHITE} Create ${GREEN}local  ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
+          read create_local
+          echo ${RESET}
+
+          if [ "$create_local" = "y" ]; then
+            git init &>/dev/null
+          elif [ "$create_local" = "n" ];then
+            return 0
+          else
+            check_local
+          fi
+        }
+        check_local
       else
         check_create_repo
       fi
@@ -2961,37 +3003,99 @@ function ghc() {
 alias ghd="ghd"
 
 # this function for ghd alias
+# IMPROVED : 09-11-2024 16:13
+# Added has_remote check
 function ghd(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    local repo_url=$(git config --get remote.origin.url)
-    local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
-    local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+    local has_remote=$(git remote -v)
 
-    if [[ "$repo_owner" != "$current_user" ]]; then
-      echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
+    if [ "$has_remote" ]; then
+      local repo_url=$(git config --get remote.origin.url)
+      local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+      local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+
+      if [[ "$repo_owner" != "$current_user" ]]; then
+        echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
+      else
+        local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+        local isPrivate=$(gh repo view $repo_name --json isPrivate --jq '.isPrivate')
+        local repo_visibility=$([[ $isPrivate == "true" ]] && echo "private" || echo "public")
+
+        # check the existence of the repo on GitHub
+        # if gh repo view "$repo_owner/$repo_name" --json name -q ".name" >/dev/null 2>&1; then
+        #   repo_exists="true"
+        # else
+        #   repo_exists="false"
+        # fi
+
+        function check_delete_local_repo(){
+          echo -ne "${BOLD}${WHITE} Delete ${GREEN}local ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
+          read delete_local_repo
+
+          if [ "$delete_local_repo" = "y" ]; then
+            local repo_source=$(git rev-parse --show-toplevel)
+            # delete the repo
+            echo -ne "${BOLD} Deleting ${GREEN}local ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}... ";
+            # remove the remote since we already
+            # deleted it in GitHub
+            git remote remove origin
+            rm -rf $repo_source/.git;
+            echo "${BOLD}${GREEN} ${WHITE}";
+          elif [ "$delete_local_repo" = "n" ];then
+            # remove the remote since we already
+            # deleted it in GitHub
+            git remote remove origin
+            return 0
+          else
+            check_delete_local_repo
+          fi
+        }
+
+        function check_delete_repo(){
+          echo -ne "${BOLD}${WHITE} Delete ${GREEN}$repo_visibility ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
+          read delete_repo
+          if [ "$delete_repo" = "y" ]; then
+            # delete the repo
+            echo -ne "${BOLD} Deleting repository ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ... ";
+            gh repo delete "$repo_name" --yes &>/dev/null;
+            echo "${BOLD}${GREEN} ${WHITE}";
+            echo -e;
+            check_delete_local_repo
+          elif [ "$delete_repo" = "n" ];then
+            return 0
+          else
+            check_delete_repo
+          fi
+        }
+
+        # Use the variable in an if statement
+        # if [ "$repo_exists" = "true" ]; then
+          check_delete_repo
+        # else
+          # check_delete_local_repo
+        # fi
+      fi
     else
-      local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
-      local isPrivate=$(gh repo view $repo_name --json isPrivate --jq '.isPrivate')
-      local repo_visibility=$([[ $isPrivate == "true" ]] && echo "private" || echo "public")
+      local repo_name=$(basename "$(git rev-parse --show-toplevel)")
 
-      function check_delete_repo(){
-        echo -ne "${BOLD}${WHITE} Delete ${GREEN}$repo_visibility ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
-        read delete_repo
-        if [ "$delete_repo" = "y" ]; then
+      function check_delete_local_repo(){
+        echo -ne "${BOLD}${WHITE} Delete ${GREEN}local ${WHITE}repo ${LIGHT_BLUE}$repo_name ${WHITE}? (y/n) ";
+        read delete_local_repo
+        if [ "$delete_local_repo" = "y" ]; then
+          local repo_source=$(git rev-parse --show-toplevel)
           # delete the repo
-          echo -ne "${BOLD} Deleting repository ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ... ";
-          gh repo delete "$repo_name" --yes &>/dev/null;
-          rm -rf .git;
+          echo -ne "${BOLD} Deleting ${GREEN}local repo ${LIGHT_BLUE}$repo_name ${WHITE}... ";
+          rm -rf $repo_source/.git;
           echo "${BOLD}${GREEN} ${WHITE}";
-        elif [ "$delete_repo" = "n" ];then
+        elif [ "$delete_local_repo" = "n" ];then
           return 0
         else
-          check_delete_repo
+          check_delete_local_repo
         fi
       }
-      check_delete_repo
+      check_delete_local_repo
     fi
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
@@ -3005,41 +3109,56 @@ alias ghv="ghv"
 # IMPROVED : 06-06-2024 10:47
 function ghv(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+  local has_remote=$(git remote -v)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
     if [[ "$#" -eq 0 || "$1" == "show" || "$1" == "owner" ]]; then
-      local repo_url=$(git config --get remote.origin.url)
       local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
-      local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
-      local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+
+      if [ "$has_remote" ]; then
+        local repo_url=$(git config --get remote.origin.url)
+        local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+        local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+      else
+        local repo_owner=$(git config user.username)
+        local repo_name=$(basename "$(git rev-parse --show-toplevel)")
+      fi
 
       if [[ "$repo_owner" != "$current_user" && "$1" != "owner" ]]; then
         echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
       elif [[ "$1" == "owner" ]]; then
-        echo "${BOLD} The repo ${LIGHT_BLUE}$repo_name ${WHITE}is owned by ${GREEN}$repo_owner";
-      else
-        local isPrivate=$(gh repo view $repo_name --json isPrivate --jq '.isPrivate')
-
-        if [[ "$1" == "show" ]]; then
-          local visibility=$([[ $isPrivate == "true" ]] && echo "private" || echo "public")
-          echo "${BOLD} This repo ${LIGHT_BLUE}$repo_name ${WHITE}is ${GREEN}$visibility";
+        if [ "$has_remote" ]; then
+          echo "${BOLD} The repo ${LIGHT_BLUE}$repo_name ${WHITE}is owned by ${GREEN}$repo_owner";
         else
-          local new_visibility=$([[ $isPrivate == "true" ]] && echo "public" || echo "private")
-          function toggle_visibility(){
-            echo -ne "${BOLD}${WHITE} Make ${LIGHT_BLUE}$repo_name ${WHITE}repo ${GREEN}$new_visibility ${WHITE}? (y/n) ";
-            read change_visibility
-            if [ "$change_visibility" = "y" ]; then
-              # toggle visibility
-              echo -ne "${BOLD} Changing repo visibility to ${GREEN}$new_visibility ${WHITE}... ";
-              gh repo edit "$repo_owner/$repo_name" --visibility "$new_visibility" &>/dev/null;
-              echo "${BOLD}${GREEN} ${WHITE}";
-            elif [ "$change_visibility" = "n" ];then
-              return 0
-            else
-              toggle_visibility
-            fi
-          }
-          toggle_visibility
+          echo "${BOLD} The local repo ${LIGHT_BLUE}$repo_name ${WHITE}is owned by ${GREEN}$repo_owner";
+        fi
+      else
+        if [ "$has_remote" ]; then
+          local isPrivate=$(gh repo view $repo_name --json isPrivate --jq '.isPrivate')
+
+          if [[ "$1" == "show" ]]; then
+            local visibility=$([[ $isPrivate == "true" ]] && echo "private" || echo "public")
+            echo "${BOLD} This repo ${LIGHT_BLUE}$repo_name ${WHITE}is ${GREEN}$visibility";
+          else
+            local new_visibility=$([[ $isPrivate == "true" ]] && echo "public" || echo "private")
+            function toggle_visibility(){
+              echo -ne "${BOLD}${WHITE} Make ${LIGHT_BLUE}$repo_name ${WHITE}repo ${GREEN}$new_visibility ${WHITE}? (y/n) ";
+              read change_visibility
+              if [ "$change_visibility" = "y" ]; then
+                # toggle visibility
+                echo -ne "${BOLD} Changing repo visibility to ${GREEN}$new_visibility ${WHITE}... ";
+                gh repo edit "$repo_owner/$repo_name" --visibility "$new_visibility" &>/dev/null;
+                echo "${BOLD}${GREEN} ${WHITE}";
+              elif [ "$change_visibility" = "n" ];then
+                return 0
+              else
+                toggle_visibility
+              fi
+            }
+            toggle_visibility
+          fi
+        else
+          echo "${BOLD} The local repo ${LIGHT_BLUE}$repo_name ${WHITE}is owned by ${GREEN}$repo_owner";
         fi
       fi
     else
@@ -3147,34 +3266,39 @@ alias ghadd="ghadd"
 # Uses the github cli rest API
 function ghadd(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+  local has_remote=$(git remote -v)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    if [[ $# -eq 0 ]]; then
-      echo "${BOLD} ■■▶ Specify the username of the new collaborator !" && br;
-    elif [[ $# -gt 0 ]]; then
-      local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
-      local repo_url=$(git config --get remote.origin.url)
-      local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
-      local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+    if [ "$has_remote" ]; then
+      if [[ $# -eq 0 ]]; then
+        echo "${BOLD} ■■▶ Specify the username of the new collaborator !" && br;
+      elif [[ $# -gt 0 ]]; then
+        local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+        local repo_url=$(git config --get remote.origin.url)
+        local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+        local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
 
-      # check if we are not the owner of the repo
-      if [[ "$repo_owner" != "$current_user" ]]; then
-        echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
-      else
-        # Loop through each collaborator username provided as an argument
-        for collaborator in "$@"; do
-          echo -ne "${BOLD} Inviting ${LIGHT_BLUE}$collaborator ${WHITE}to collaborate on ${LIGHT_BLUE}$repo_name${WHITE} "
+        # check if we are not the owner of the repo
+        if [[ "$repo_owner" != "$current_user" ]]; then
+          echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
+        else
+          # Loop through each collaborator username provided as an argument
+          for collaborator in "$@"; do
+            echo -ne "${BOLD} Inviting ${LIGHT_BLUE}$collaborator ${WHITE}to collaborate on ${LIGHT_BLUE}$repo_name${WHITE} "
 
-          # Check if the collaborator exists on GitHub
-          if is_a_github_user "$collaborator"; then
-            # Add collaborator using gh api
-            gh api --method=PUT "repos/$current_user/$repo_name/collaborators/$collaborator" &>/dev/null
-            echo "${BOLD}${GREEN} ${WHITE}"
-          else
-            echo "${BOLD}${RED}✘ ${WHITE}"
-          fi
-        done
+            # Check if the collaborator exists on GitHub
+            if is_a_github_user "$collaborator"; then
+              # Add collaborator using gh api
+              gh api --method=PUT "repos/$current_user/$repo_name/collaborators/$collaborator" &>/dev/null
+              echo "${BOLD}${GREEN} ${WHITE}"
+            else
+              echo "${BOLD}${RED}✘ ${WHITE}"
+            fi
+          done
+        fi
       fi
+    else
+      echo "${BOLD} ■■▶ This repo has no remote on GitHub !" && br;
     fi
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
@@ -3189,47 +3313,52 @@ alias ghdel="ghdel"
 # Derived from ghadd
 function ghdel(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+  local has_remote=$(git remote -v)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    if [[ $# -eq 0 ]]; then
-      echo "${BOLD} ■■▶ Specify the username of the collaborator to remove !" && br;
-    elif [[ $# -gt 0 ]]; then
-      local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
-      local repo_url=$(git config --get remote.origin.url)
-      local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
-      local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+    if [ "$has_remote" ]; then
+      if [[ $# -eq 0 ]]; then
+        echo "${BOLD} ■■▶ Specify the username of the collaborator to remove !" && br;
+      elif [[ $# -gt 0 ]]; then
+        local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+        local repo_url=$(git config --get remote.origin.url)
+        local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+        local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
 
-      # check if we are not the owner of the repo
-      if [[ "$repo_owner" != "$current_user" ]]; then
-        echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
-      else
-        # Retrieve the list of collaborators
-        local collaborators=$(gh api "repos/$current_user/$repo_name/collaborators" --jq '.[].login')
-        local invitations=$(gh api "repos/$current_user/$repo_name/invitations" --jq '.[].invitee.login')
+        # check if we are not the owner of the repo
+        if [[ "$repo_owner" != "$current_user" ]]; then
+          echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
+        else
+          # Retrieve the list of collaborators
+          local collaborators=$(gh api "repos/$current_user/$repo_name/collaborators" --jq '.[].login')
+          local invitations=$(gh api "repos/$current_user/$repo_name/invitations" --jq '.[].invitee.login')
 
-        # Loop through each collaborator username provided as an argument
-        for collaborator in "$@"; do
-          # Check if the collaborator exists in the list of collaborators
-          if echo "$collaborators" | grep -q "$collaborator" ||
-            echo "$invitations" | grep -q "$collaborator"; then
-            echo -ne "${BOLD} Removing ${LIGHT_BLUE}$collaborator ${WHITE}from ${LIGHT_BLUE}$repo_name${WHITE} "
-            # Check for pending invitations
-            local invitation_id=$(gh api "repos/$current_user/$repo_name/invitations" --jq ".[] | select(.invitee.login==\"$collaborator\") | .id")
+          # Loop through each collaborator username provided as an argument
+          for collaborator in "$@"; do
+            # Check if the collaborator exists in the list of collaborators
+            if echo "$collaborators" | grep -q "$collaborator" ||
+              echo "$invitations" | grep -q "$collaborator"; then
+              echo -ne "${BOLD} Removing ${LIGHT_BLUE}$collaborator ${WHITE}from ${LIGHT_BLUE}$repo_name${WHITE} "
+              # Check for pending invitations
+              local invitation_id=$(gh api "repos/$current_user/$repo_name/invitations" --jq ".[] | select(.invitee.login==\"$collaborator\") | .id")
 
-            if [[ -n "$invitation_id" ]]; then
-              # Delete the pending invitation
-              gh api --method=DELETE "repos/$current_user/$repo_name/invitations/$invitation_id" &>/dev/null
-              echo -ne " ${BOLD}(invitation deleted) "
+              if [[ -n "$invitation_id" ]]; then
+                # Delete the pending invitation
+                gh api --method=DELETE "repos/$current_user/$repo_name/invitations/$invitation_id" &>/dev/null
+                echo -ne " ${BOLD}(invitation deleted) "
+              fi
+
+              # Remove collaborator using gh api
+              gh api --method=DELETE "repos/$current_user/$repo_name/collaborators/$collaborator" &>/dev/null
+              echo "${BOLD}${GREEN} ${WHITE}"
+            else
+              echo "${BOLD}${LIGHT_BLUE}$collaborator ${WHITE}is not a ${LIGHT_BLUE}collaborator ${RED}✘ ${WHITE}"
             fi
-
-            # Remove collaborator using gh api
-            gh api --method=DELETE "repos/$current_user/$repo_name/collaborators/$collaborator" &>/dev/null
-            echo "${BOLD}${GREEN} ${WHITE}"
-          else
-            echo "${BOLD}${LIGHT_BLUE}$collaborator ${WHITE}is not a ${LIGHT_BLUE}collaborator ${RED}✘ ${WHITE}"
-          fi
-        done
+          done
+        fi
       fi
+    else
+      echo "${BOLD} ■■▶ This repo has no remote on Github !" && br;
     fi
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
@@ -3279,48 +3408,53 @@ alias ghcls="ghcls"
 # Derived from ghadd
 function ghcls(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+  local has_remote=$(git remote -v)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
-    local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
-    local repo_url=$(git config --get remote.origin.url)
-    local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
-    local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+    if [ "$has_remote" ]; then
+      local current_user=$(awk '/user:/ {print $2; exit}' ~/.config/gh/hosts.yml)
+      local repo_url=$(git config --get remote.origin.url)
+      local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+      local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
 
-    # check if we are not the owner of the repo
-    if [[ "$repo_owner" != "$current_user" ]]; then
-      echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
-    else
-      echo -ne "${BOLD} ${LIGHT_BLUE}Collaborators ${WHITE}for the ${LIGHT_BLUE}$repo_name ${WHITE}repository "
-
-      # List collaborators using gh api
-      local collaborators=$(gh api "repos/$current_user/$repo_name/collaborators" --jq '.[].login')
-      local invitations=$(gh api "repos/$current_user/$repo_name/invitations" --jq '.[].invitee.login')
-
-      local collaborators_count=$(echo "$collaborators" | wc -l)
-      local invitations_count=$(echo "$invitations" | wc -l)
-      local collaborators_num=$((collaborators_count + invitations_count))
-      echo "${WHITE}${BOLD}($collaborators_count)"
-
-      # Iterate through each collaborator
-      if [[ -n "$collaborators" ]]; then
-        while IFS= read -r collaborator; do
-          if [[ "$collaborator" == "$current_user" ]]; then
-            echo " ● $collaborator (owner)"
-          else
-            echo " ● $collaborator"
-          fi
-        done <<< "$collaborators"
+      # check if we are not the owner of the repo
+      if [[ "$repo_owner" != "$current_user" ]]; then
+        echo "${BOLD} ■■▶ Sorry, you are not the owner of this repo !" && br;
       else
-        echo "No collaborators found."
-      fi
+        echo -ne "${BOLD} ${LIGHT_BLUE}Collaborators ${WHITE}for the ${LIGHT_BLUE}$repo_name ${WHITE}repository "
 
-      # Check if there are pending invitations
-      if [[ -n "$invitations" ]]; then
-        # Print pending invitations
-        while IFS= read -r invitee; do
-          echo " ● $invitee (invitation pending)"
-        done <<< "$invitations"
+        # List collaborators using gh api
+        local collaborators=$(gh api "repos/$current_user/$repo_name/collaborators" --jq '.[].login')
+        local invitations=$(gh api "repos/$current_user/$repo_name/invitations" --jq '.[].invitee.login')
+
+        local collaborators_count=$(echo "$collaborators" | wc -l)
+        local invitations_count=$(echo "$invitations" | wc -l)
+        local collaborators_num=$((collaborators_count + invitations_count))
+        echo "${WHITE}${BOLD}($collaborators_count)"
+
+        # Iterate through each collaborator
+        if [[ -n "$collaborators" ]]; then
+          while IFS= read -r collaborator; do
+            if [[ "$collaborator" == "$current_user" ]]; then
+              echo " ● $collaborator (owner)"
+            else
+              echo " ● $collaborator"
+            fi
+          done <<< "$collaborators"
+        else
+          echo "No collaborators found."
+        fi
+
+        # Check if there are pending invitations
+        if [[ -n "$invitations" ]]; then
+          # Print pending invitations
+          while IFS= read -r invitee; do
+            echo " ● $invitee (invitation pending)"
+          done <<< "$invitations"
+        fi
       fi
+    else
+      echo "${BOLD} ■■▶ This repo has no remote on GitHub !" && br;
     fi
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
@@ -3359,10 +3493,19 @@ alias gck="gck";
 # this function for gck alias
 function gck(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+  local has_remote=$(git remote -v)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
     local current_branch=$(git branch | awk '/\*/ {print $2}');
-    local default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+
+    if [ "$has_remote" ]; then
+      local default_branch=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')
+      local repo_url=$(git config --get remote.origin.url)
+      local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+    else
+      local default_branch=$(git config --get init.defaultBranch)
+      local repo_name=$(basename "$(git rev-parse --show-toplevel)")
+    fi
 
     if [[ -z "$default_branch" ]]; then
       default_branch=$(git config --get init.defaultBranch)
@@ -3378,7 +3521,23 @@ function gck(){
             echo -ne "${BOLD}${WHITE}New branch${GREEN} "$user"${WHITE} ? (y/n) ";
             read branch
             if [ "$branch" = "y" ]; then
-              git checkout -b "$user";
+              git checkout -b "$user" &>/dev/null;
+
+              # check for remote
+              if [ "$has_remote" ]; then
+                function check_new_remote_branch(){
+                  echo -ne "${BOLD}${WHITE}Add${GREEN} "$user"${WHITE} branch to ${LIGHT_BLUE}$repo_name ${WHITE} on GitHub ? (y/n) ";
+                  read remote_branch
+                  if [ "$remote_branch" = "y" ]; then
+                    git push origin "$user";
+                  elif [ "$remote_branch" = "n" ];then
+                    return 0
+                  else
+                    check_new_remote_branch
+                  fi
+                }
+                check_new_remote_branch
+              fi
             elif [ "$branch" = "n" ];then
               return 0
             else
@@ -3398,7 +3557,24 @@ function gck(){
           echo -ne "${BOLD}${WHITE}New branch${GREEN} "$new_branch"${WHITE} ? (y/n) ";
           read branch
           if [ "$branch" = "y" ]; then
-            git checkout -b "$new_branch";
+            git checkout -b "$new_branch" &>/dev/null;
+
+            # check for remote
+            if [ "$has_remote" ]; then
+              function check_new_remote_branch(){
+                echo -ne "${BOLD}${WHITE}Add${GREEN} "$new_branch"${WHITE} branch to ${LIGHT_BLUE}$repo_name ${WHITE} on GitHub ? (y/n) ";
+                read remote_branch
+                echo ${RESET}
+                if [ "$remote_branch" = "y" ]; then
+                  git push origin "$new_branch";
+                elif [ "$remote_branch" = "n" ];then
+                  return 0
+                else
+                  check_new_remote_branch
+                fi
+              }
+              check_new_remote_branch
+            fi
           elif [ "$branch" = "n" ];then
             return 0
           else
@@ -3479,6 +3655,7 @@ alias gbd="gbd"
 # this function for gbd alias
 function gbd() {
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+  local has_remote=$(git remote -v)
 
   if [[ "$is_a_git_repo" == "true" ]]; then
     local current_branch=$(git branch | awk '/\*/ {print $2}');
@@ -3501,6 +3678,7 @@ function gbd() {
           else
             echo -ne "${BOLD}${WHITE}Delete remote branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
             read delete_remote_branch
+            echo ${RESET}
             if [ "$delete_remote_branch" = "y" ]; then
               git push origin --delete "$current_branch";
             elif [ "$delete_remote_branch" = "n" ];then
@@ -3513,18 +3691,19 @@ function gbd() {
 
         function check_delete_branch() {
           local branch_name="$1"
-          local git_root=$(git rev-parse --show-toplevel 2>/dev/null)
-          local has_remote="$git_root/.git/logs/refs/remotes/origin/$branch_name"
 
           echo -ne "${BOLD}${WHITE}Delete branch${GREEN} "$branch_name"${WHITE} ? (y/n) ${RESET}";
           read delete_branch
 
           if [ "$delete_branch" = "y" ]; then
             if [[ "$current_branch" != "$default_branch" ]]; then
-              git checkout $default_branch;
+              git checkout $default_branch &>/dev/null;
             fi
-            if -f "$has_remote" ; then
-              check_delete_remote_branch
+            if [ "$has_remote" ]; then
+              local is_remote_branch=$(git branch -r | grep "origin/$1")
+              if [ -n "$is_remote_branch" ]; then
+                check_delete_remote_branch
+              fi
             fi
             git branch -D "$1";
           elif [ "$delete_branch" = "n" ]; then
@@ -3544,7 +3723,31 @@ function gbd() {
           read delete_branch
           if [ "$delete_branch" = "y" ]; then
             # TODO : Remote branch Deletion
-            git checkout "$default_branch";
+            function check_delete_remote_branch() {
+              if [[ "$current_branch" == "$default_branch" ]]; then
+                echo "${BOLD} ■■▶ Fatal ! Cannot Delete the Default Branch " && br;
+              else
+                echo -ne "${BOLD}${WHITE}Delete remote branch${GREEN} "$current_branch"${WHITE} ? (y/n) ${RESET}";
+                read delete_remote_branch
+                echo ${RESET}
+                if [ "$delete_remote_branch" = "y" ]; then
+                  git push origin --delete "$current_branch";
+                elif [ "$delete_remote_branch" = "n" ];then
+                  return 0
+                else
+                  check_delete_remote_branch
+                fi
+              fi
+            }
+
+            git checkout "$default_branch" &>/dev/null;
+
+            if [ "$has_remote" ]; then
+              local is_remote_branch=$(git branch -r | grep "origin/$current_branch")
+              if [ -n "$is_remote_branch" ]; then
+                check_delete_remote_branch
+              fi
+            fi
             git branch -D "$current_branch";
           elif [ "$delete_branch" = "n" ];then
             return 0
@@ -3601,10 +3804,25 @@ alias gpsh="gpsh"
 # this function for gpsh alias
 function gpsh(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+  local has_remote=$(git remote -v)
+
+  if [ "$has_remote" ]; then
+    local repo_url=$(git config --get remote.origin.url)
+    local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+  else
+    local repo_name=$(basename "$(git rev-parse --show-toplevel)")
+  fi
+
 
   if [[ "$is_a_git_repo" == "true" ]]; then
     local current_branch=$(git branch | awk '/\*/ {print $2}');
-    git push origin $current_branch;
+
+    # check if it has a remote to push
+    if [ "$has_remote" ]; then
+      git push origin $current_branch;
+    else
+      echo "${BOLD} The local repo ${LIGHT_BLUE}$repo_name ${WHITE}has ${RED}no remote";
+    fi
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
@@ -3616,10 +3834,30 @@ alias gpl="gpl"
 # this function for gpsh alias
 function gpl(){
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+  local has_remote=$(git remote -v)
+
+  if [ "$has_remote" ]; then
+    local repo_url=$(git config --get remote.origin.url)
+    local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+  else
+    local repo_name=$(basename "$(git rev-parse --show-toplevel)")
+  fi
 
   if [[ "$is_a_git_repo" == "true" ]]; then
     local current_branch=$(git branch | awk '/\*/ {print $2}');
-    git pull origin $current_branch;
+
+    if [ "$has_remote" ]; then
+      local is_remote_branch=$(git branch -r | grep "origin/$current_branch")
+
+      # check if the current branch has remote
+      if [ -n "$is_remote_branch" ]; then
+        git pull origin $current_branch;
+      else
+        echo "${BOLD} ■■▶ The remote repo ${LIGHT_BLUE}$repo_name ${WHITE}has no branch named ${GREEN}$current_branch ${WHITE}!" && br;
+      fi
+    else
+      echo "${BOLD} The local repo ${LIGHT_BLUE}$repo_name ${WHITE}has ${RED}no remote";
+    fi
   else
     echo "${BOLD} ■■▶ This won't work, you are not in a git repo !" && br;
   fi
