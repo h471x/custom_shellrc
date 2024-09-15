@@ -10,10 +10,10 @@ WSL sections can be skipped for Linux configurations.
 <details>
   <summary><strong> Prerequisites</strong></summary>
 
-  - **Fonts** : ``Nerd Font``
   - **Packages** : ``eza`` ``figlet`` ``git`` ``gh`` ``tmux`` ``neofetch``
-  - **Plugins** : ``oh-my-zsh`` ``powerlevel10k``
   - **Services** : ``sshd`` ``apache2`` ``mariadb`` ``postgres`` ``postfix``
+  - **Plugins** : ``oh-my-zsh`` ``powerlevel10k``
+  - **Fonts** : ``Nerd Font``
 </details>
 
 <hr style="border: 0; height: 1px; background: #21262d;">
@@ -135,6 +135,18 @@ WSL sections can be skipped for Linux configurations.
     *)tmux att -t 0 2>/dev/null|| tmux;;
   esac;
 
+  # this alias to launch tmux
+  alias tmx="tmx"
+
+  #this function for tmx alias
+  function tmx(){
+    if [[ $(tmux ls | wc -l) -gt 0 ]]; then
+     tmux rename-session "$(basename "$PWD")"
+    else
+    clear && br
+    fi
+  }
+
   #######################################################################
   ```
 </details>
@@ -198,6 +210,530 @@ WSL sections can be skipped for Linux configurations.
   # Character
   CHECKMARK="$(printf '\xE2\x9C\x94')"
   QUESTION_MARK="$(printf '\xE2\x9D\x93')"
+
+  #######################################################################
+  ```
+</details>
+
+<hr style="border: 0; height: 1px; background: #21262d;">
+
+<details>
+  <summary><strong> Basic Aliases</strong></summary>
+
+  ```sh
+  ### Basic Aliases
+
+  # this alias to update the package
+  alias upd="allow_sudo && upd"
+
+  # this function for up alias
+  function upd(){
+    echo "u p d a t i n g .  .  ." | figlet -t -c;
+    br && sudo apt update && br;
+  }
+
+  # this alia to update the package
+  alias upg="allow_sudo && upg"
+
+  # this function for up alias
+  function upg(){
+    echo "u p g r a d i n g . . ." | figlet -t -c;
+    br && sudo apt upgrade && br;
+  }
+
+  # this alias to install package
+  alias ist="allow_sudo && ist"
+
+  # this function for ist alias
+  function ist(){
+    case "${1##*.}" in
+      git)
+        echo "   C l o n i n g .  .  . " | figlet;
+        br && echo "Package =======> "${1%.*}" ";
+        br && git clone "$1" && br;
+        ;;
+      *)
+        echo "   I n s t a l l i n g .  .  . " | figlet;
+        c && br && echo "Package =======> "$1" ";
+        br && sudo apt install "$1" && br;
+        ;;
+    esac
+  }
+
+  # this alias to install package
+  alias rmv="rmv"
+
+  # this function for ist alias
+  function rmv(){
+    case "${1##*.}" in
+      deb)
+        c && echo -e && echo -e && sudo clear && echo -e && echo -e && echo "   r e m o v i n g .  .  . " | figlet | lolcat && echo -e && echo "Package =======> "${1%.*}" " && echo -e && sudo dpkg -r "$1" && echo -e;
+        ;;
+      *)
+        c && echo -e && echo -e && sudo clear && echo -e && echo -e && echo "   r e m o v  i n g .  .  . " | figlet | lolcat && echo -e && echo "Package =======> "$1" " && echo -e && sudo apt remove "$1" && echo -e;
+        ;;
+    esac
+  }
+
+  # this alias to rename a file / directory; and display it after
+  alias nm="nm"
+
+  # this function for cpf alias
+  function nm(){
+    mv "$1" "$2" && cv;
+  }
+
+  # this line to count line inside a file
+  alias cl="linecount"
+
+  # this function for the cl alias
+  function linecount() {
+    if [ -z "$1" ]; then
+        echo "Please provide a filename"
+    elif [ -z "$2" ]; then
+        wc -l "$1" | awk '{print $1, "lines"}'
+    else
+        grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
+    fi
+  };
+
+  # this line to view a command manual
+  alias mn="mn"
+
+  # this function for mn alias
+  function mn(){
+    if [[ $# -eq 1 ]]; then
+      man $1 | less
+    else
+      man $1 | grep $2 | less
+    fi
+  }
+
+  # this alias to view tthe manual entry for a command
+  alias mns="mns"
+
+  # this function for mn alias
+  function mns(){
+    if [[ $(command -v "$1") ]]; then
+      local manual_path=~/NTSOA/manual
+      # here to check if the command exists
+      man "$1" | cat > $manual_path/"$1"_manual.txt;
+      all $manual_path/"$1"_manual.txt;
+      vf $manual_path/"$1"_manual.txt;
+      cv;
+    else
+      cv
+    fi
+  }
+
+  # this alias to enter the manual directory
+  alias mnv="mnv"
+
+  # this function for mnv alias
+  function mnv(){
+    if [[ $# -eq 0 ]]; then
+      op /home/h471x/NTSOA/manual;
+    elif [[ $# -eq 1 ]]; then
+      op /home/h471x/NTSOA/manual "$1";
+    fi
+  }
+
+  # this alias to view the pc state
+  alias pc="c && br 2 && neofetch --source ~/.config/neofetch/htx2.txt"
+
+  # this alias to view the history
+  alias hst="hst"
+
+  # this function for hst alias
+  function hst(){
+    if [[ $# -eq 0 ]]; then
+      history | less && cv
+    else
+      re='^[0-9]+$'
+      # check if the argument is an integrer
+      if [[ $1 =~ $re ]]; then
+        history | tail -$1 | less && cv
+      else  # else if it's a text to grep
+        history | grep "$1" | less && cv
+      fi
+    fi
+  }
+
+  # this alias to specify which command in the history to search
+  alias hsg="hsg"
+
+  # this function for hsg alias
+  function hsg(){
+    if [[ $# -eq 0 ]]; then
+      history | less && cv;
+    else
+      history | grep "$1" | less && cv;
+    fi
+  }
+
+  # this alias to count line and words inside a file
+  alias flc="flc"
+
+  # this function for the cl alias
+  function flc(){
+    if [[ -f "$1" ]]; then
+      if [ -z "$1" ]; then
+        echo "Please provide a filename"
+      elif [ -z "$2" ]; then
+        c && br;
+        echo -ne " ==> "
+        file "$1";
+        echo -ne " ==> ";
+        wc -l "$1" | awk '{print $1, "lines"}';
+        echo -ne " ==> ";
+        wc -w "$1" | awk '{print $1, "words"}';
+        br;
+      else
+        grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
+      fi
+    elif [[ -d "$1" ]]; then
+      dc "$1";
+    fi
+  }
+
+  # this alias to list
+  alias list="list"
+
+  # this function for list alias
+  function list(){
+    local list_app="eza --icons=always --no-quotes"
+    eval $list_app
+  }
+
+  # this alias to save a file content to another file
+  alias sv="sv"
+
+  # this function for sv alias
+  function sv(){
+    cat "$1" > "$2";
+  }
+
+  kill-line() {
+    if [[ $BUFFER == "" ]]; then
+      zle backward-kill-line
+    else
+      zle kill-whole-line
+    fi
+  }
+
+  zle -N kill-line
+  bindkey "²²" kill-line
+
+  # this alias to clear
+  alias c="clear"
+
+  # this alias to clear but with extra lines
+  alias x="clear && echo -e && echo -e && echo -e && echo -e && echo -e && echo -e"
+
+  # this alias to break a line
+  alias br="br"
+
+  # this function for br alias
+  function br(){
+    if [[ $# -eq 1 ]]; then
+      for ((i=1; i<=$1;i++)); do
+        echo -e;
+      done
+    elif [[ $# -eq 0 ]]; then
+      echo -e;
+    fi
+  }
+
+  # this alias to show the welcome message
+  alias cvi="cvii"
+
+  # here to write a welcome message
+  function cvii(){
+    clear && br 2;
+    echo "H    4    7    1    X" | figlet -t -c;
+    br 2;
+  }
+
+  x;
+
+  # this alias to exit
+  alias q='exit'
+
+  # this alias to give full permission
+  alias all="all"
+
+  # this function for all alias
+  function all(){
+    if [[ $# -eq 0 ]]; then
+      if [[ -d "$1" ]]; then
+        chmod 700 * && cv;
+      elif [[ -f "$1" ]]; then
+        chmod 777 * && cv;
+      fi
+    else
+      if [[ -d "$1" ]]; then
+        chmod 700 "$@" && cv;
+      elif [[ -f "$1" ]]; then
+        chmod 777 "$@" && cv;
+      fi
+    fi
+  }
+
+  #######################################################################
+  ```
+</details>
+
+<hr style="border: 0; height: 1px; background: #21262d;">
+
+<details>
+  <summary><strong> Navigation Aliases</strong></summary>
+
+  ```sh
+  ### Navigation Aliases
+
+  # this alias to have the current view
+  # of working directory content using ls
+  alias cv="cv"
+
+  # this function for cv alias
+  # UPDATED : 01/25/2024
+  # to adjust the title
+  # when we have more than 50 visible items
+  function cv() {
+    local target="$1"
+    local folder_content="${target:-$PWD}"
+    local folder_name=$(basename $folder_content)
+    local visible_item=$(ls $folder_content | wc -l)
+    local total_item=$(ls -A $folder_content | wc -l)
+    local hidden_item=$((total_item - visible_item))
+
+    # this function for the header of cv alias
+    function show_header(){
+      local folder_header
+      if [[ $total_item -eq 0 ]]; then
+        folder_header="Empty(0)";
+        folder_icon=" "
+      elif [[ $hidden_item -eq 0 ]]; then
+        folder_header="total($visible_item)";
+        folder_icon=" "
+      else
+        folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
+        folder_icon=" "
+      fi
+      echo "${BOLD}${WHITE} $folder_icon $folder_name -> $folder_header ${RESET}";
+    }
+
+    # this function to show the content of the cv
+    function show_content(){
+      # local flag="${1:-}"
+      # ls $flag $folder_content;
+      eza --icons=always --no-quotes --group-directories-first $folder_content
+    }
+
+    # this function to show the all of the cv content
+    function show_all(){
+      c && br;
+
+      if [[ $visible_item -lt 30 ]]; then
+        show_header;
+        br;
+        show_content;
+        br;
+      else
+        show_content;
+        br 2;
+        show_header;
+        br;
+      fi
+    }
+    show_all;
+  }
+
+  # this alias to view the current directory content
+  alias cvf="cvf"
+
+  # this function for cvf alias
+  # UPDATED : 01/25/2024
+  # to adjust the title
+  # when we have more than 50 visible items
+  function cvf() {
+    local target="$1"
+    local folder_content="${target:-$PWD}"
+    local folder_name=$(basename $folder_content)
+    local visible_item=$(ls $folder_content | wc -l)
+    local total_item=$(ls -A $folder_content | wc -l)
+    local hidden_item=$((total_item - visible_item))
+
+    # this function for the header of cv alias
+    function show_header(){
+      local folder_header
+      if [[ $total_item -eq 0 ]]; then
+        folder_header="Empty(0)";
+        folder_icon=" "
+      elif [[ $hidden_item -eq 0 ]]; then
+        folder_header="total($visible_item)";
+        folder_icon=" "
+      else
+        folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
+        folder_icon=" "
+      fi
+      echo "${BOLD}${WHITE} $folder_icon $folder_name -> $folder_header ${RESET}";
+    }
+
+    # this function to show the content of the cv
+    function show_content(){
+      eza --icons=always --no-quotes -a --group-directories-first $folder_content;
+    }
+
+    # this function to show the cv
+    function show_all(){
+      c && br;
+
+      if [[ $hidden_item -lt 30 ]]; then
+        show_header;
+        br;
+        show_content;
+        br;
+      else
+        show_content;
+        br 2;
+        show_header;
+        br;
+      fi
+    }
+    show_all;
+  }
+
+  # this alias to view the current directory content
+  # with specifications
+  alias cvg="cvg"
+
+  # this function for cvg alias
+  function cvg(){
+    local folder_name=$(basename $PWD)
+    local item="$1"
+    local matched_items=$(ls -A | grep "$item" | wc -l)
+
+    function show_header(){
+      echo "${BOLD}   $folder_name -> contains $matched_items '$1' ${RESET}";
+    }
+
+    function show_content(){
+      eza --icons=always --color=always -a --group-directories-first | grep "$1";
+    }
+
+    # this function to show the cv
+    function show_all(){
+      c && br;
+
+      if [[ $matched_items -lt 20 ]]; then
+        show_header $1; br;
+        show_content $1; br;
+      else
+        show_content $1; br;
+        show_header $1;
+      fi
+    }
+    show_all $item;
+  }
+
+  # this alias to open a directory
+  alias op="op"
+
+  # this function for op alias
+  function op() {
+    # Check if $1 is a symbolic link
+    if [[ -L "$1" ]]; then
+      # Resolve the real path of the symbolic link
+      real_path=$(readlink -f "$1")
+      # Check if the resolved path is a directory
+      if [[ -d "$real_path" ]]; then
+        if [[ $# -eq 1 ]]; then
+          cd "$real_path" && cv
+        elif [[ $# -eq 2 ]]; then
+          cd "$real_path" && cvg "$2"
+        fi
+      # Check if the resolved path is a file
+      elif [[ -f "$real_path" ]]; then
+        vf "$real_path"
+      fi
+    # If $1 is a directory (but not a symbolic link)
+    elif [[ -d "$1" ]]; then
+      if [[ $# -eq 1 ]]; then
+        cd "$1" && cv
+      elif [[ $# -eq 2 ]]; then
+        cd "$1" && cvg "$2"
+      fi
+    # If $1 is a file (but not a symbolic link)
+    elif [[ -f "$1" ]]; then
+      vf "$1"
+    fi
+  }
+
+  # this alias to create a directory
+  alias dr="dr"
+
+  # this function for dr alias
+  function dr(){
+    mkdir "$@" && cv;
+  }
+
+  # this alias to remove a directory
+  alias rd="rd"
+
+  # this function for rd alias
+  function rd(){
+    rm -r "$@" && cv;
+  }
+
+  # this line to have destination location for copy / cut
+  alias dt="dt"
+
+  # this function for dst alias
+  function dt(){
+    dest="$PWD" && c && echo -e && echo "d e s t   s a v e d" | figlet -t -c && sleep 0.6 && cv;
+  }
+
+  # this alias to open a directory
+  # and make it as destination
+  alias opd="opd"
+
+  # this function for opd alias
+  function opd(){
+    op "$1" && dt && nd;
+  }
+
+  # this alias to create a directory
+  # and then directly enter to it
+  alias opdr="opdr"
+
+  # this function for opdr alias
+  function opdr(){
+    dr "$*" && op "$*";
+  }
+
+  # this alias to go back from a directory
+  alias b="b"
+
+  # this function for b alias
+  function b(){
+    if [[ $# -eq 0 ]]; then
+      cd .. && cv
+    else
+      for ((i=1; i<=$1;i++)); do
+        cd .. && cv
+      done
+    fi
+  }
+
+  # this alias to go to the previous directory
+  alias nd="nd"
+
+  # this function for nd alias
+  function nd(){
+    cd - &>/dev/null;
+    cv;
+  }
 
   #######################################################################
   ```
@@ -1472,7 +2008,16 @@ WSL sections can be skipped for Linux configurations.
       c && br;
       echo "${BOLD}Ssh Server Active [${GREEN}✓${WHITE}]"
       br;
-      local wifi_iface="wifi0"
+
+      local is_wsl=$(grep -qi microsoft /proc/version && echo true || echo false)
+
+      if $is_wsl; then
+       local wifi_iface="wifi0"
+      else
+       # at least it is on kali linux
+       local wifi_iface="wlan0"
+      fi
+
       local wifi_ip=$(ifconfig $wifi_iface | grep inet | awk '{print $2}');
       # echo " Connect Via  ==>  ssh $USER@$ip";
       # check_ngrok="cmd.exe /c 'tasklist | findstr /I "ngrok"'"
@@ -1488,7 +2033,13 @@ WSL sections can be skipped for Linux configurations.
 
   # this function for sshon alias
   function sshon(){
-    sudo /etc/init.d/ssh start &>/dev/null;
+    local is_wsl=$(grep -qi microsoft /proc/version && echo true || echo false)
+
+    if $is_wsl; then
+      sudo /etc/init.d/ssh start &>/dev/null;
+    else
+      svc_on ssh;
+    fi
     sth;
   }
 
@@ -1513,7 +2064,14 @@ WSL sections can be skipped for Linux configurations.
       br;
 
       local eth_iface="eth0"
-      local wifi_iface="wifi0"
+
+      if $is_wsl; then
+        local wifi_iface="wifi0"
+      else
+        # at least it is on kali linux
+        local wifi_iface="wlan0"
+      fi
+      
       local loopback_iface="lo"
       local wlan_ip=$(ifconfig $wifi_iface | grep "inet " | awk '{print $2}');
       local loopback_ip=$(ifconfig $loopback_iface | grep "inet " | awk '{print $2}');
@@ -1673,7 +2231,15 @@ WSL sections can be skipped for Linux configurations.
     # Status
     br;
     local eth_iface="eth0"
-    local wifi_iface="wifi0"
+    local is_wsl=$(grep -qi microsoft /proc/version && echo true || echo false)
+
+    if $is_wsl; then
+      local wifi_iface="wifi0"
+    else
+      # at least it is on kali linux
+      local wifi_iface="wlan0"
+    fi
+
     local loopback_iface="lo"
     local wlan_ip=$(ifconfig $wifi_iface | grep "inet " | awk '{print $2}');
     local loopback_ip=$(ifconfig $loopback_iface | grep "inet " | awk '{print $2}');
@@ -1744,7 +2310,15 @@ WSL sections can be skipped for Linux configurations.
     if sudo service apache2 status &>/dev/null; then
       br;
       local eth_iface="eth0"
-      local wifi_iface="wifi0"
+      local is_wsl=$(grep -qi microsoft /proc/version && echo true || echo false)
+
+      if $is_wsl; then
+        local wifi_iface="wifi0"
+      else
+        # at least it is on kali linux
+        local wifi_iface="wlan0"
+      fi
+
       local loopback_iface="lo"
       local wlan_ip=$(ifconfig $wifi_iface | grep "inet " | awk '{print $2}');
       local loopback_ip=$(ifconfig $loopback_iface | grep "inet " | awk '{print $2}');
@@ -1789,6 +2363,17 @@ WSL sections can be skipped for Linux configurations.
     check_mysql_server
   }
 
+  # this alias to start the sql cli
+  alias rdbp="rdbp"
+
+  # this function for rdbp alias
+  function rdbp(){
+    clear && br 2 && sudo clear;
+    sudo systemctl start psql;
+    sudo mysql -u root;
+    sudo systemctl stop psql;
+  }
+
   # this alias to check sendmail process
   alias mails="allow_sudo && mails"
 
@@ -1820,274 +2405,32 @@ WSL sections can be skipped for Linux configurations.
     mails
   }
 
-  #######################################################################
-  ```
-</details>
+  # this alias to check snmp service
+  alias snmps="snmps"
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
-<details>
-  <summary><strong> Basic Aliases</strong></summary>
-
-  ```sh
-  ### Aliases
-
-  ### Basic Aliases
-
-  # this alias to update the package
-  alias upd="allow_sudo && upd"
-
-  # this function for up alias
-  function upd(){
-    echo "u p d a t i n g .  .  ." | figlet -t -c;
-    br && sudo apt update && br;
+  # this function for snmps alias
+  function snmps(){
+    local name="SNMP Server";
+    local cmd="$(pgrep snmpd)";
+    svc_show_stat $name $cmd;
   }
 
-  # this alia to update the package
-  alias upg="allow_sudo && upg"
+  # this function to start snmpd service
+  alias snmpon="snmpon"
 
-  # this function for up alias
-  function upg(){
-    echo "u p g r a d i n g . . ." | figlet -t -c;
-    br && sudo apt upgrade && br;
+  # this function for snmpon alias
+  function snmpon(){
+    svc_on snmpd;
+    snmps;
   }
 
-  # this alias to install package
-  alias ist="allow_sudo && ist"
+  # this alias to stop the snmp service
+  alias snmpoff="snmpoff"
 
-  # this function for ist alias
-  function ist(){
-    case "${1##*.}" in
-      git)
-        echo "   C l o n i n g .  .  . " | figlet;
-        br && echo "Package =======> "${1%.*}" ";
-        br && git clone "$1" && br;
-        ;;
-      *)
-        echo "   I n s t a l l i n g .  .  . " | figlet;
-        c && br && echo "Package =======> "$1" ";
-        br && sudo apt install "$1" && br;
-        ;;
-    esac
-  }
-
-  # this alias to install package
-  alias rmv="rmv"
-
-  # this function for ist alias
-  function rmv(){
-    case "${1##*.}" in
-      deb)
-        c && echo -e && echo -e && sudo clear && echo -e && echo -e && echo "   r e m o v i n g .  .  . " | figlet | lolcat && echo -e && echo "Package =======> "${1%.*}" " && echo -e && sudo dpkg -r "$1" && echo -e;
-        ;;
-      *)
-        c && echo -e && echo -e && sudo clear && echo -e && echo -e && echo "   r e m o v  i n g .  .  . " | figlet | lolcat && echo -e && echo "Package =======> "$1" " && echo -e && sudo apt remove "$1" && echo -e;
-        ;;
-    esac
-  }
-
-  # this alias to rename a file / directory; and display it after
-  alias nm="nm"
-
-  # this function for cpf alias
-  function nm(){
-    mv "$1" "$2" && cv;
-  }
-
-  # this line to count line inside a file
-  alias cl="linecount"
-
-  # this function for the cl alias
-  function linecount() {
-    if [ -z "$1" ]; then
-        echo "Please provide a filename"
-    elif [ -z "$2" ]; then
-        wc -l "$1" | awk '{print $1, "lines"}'
-    else
-        grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
-    fi
-  };
-
-  # this line to view a command manual
-  alias mn="mn"
-
-  # this function for mn alias
-  function mn(){
-    if [[ $# -eq 1 ]]; then
-      man $1 | less
-    else
-      man $1 | grep $2 | less
-    fi
-  }
-
-  # this alias to view tthe manual entry for a command
-  alias mns="mns"
-
-  # this function for mn alias
-  function mns(){
-    if [[ $(command -v "$1") ]]; then
-      local manual_path=~/NTSOA/manual
-      # here to check if the command exists
-      man "$1" | cat > $manual_path/"$1"_manual.txt;
-      all $manual_path/"$1"_manual.txt;
-      vf $manual_path/"$1"_manual.txt;
-      cv;
-    else
-      cv
-    fi
-  }
-
-  # this alias to enter the manual directory
-  alias mnv="mnv"
-
-  # this function for mnv alias
-  function mnv(){
-    if [[ $# -eq 0 ]]; then
-      op /home/h471x/NTSOA/manual;
-    elif [[ $# -eq 1 ]]; then
-      op /home/h471x/NTSOA/manual "$1";
-    fi
-  }
-
-  # this alias to view the pc state
-  alias pc="c && br 2 && neofetch --source ~/.config/neofetch/htx2.txt"
-
-  # this alias to view the history
-  alias hst="hst"
-
-  # this function for hst alias
-  function hst(){
-    if [[ $# -eq 0 ]]; then
-      history | less && cv
-    else
-      re='^[0-9]+$'
-      # check if the argument is an integrer
-      if [[ $1 =~ $re ]]; then
-        history | tail -$1 | less && cv
-      else  # else if it's a text to grep
-        history | grep "$1" | less && cv
-      fi
-    fi
-  }
-
-  # this alias to specify which command in the history to search
-  alias hsg="hsg"
-
-  # this function for hsg alias
-  function hsg(){
-    if [[ $# -eq 0 ]]; then
-      history | less && cv;
-    else
-      history | grep "$1" | less && cv;
-    fi
-  }
-
-  # this alias to count line and words inside a file
-  alias flc="flc"
-
-  # this function for the cl alias
-  function flc(){
-    if [[ -f "$1" ]]; then
-      if [ -z "$1" ]; then
-        echo "Please provide a filename"
-      elif [ -z "$2" ]; then
-        c && br;
-        echo -ne " ==> "
-        file "$1";
-        echo -ne " ==> ";
-        wc -l "$1" | awk '{print $1, "lines"}';
-        echo -ne " ==> ";
-        wc -w "$1" | awk '{print $1, "words"}';
-        br;
-      else
-        grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
-      fi
-    elif [[ -d "$1" ]]; then
-      dc "$1";
-    fi
-  }
-
-  # this alias to list
-  alias list="list"
-
-  # this function for list alias
-  function list(){
-    local list_app="eza --icons=always --no-quotes"
-    eval $list_app
-  }
-
-  # this alias to save a file content to another file
-  alias sv="sv"
-
-  # this function for sv alias
-  function sv(){
-    cat "$1" > "$2";
-  }
-
-  kill-line() {
-    if [[ $BUFFER == "" ]]; then
-      zle backward-kill-line
-    else
-      zle kill-whole-line
-    fi
-  }
-
-  zle -N kill-line
-  bindkey "²²" kill-line
-
-  # this alias to clear
-  alias c="clear"
-
-  # this alias to clear but with extra lines
-  alias x="clear && echo -e && echo -e && echo -e && echo -e && echo -e && echo -e"
-
-  # this alias to break a line
-  alias br="br"
-
-  # this function for br alias
-  function br(){
-    if [[ $# -eq 1 ]]; then
-      for ((i=1; i<=$1;i++)); do
-        echo -e;
-      done
-    elif [[ $# -eq 0 ]]; then
-      echo -e;
-    fi
-  }
-
-  # this alias to show the welcome message
-  alias cvi="cvii"
-
-  # here to write a welcome message
-  function cvii(){
-    clear && br 2;
-    echo "H    4    7    1    X" | figlet -t -c;
-    br 2;
-  }
-
-  x;
-
-  # this alias to exit
-  alias q='exit'
-
-  # this alias to give full permission
-  alias all="all"
-
-  # this function for all alias
-  function all(){
-    if [[ $# -eq 0 ]]; then
-      if [[ -d "$1" ]]; then
-        chmod 700 * && cv;
-      elif [[ -f "$1" ]]; then
-        chmod 777 * && cv;
-      fi
-    else
-      if [[ -d "$1" ]]; then
-        chmod 700 "$@" && cv;
-      elif [[ -f "$1" ]]; then
-        chmod 777 "$@" && cv;
-      fi
-    fi
+  # this function for snmpoff alias
+  function snmpoff(){
+    svc_off snmpd;
+    snmps;
   }
 
   #######################################################################
@@ -2171,260 +2514,78 @@ WSL sections can be skipped for Linux configurations.
     cv;
   }
 
-  #######################################################################
-  ```
-</details>
+  # this alias to count the number of file/directory
+  # inside a directory
+  alias dc="dc"
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
-<details>
-  <summary><strong> Navigation Aliases</strong></summary>
-
-  ```sh
-  ### Navigation Aliases
-
-  # this alias to have the current view
-  # of working directory content using ls
-  alias cv="cv"
-
-  # this function for cv alias
-  # UPDATED : 01/25/2024
-  # to adjust the title
-  # when we have more than 50 visible items
-  function cv() {
-    local target="$1"
-    local folder_content="${target:-$PWD}"
-    local folder_name=$(basename $folder_content)
-    local visible_item=$(ls $folder_content | wc -l)
-    local total_item=$(ls -A $folder_content | wc -l)
-    local hidden_item=$((total_item - visible_item))
-
-    # this function for the header of cv alias
-    function show_header(){
-      local folder_header
-      if [[ $total_item -eq 0 ]]; then
-        folder_header="Empty(0)";
-        folder_icon=" "
-      elif [[ $hidden_item -eq 0 ]]; then
-        folder_header="total($visible_item)";
-        folder_icon=" "
-      else
-        folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
-        folder_icon=" "
-      fi
-      echo "${BOLD}${WHITE} $folder_icon $folder_name -> $folder_header ${RESET}";
-    }
-
-    # this function to show the content of the cv
-    function show_content(){
-      # local flag="${1:-}"
-      # ls $flag $folder_content;
-      eza --icons=always --no-quotes --group-directories-first $folder_content
-    }
-
-    # this function to show the all of the cv content
-    function show_all(){
-      c && br;
-
-      if [[ $visible_item -lt 30 ]]; then
-        show_header;
-        br;
-        show_content;
-        br;
-      else
-        show_content;
-        br 2;
-        show_header;
-        br;
-      fi
-    }
-    show_all;
-  }
-
-  # this alias to view the current directory content
-  alias cvf="cvf"
-
-  # this function for cvf alias
-  # UPDATED : 01/25/2024
-  # to adjust the title
-  # when we have more than 50 visible items
-  function cvf() {
-    local target="$1"
-    local folder_content="${target:-$PWD}"
-    local folder_name=$(basename $folder_content)
-    local visible_item=$(ls $folder_content | wc -l)
-    local total_item=$(ls -A $folder_content | wc -l)
-    local hidden_item=$((total_item - visible_item))
-
-    # this function for the header of cv alias
-    function show_header(){
-      local folder_header
-      if [[ $total_item -eq 0 ]]; then
-        folder_header="Empty(0)";
-        folder_icon=" "
-      elif [[ $hidden_item -eq 0 ]]; then
-        folder_header="total($visible_item)";
-        folder_icon=" "
-      else
-        folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
-        folder_icon=" "
-      fi
-      echo "${BOLD}${WHITE} $folder_icon $folder_name -> $folder_header ${RESET}";
-    }
-
-    # this function to show the content of the cv
-    function show_content(){
-      eza --icons=always --no-quotes -a --group-directories-first $folder_content;
-    }
-
-    # this function to show the cv
-    function show_all(){
-      c && br;
-
-      if [[ $hidden_item -lt 30 ]]; then
-        show_header;
-        br;
-        show_content;
-        br;
-      else
-        show_content;
-        br 2;
-        show_header;
-        br;
-      fi
-    }
-    show_all;
-  }
-
-  # this alias to view the current directory content
-  # with specifications
-  alias cvg="cvg"
-
-  # this function for cvg alias
-  function cvg(){
-    local folder_name=$(basename $PWD)
-    local item="$1"
-    local matched_items=$(ls -A | grep "$item" | wc -l)
-
-    function show_header(){
-      echo "${BOLD}   $folder_name -> contains $matched_items '$1' ${RESET}";
-    }
-
-    function show_content(){
-      eza --icons=always --color=always -a --group-directories-first | grep "$1";
-    }
-
-    # this function to show the cv
-    function show_all(){
-      c && br;
-
-      if [[ $matched_items -lt 20 ]]; then
-        show_header $1; br;
-        show_content $1; br;
-      else
-        show_content $1; br;
-        show_header $1;
-      fi
-    }
-    show_all $item;
-  }
-
-  # this alias to open a directory
-  alias op="op"
-
-  # this function for op alias
-  function op() {
-    # Check if $1 is a symbolic link
-    if [[ -L "$1" ]]; then
-      # Resolve the real path of the symbolic link
-      real_path=$(readlink -f "$1")
-      # Check if the resolved path is a directory
-      if [[ -d "$real_path" ]]; then
-        if [[ $# -eq 1 ]]; then
-          cd "$real_path" && cv
-        elif [[ $# -eq 2 ]]; then
-          cd "$real_path" && cvg "$2"
-        fi
-      # Check if the resolved path is a file
-      elif [[ -f "$real_path" ]]; then
-        vf "$real_path"
-      fi
-    # If $1 is a directory (but not a symbolic link)
-    elif [[ -d "$1" ]]; then
-      if [[ $# -eq 1 ]]; then
-        cd "$1" && cv
-      elif [[ $# -eq 2 ]]; then
-        cd "$1" && cvg "$2"
-      fi
-    # If $1 is a file (but not a symbolic link)
-    elif [[ -f "$1" ]]; then
-      vf "$1"
-    fi
-  }
-
-  # this alias to create a directory
-  alias dr="dr"
-
-  # this function for dr alias
-  function dr(){
-    mkdir "$@" && cv;
-  }
-
-  # this alias to remove a directory
-  alias rd="rd"
-
-  # this function for rd alias
-  function rd(){
-    rm -r "$@" && cv;
-  }
-
-  # this line to have destination location for copy / cut
-  alias dt="dt"
-
-  # this function for dst alias
-  function dt(){
-    dest="$PWD" && c && echo -e && echo "d e s t   s a v e d" | figlet -t -c && sleep 0.6 && cv;
-  }
-
-  # this alias to open a directory
-  # and make it as destination
-  alias opd="opd"
-
-  # this function for opd alias
-  function opd(){
-    op "$1" && dt && nd;
-  }
-
-  # this alias to create a directory
-  # and then directly enter to it
-  alias opdr="opdr"
-
-  # this function for opdr alias
-  function opdr(){
-    dr "$*" && op "$*";
-  }
-
-  # this alias to go back from a directory
-  alias b="b"
-
-  # this function for b alias
-  function b(){
+  #this function for dc alias
+  function dc(){
     if [[ $# -eq 0 ]]; then
-      cd .. && cv
-    else
-      for ((i=1; i<=$1;i++)); do
-        cd .. && cv
-      done
+      clear;
+      br;
+      case "$(ls -1 | wc -l)" in
+        0)
+          br;
+          echo "There is nothing inside $(basename $PWD)";
+          br;;
+        *)
+          case "$(ls -1 | wc -l)" in
+            1)it="item";;
+            *)it="items";;
+          esac
+          echo "   $(basename $PWD) folder has $(ls -1 | wc -l) $it : ";
+          br;
+          if [[ $(ls -1 | wc -l) -gt 50 ]]; then
+            br;
+          else
+            ls
+          fi
+          br;
+      esac
+    elif [[ $# -eq 1 ]]; then
+      clear;
+      br;
+      case "$(ls -1 $1 | wc -l)" in
+        0)
+          br;
+          echo "There is nothing inside $(basename $1)";
+          br;
+          sleep 1;
+          cv;
+          br;;
+        *)
+          case "$(ls -1 $1 | wc -l)" in
+            1)it="item";;
+            *)it="items";;
+          esac
+          echo "   $(basename $1) folder has $(ls -1 $1 | wc -l) $it : ";
+          br;
+          if [[ $(ls -1 "$1" | wc -l) -gt 50 ]]; then
+            br;
+          else
+            ls "$1";
+          fi
+          br;
+          sleep 1;
+          cv;
+      esac
     fi
   }
 
-  # this alias to go to the previous directory
-  alias nd="nd"
+  # this alias to know the file type
+  alias tp="tp"
 
-  # this function for nd alias
-  function nd(){
-    cd - &>/dev/null;
-    cv;
+  # this function for tp alias
+  function tp(){
+    type=$(ls -ld "$1" | cut -c1)
+    case $type in
+      -) echo "File" ;;
+      d) echo "Directory" ;;
+      b) echo "Block" ;;
+      l) echo "Sym-Link" ;;
+      c) echo "Character" ;;
+      *) echo "Other" ;;
+    esac
   }
 
   #######################################################################
@@ -2512,7 +2673,9 @@ WSL sections can be skipped for Linux configurations.
 
     # local variables
     local shellrc=.$(basename $SHELL)rc;
-    local backup_dir=$HOME/NTSOA/zshrc/wsl;
+    local is_wsl=$(grep -qi microsoft /proc/version && echo true || echo false)
+    local platform=$($is_wsl && echo "wsl" || echo "linux")
+    local backup_dir=$HOME/NTSOA/zshrc/$platform;
     local backup_file=zshrc[$USER];
     local saved_message="$shellrc backed up"
 
@@ -2567,6 +2730,900 @@ WSL sections can be skipped for Linux configurations.
   function ed(){
     # nvim -c "startinsert" "$1" && cv;
     nvim "$1" && cv;
+  }
+
+  #######################################################################
+  ```
+</details>
+
+<hr style="border: 0; height: 1px; background: #21262d;">
+
+<details>
+  <summary><strong> Linux Paths</strong></summary>
+
+  ```sh
+  ### Kali Linux Paths
+
+  # Binary
+  CUPP_PATH=/usr/share/cupp
+  GO_PATH=/usr/local/go/bin
+  HOME_PATH=$HOME/bin
+  SCP_PATH=/usr/bin/scp
+
+  PATH=$CUPP_PATH:$HOME_PATH:$GO_PATH:$SCP_PATH:$PATH
+
+  # here to hide the java options
+  unset _JAVA_OPTIONS
+
+  #######################################################################
+  ```
+</details>
+
+<hr style="border: 0; height: 1px; background: #21262d;">
+
+<details>
+  <summary><strong> Linux Shortcuts Aliases</strong></summary>
+
+  ```sh
+  ### Kali Linux Shortcuts Aliases
+
+  # this alias to view the usb device connected here
+  alias usb="op /media/h471x"
+
+  # this alias to open the shared folder
+  alias sf="op /media/sf_ENI_2023"
+
+  # this alias to view the pc state
+  alias pc="c && br 2 && neofetch --source ~/.config/neofetch/htx2.txt"
+
+  # this alias to go to home directory
+  alias hm="cd && cv"
+
+  # this alias to access / directory
+  alias rt="cd / && cv"
+
+  # this alias to enter the NTSOA directory
+  alias hn="op ~/NTSOA"
+
+  # this alias to go to the download folder
+  alias dwl="op /home/h471x/Downloads"
+
+  # this alias to open the HACK directory
+  alias hack="op /home/h471x/NTSOA/hack"
+
+  # this alias to open the ENI CYBERSECURITY directory
+  alias cs="op /home/h471x/NTSOA/ENI\ CYBERSECURITY"
+
+  # this alias to enter the devops course
+  alias dvps="op /home/h471x/NTSOA/COURSE/DEVOPS/NOTES "
+
+  # this alias to view the aws informations
+  alias awsd="op /home/h471x/NTSOA/COURSE/DEVOPS/AWS "
+
+  # this alias to go to the to desktop
+  alias dtp="op /home/h471x/Desktop"
+
+  # this alias to go to the to dev
+  alias dev="op /home/h471x/NTSOA/dev"
+
+  # this alias to open the windows dev shared folder
+  alias wdev="op /media/sf_DEV"
+
+  # this alias to open the text notes
+  alias nt="op /home/h471x/NTSOA/notes"
+
+  # this alias to open HTX USB
+  alias htx="op /media/h471x/HTX\ USB"
+
+  # this alias to open the shareed folder
+  alias kali="op /media/sf_KALI_LINUX"
+
+  # this alias to open the books shared folder
+  alias books="op /media/sf_BOOKS"
+
+  # this alias to open ENI shared folder
+  alias eni="op /media/sf_0_ENI/ENI\ 2024"
+
+  # this alias to view the pictures folder
+  alias pct="pct"
+
+  # this function for pct alias
+  function pct(){
+    op /home/$USER/Pictures;
+  }
+
+  # this alias to directly go to JPG version of the time schedule
+  alias ej="c && op /home/h471x/NTSOA/EDT\ ENI/JPG/L2\ 2024"
+
+  # this alias to convert pdf to jpg for EDT
+  alias ei="ei"
+
+  # this function for ei alias
+  function ei(){
+    # useful variables
+    local input_pdf="$1"
+    local output_image="$(basename "$input_pdf" .pdf).jpg";
+    local kali_edt_path=/home/h471x/NTSOA/EDT\ ENI/JPG/L2\ 2024;
+    local windows_edt_path=/media/sf_0_ENI/ENI\ 2024/0\ EDT/L2\ 2024
+
+    # convert pdf to jpg using imagemagick convert
+    convert -density 500 "$input_pdf" "$output_image";
+
+    # full access to the files
+    all "$input_pdf";
+    all "$output_image";
+
+    # moving to the right directories
+    cp "$output_image" $windows_edt_path;
+    mv "$output_image" $kali_edt_path;
+
+    # Success message
+    c && br 2;
+    echo "${GREEN}${BOLD} ==> SUCCESS ${WHITE}"
+    br;
+    echo "${BOLD} $input_pdf -> $output_image ${RESET}";
+    br;
+    sleep 3;
+
+    # open the edt list
+    op $windows_edt_path;
+  }
+
+  # this alias to edit the time schedule
+  alias edt="edt"
+
+  # this function for edt alias
+  function edt(){
+    cd /home/h471x/NTSOA/'EDT ENI'/ODS;
+    op "EDT ENI L2 2024.ods"
+    op /home/h471x/NTSOA/'EDT ENI'/PDF;
+  }
+
+  # this alias to view the time schedule
+  alias edt="edtv"
+
+  # this function for edt alias
+  function edtv(){
+    op /home/h471x/NTSOA/'EDT ENI';
+  }
+
+  #######################################################################
+  ```
+</details>
+
+<hr style="border: 0; height: 1px; background: #21262d;">
+
+<details>
+  <summary><strong> Linux Network Aliases</strong></summary>
+
+  ```sh
+  ### Kali Linux Network Aliases
+
+  # this function to switch from ethernet to wireless connection
+  function wf(){
+    c && br 2;
+    sudo clear;
+    br 2;
+    if [ -d /sys/class/net/wlan0 ]; then
+      downnet eth0 && upnet wlan0;
+      echo "w i r e l e s s" | figlet -t -c;
+      tlk "wifi on";
+      br && sleep 1 && cv;
+    else
+      echo "Can't switch to wireless, wlan0 not found";
+      br;
+    fi
+  }
+
+  # this function to bring a connection interface up 
+  function upnet(){
+    sudo ifconfig "$1" up;
+  }
+
+  # this function to bring a connection interface down 
+  function downnet(){
+    sudo ifconfig "$1" down;
+  }
+
+  # this alias to show the network configuration
+  alias ipsh="ipsh"
+
+  # this function for ntsh alias
+  function ipsh(){
+    c && br;
+    echo "  Available IP Adresses : ";
+    br;
+    # ifconfig wlan0;
+    # br;
+    local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
+
+    # Add a conditon to make it view
+    # IP from interface passed as argument
+    if [[ $# -eq 1 ]]; then
+      local iface_ip=$(ifconfig "$1" | grep "inet " | awk '{print $2}');
+      echo " $1 ==> $iface_ip";
+    else
+      if [ -d /sys/class/net/wlan0 ]; then
+        local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
+        echo " wlan0 ==> $wlan_ip";
+        echo " eth0  ==> $eth_ip" && br;
+      else
+        echo " eth0 IP ==> $eth_ip" && br;
+      fi
+    fi
+
+    # ifconfig | awk -F '[ :]+' '/^[a-z]/ {interface=$1} /inet / {print interface " ==> " $3}'
+  }
+
+  # this alias to list the local IP adresses
+  alias ipls="ipls"
+
+  # this function for ipls alias
+  function ipls(){
+    c && br;
+    echo "   Local Devices IP Adresses : ";
+    br;
+    arp -e;
+    br;
+  }
+
+  # this alias to show the network configuration
+  alias ntsh="ntsh"
+
+  # this function for ntsh alias
+  function ntsh(){
+    c && br;
+
+    if [ -d /sys/class/net/wlan0 ]; then
+      echo "      Wireless Network informations : ";
+      if [[ $# -eq 0 ]]; then
+        br;
+        iwconfig wlan0 | grep "Mode" | awk -F ":" '{print $2}' | grep M | awk '{print "wlan0 Mode ==> " $1}';
+        br;
+      elif [[ $# -eq 1 ]]; then
+        br && iwconfig "$1" && br;
+      fi
+    else
+      echo "No Wireless adapter found" && br;
+    fi
+  }
+
+  # this alias to define the type of the wireless adapter
+  alias wtp="wtp"
+
+  # this function for wtp alias
+  function wtp(){
+    if [[ $# -eq 2 ]]; then
+      sudo ip link set "$1" down;
+      sudo iw "$1" set type "$2";
+      sudo ip link set "$1" up;
+    else
+      c && br 2;
+      echo "Invalid Argument" | figlet -t -c;
+      br;
+    fi
+  }
+
+  # this alias to scan wifi
+  alias scn="scn"
+
+  # this function for scn alias
+  function scn(){
+    c && br 2 && sudo clear;
+    wtp wlan0 monitor;
+    br 2;
+    echo "s c a n n  i n g . . ." | figlet -t -c | lolcat;
+    sleep 1;
+    sudo airodump-ng wlan0;
+    wtp wlan0 managed;
+    br;
+  }
+
+  # this function to kill process
+  function kl(){
+    if pgrep -f "$1">/dev/null; then
+      sudo kill $(pgrep "$1");
+    fi
+  }
+
+  # this alias to switch to monitor mode
+  alias mntr="mntr"
+
+  # this function for mntr alias
+  function mntr(){
+    c && br 2;
+    sudo clear;
+
+    if [ -d /sys/class/net/wlan0 ]; then
+      c && br 2 && sudo clear;
+      kl NetworkManager;
+      kl wpa_supplicant;
+      kl dhclient;
+      sudo airmon-ng start wlan0 && c;
+      echo "M o n i t o r" | figlet -t -c;
+      sleep 0.5;
+      br;
+    else
+      br 2;
+      echo "No wireless adapter";
+      br;
+    fi
+  }
+
+  # this alias to set the network adapter to monitor mode
+  # in another way
+  alias rmon="rmon"
+
+  # this function for rmn alias
+  function rmon(){
+    c && br 2 && sudo clear;
+    sudo airmon-ng check wlan0;
+    c;
+    sleep 1;
+    sudo airmon-ng check kill wlan0;
+    c;
+    sleep 1;
+    sudo airmon-ng start wlan0;
+    c;
+    echo "M o n i t o r     M o d e" | figlet -t -c | lolcat;
+    sleep 1;
+    c && br;
+    ntsh;
+  }
+
+  # this alias to switch to managed mode
+  alias mngd="mngd"
+
+  # this function for mngd alias
+  function mngd(){
+    c && br 2 && sudo clear;
+    wtp wlan0 managed;
+    br 2;
+    echo "M a n a g e d     M o d e" | figlet -t -c | lolcat;
+    tlk "managed mode";
+    sleep 0.5;
+    c && br;
+    ntsh;
+  }
+
+  # this alias to restart the network manager after a hack
+  alias rst="allow_sudo && rst"
+
+  # this function for rst alias
+  function rst(){
+    c && br 2;
+    sudo service NetworkManager restart;
+    br 2;
+    echo "N e t     R e s e t" | figlet -t -c;
+    # tlk "network reset";
+    sleep 1;
+    sudo service NetworkManager restart;
+    upnet eth0;
+    #upnet eth1;
+    if [ -d /sys/class/net/wlan0 ]; then
+      upnet wlan0;
+      wtp wlan0 managed;
+      sleep 0.5;
+    fi
+    cv;
+  }
+
+  # this alias to run wifite
+  alias whk="allow_sudo && whk"
+
+  # this function for whk alias
+  function whk(){
+    function hack_wifi(){
+      sudo wifite --kill;
+      br;
+
+      # this function will ask if the
+      # hacking should restart or not
+      function check_quit(){
+        echo -ne " ${BOLD}${WHITE}[${GREEN}?${WHITE}]${WHITE} ${GREEN}Restart ${WHITE}the wifi hacking ? (y/n) ";
+        read wifi
+        if [ "$wifi" = "y" ]; then
+          whk
+        elif [[ "$wifi" = "n" ]]; then
+          echo -ne " ${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Switching to ${GREEN}Managed ${WHITE}Mode  ";
+          downnet eth0 && upnet wlan0;
+          wtp wlan0 managed;
+          echo "${GREEN}  ${WHITE}"
+          echo -ne " ${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Restarting Network Manager "
+          sudo service NetworkManager restart;
+          echo "${GREEN}  ${WHITE}"
+        else
+          check_quit
+        fi
+      }
+      allow_sudo && check_quit
+    }
+
+    if [ -d /sys/class/net/wlan0 ]; then
+      c && br
+      hack_wifi
+    else
+      br
+      echo "  ${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} No ${RED}Wireless Card ${WHITE}Available"
+      br
+    fi
+  }
+
+  # this alias to create a Fake Access Point
+  alias facp="allow_sudo && facp"
+
+  # this function for facp alias
+  function facp(){
+    if [ -d /sys/class/net/wlan0 ]; then
+      sudo systemctl stop NetworkManager
+      sudo systemctl stop wpa_supplicant
+      sudo ifconfig wlan0 down
+      sudo ifconfig wlan0 up
+      sudo airbase-ng --essid "$*" -c 11 wlan0
+    else
+      echo "No wireless adapter found"
+    fi
+
+    function check_quit(){
+      echo -ne " ${BOLD}${WHITE}[${GREEN}?${WHITE}]${WHITE} ${GREEN}Restart ${WHITE}the Fake Acces Point ? (y/n) ";
+      read wifi
+      if [ "$wifi" = "y" ]; then
+        whk
+      elif [[ "$wifi" = "n" ]]; then
+        echo -ne " ${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Switching to ${GREEN}Managed ${WHITE}Mode  ";
+        downnet eth0 && upnet wlan0;
+        wtp wlan0 managed;
+        echo "${GREEN}  ${WHITE}"
+        echo -ne " ${BOLD}${WHITE}[${GREEN}+${WHITE}]${WHITE} Restarting Network Manager "
+        sudo service NetworkManager restart;
+        echo "${GREEN}  ${WHITE}"
+      else
+        check_quit
+      fi
+    }
+    check_quit
+  }
+
+  # function facp(){
+  #   if [ -d /sys/class/net/wlan0 ]; then
+  #     sudo systemctl stop NetworkManager
+  #     sudo systemctl stop wpa_supplicant
+  #     sudo ifconfig wlan0 down
+  #     sudo ifconfig wlan0 up
+  #
+  #     sudo airbase-ng --essid "$*" -c 11 wlan0 &
+  #
+  #     sleep 5  # Wait for airbase-ng to create the at0 interface
+  #
+  #     sudo ifconfig at0 up 10.0.0.1 netmask 255.255.255.0
+  #     sudo dnsmasq -C /etc/dnsmasq.conf -d &
+  #
+  #     echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
+  #     sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+  #     sudo iptables -A FORWARD -i eth0 -o at0 -m state --state RELATED,ESTABLISHED -j ACCEPT
+  #     sudo iptables -A FORWARD -i at0 -o eth0 -j ACCEPT
+  #   else
+  #     echo "No wireless adapter found"
+  #   fi
+  # }
+
+  # this alias to deauth wireless connection
+  alias deauth="deauth"
+
+  # this function for deatuh alias
+  function deauth(){
+    if [[ $# -ge 1 ]]; then
+      if [ -d /sys/class/net/wlan0 ]; then
+        c && br 2 && sudo clear;
+
+        if [[ !$(pgrep NetworkManager) ]]; then
+          sudo systemctl start NetworkManager;
+          wtp wlan0 managed;
+        fi
+
+        kl wpa_supplicant;
+        kl dhclient;
+
+        echo "        D e A u t h" | figlet && br;
+        echo " ==> Target Wi-Fi : '$*' " && br;
+        ssid="$*"
+        bssid=$(nmcli -f BSSID,SSID device wifi list | grep "$ssid" | awk '{print $1}')
+        # bssid=$(sudo iw dev wlan0 scan | grep -B 8 "SSID: $ssid" | awk -F "(" '/^BSS/{print $1}' | tr '[:lower:]' '[:upper:]' | sed 's/BSS //');
+        # here we use the iw dev wlan0 scan to show the wireless networks without using nmcli
+        # the grep -B 8 means it will match the eight's line before the found on the pattern
+        # use grep -A to match lines after the matched one
+        # awk -F "" will set the delimiter between matches and then it will print the first side of the matching pattern 
+        # tr will then convert all the letter to uppercase
+        # the sed 's/BSS //' will replace BSS to nothing
+        # what can I say, today 11/11/2023 I'm becoming more and more good at pattern matching
+        if [ -n "$bssid" ]; then
+          # if [[ -n $(sudo airmon-ng check wlan0) ]]; then
+          #   sudo airmon-ng check kill wlan0;
+          # fi
+          sudo aireplay-ng -0 0 -a "$bssid" wlan0 --ignore-negative-one;
+        else
+          echo "SSID '$ssid' not found";
+          br;
+        fi
+      else
+        echo "No wireless adapter found";
+        br;
+      fi
+    else
+      echo "Please pass the Wi-Fi SSID as the argument";
+    fi
+  }
+
+  # this alias to connect to a wifi via CLI
+  alias wcnt="wcnt"
+
+  # this function for wcnt alias
+  function wcnt(){
+    if [[ $# -eq 1 ]]; then
+      if [ -d /sys/class/net/wlan0 ]; then
+        nmcli device wifi connect "$1";
+      else
+        echo " No wireless adapter found";
+        br;
+      fi
+    elif [[ $# -eq 2 ]]; then
+      if [ -d /sys/class/net/wlan0 ]; then
+        nmcli device wifi connect "$1" password "$2";
+      else
+        echo " No wireless adapter found";
+        br;
+      fi
+    else
+      echo "Please pass the Wi-Fi SSID as argument";
+    fi
+  }
+
+  # this alias to list all the wifi nearby
+  alias wls="allow_sudo && wls"
+
+  # this function for wls alias
+  function wls(){
+    if [ -d /sys/class/net/wlan0 ]; then
+      downnet eth0 && upnet wlan0;
+      c && br 2;
+      echo " Wi-Fi connections nearby : " && br;
+      nmcli device wifi list
+      # nmcli -f SSID,BSSID,SECURITY,CHAN,SIGNAL,BARS,RATE,MODE device wifi list
+      # nmcli -f SSID,SECURITY,CHAN,SIGNAL,BARS,RATE,MODE device wifi list
+      # wait;
+      br;
+    else
+      c && br 2;
+      echo "No wireless adapter";
+      br;
+    fi
+  }
+
+  # this function to check saved wifi network
+  function wchk(){
+    # Get the saved Wi-Fi connections
+    nmcli connection show | grep -q "$1" && echo "$1 found" || echo "$1 not found"
+    # We have a cool ternary expression here :D
+  }
+
+  # this alias to run airgeddon
+  alias rhk="allow_sudo && rhk"
+
+  # this function for rhk alias
+  function rhk(){
+    sudo airgeddon
+  }
+
+  # this alias to run the cupp command
+  alias cupp="cupp"
+
+  # this function for cupp alias
+  function cupp(){
+    c && br;
+    if [[ $# -eq 0 ]]; then
+      cupp.py -i;
+    elif [[ $# -gt 0 ]]; then
+      cupp.py $@;
+    fi
+  }
+
+  # this alias to ping a network
+  alias reach="allow_sudo && reach"
+
+  #this function to check if pfsense is reachable
+  # coded 01/29/2024
+  function reach(){
+    local target_IP="$1"
+    local check_message="Checking $target_IP reachability..."
+    local check_IP="sudo ping -c 1 -W 5 "
+    local reachable="c && br && echo ' $check_message' && eval $check_IP $target_IP &> /dev/null;"
+    # the -c 1 means we send one packet to test it
+    # the -W 5 means if the ping have 5 seconds to check
+    # as always we run it in background in order to
+    # not see all the boring logs messages
+
+    if eval $reachable ;then
+      #if PfSense is reachable then
+      #we execute the next command after
+      #this function calling
+      # eval "$@"
+      echo " $target_IP is reachable"
+    else;
+      echo " $target_IP is not reachable"
+    fi
+  }
+
+  #######################################################################
+  ```
+</details>
+
+<hr style="border: 0; height: 1px; background: #21262d;">
+
+<details>
+  <summary><strong> Linux Programs Aliases</strong></summary>
+
+  ```sh
+  ### Kali Linux Programs Aliases
+
+  # this alias to run an executable file or a script
+  alias rn="rn"
+
+  # this function for rn alias
+  function rn(){
+    #this will look for the extension of the file
+    case "${1##*.}" in
+      class)
+        java "$1";;
+      py)
+        if [[ $# -eq 1 ]]; then
+          # all "$1";
+          # c && br;
+          python3 "$1";
+          return 0;
+          # br;
+        elif [[ $# -gt 1 ]]; then
+          all "$1";
+          c && br;
+          python3 "$1" "$@";
+          return 0;
+          br;
+        fi
+      ;;
+      c || cpp) # update 07/28/2023
+        file="$1";
+        out="${file%.*}"
+
+        # Condition 1: Check if the file extension is c
+        extension='[[ "${file##*.}" == "c" ]]';
+
+        # Condition 2: Check if the file contains math library
+        math='grep -E "^#include <math.h>" "$file" >/dev/null';
+
+        # Ternary expressions to determine compiler and flags
+        compiler=$(eval "$extension" && echo "gcc" || echo "g++");
+        flags=$(eval "$math" && echo "-lm" || echo "");
+
+        # check if an old executable exists
+        if [[ -f "$out" ]]; then
+          dlf "$out";
+        fi
+
+        # Compile the C file
+        "$compiler" "$file" -o "$out" $flags;
+
+        # Execute the resulting executable
+        all "$out";
+        clear && br;
+        ./"$out";
+        br;;
+      html)
+        google-chrome "$1" && cv;;
+      asm)
+        nasm -felf64 "$1"
+        ld ${1%.*}.o -o ${1%.*}
+        ./${1%.*}
+        ;;
+      *)
+        all "$1" && c && ./"$1";;
+  esac
+  }
+
+  # this alias to run an executable file or a script
+  alias rns="allow_sudo && rns"
+
+  # this function for rn alias
+  function rns(){
+    #this will look for the extension of the file
+    case "${1##*.}" in
+      py)
+        if [[ $# -eq 1 ]]; then
+          # all "$1";
+          # c && br;
+          python3 "$1";
+          return 0;
+          # br;
+        elif [[ $# -gt 1 ]]; then
+          all "$1";
+          c && br;
+          python3 "$1" "$@";
+          return 0;
+          br;
+        fi
+      ;;
+      c || cpp) # update 07/28/2023
+        file="$1";
+        out="${file%.*}"
+
+        # Condition 1: Check if the file extension is c
+        extension='[[ "${file##*.}" == "c" ]]';
+
+        # Condition 2: Check if the file contains math library
+        math='grep -E "^#include <math.h>" "$file" >/dev/null';
+
+        # Ternary expressions to determine compiler and flags
+        compiler=$(eval "$extension" && echo "gcc" || echo "g++");
+        flags=$(eval "$math" && echo "-lm" || echo "");
+
+        # check if an old executable exists
+        if [[ -f "$out" ]]; then
+          dlf "$out";
+        fi
+
+        # Compile the C file
+        "$compiler" "$file" -o "$out" $flags;
+
+        # Execute the resulting executable
+        all "$out";
+        clear && br;
+        ./"$out";
+        br;;
+      html)
+        google-chrome "$1" && cv;;
+      asm)
+        nasm -felf64 "$1"
+        ld ${1%.*}.o -o ${1%.*}
+        ./${1%.*}
+        ;;
+      *)
+        all "$1" && c && sudo ./"$1";;
+  esac
+  }
+
+  # this alias to make the pc talk
+  alias tlk="espeak -v en+m3 -s 150" 
+  # -v en+m3 -s 150" ==> those are optional
+
+  # this function for tlk alias
+  function tlk1(){
+    espeak "$1" && cv;
+  }
+
+  # this alias to serve files via the Php server
+  alias srv="srv"
+
+  # this function for srv alia
+  function srv(){
+    php -S 127.0.0.1:50000;
+    google-chrome 127.0.0.1:50000/"$1";
+  }
+
+  # alias to view inside a file
+  alias vf="vf"
+
+  # function for vf alias
+  # update 09/14/2023
+  function vf() {
+    local file="$1"
+    local extension="${file##*.}"
+
+    case "$extension" in
+      mcd)
+        cmd="katyushamcd";;
+      *)
+        cmd="xdg-open";;
+    esac
+
+    "$cmd" "$file" && cv
+  }
+
+  # this alias to view binary file
+  alias vfb="vfb"
+
+  # this function for vfb alias
+  function vfb(){
+    od -t x1 -A n "$1";
+  }
+
+  # this alias to copy files
+  alias cpf="cpf"
+
+  # this function for cpf alias
+  function cpf(){
+    local copy_target=${2:-$dest}
+    cp -r "$@" "$copy_target" && op "$copy_target";
+  }
+
+  function cpf2() {
+    cp "${@:1:$#-1}" "${@:$#}";
+  }
+
+  # this alias to copy the content of a file
+  alias cnf="cnf"
+
+  # this function for cnf alias
+  function cnf(){
+    cat "$1" > "$2" && dlf "$1" && all "$2";
+  }
+
+  # this alias to locate packages
+  alias lc="lc"
+
+  # this function for lc alias
+  function lc(){
+    locate "$1" | less && cv;
+  }
+
+  # this alias for ngrok
+  alias ngrok="ngrok"
+
+  # this function for ngrok alias
+  # IMPROVED: 05-30-2024 14:12
+  function ngrok() {
+    # get the ngrok arguments
+    local ngrok_args="$@"
+
+    # check for dashes then do not
+    # redirect to another terminal
+    for arg in "$@"; do
+      if [[ "$arg" == *-* ]]; then
+        command ngrok "$@"
+        return
+      fi
+    done
+
+    (setsid qterminal -e bash -c "ngrok $ngrok_args" >/dev/null 2>&1 &)
+  }
+
+  # this alias to view the irc sever status
+  alias irth="irth"
+
+  # this function for irth alias
+  function irth(){
+    c && br 2 && sudo clear;
+    echo "    irc server status : ";
+    br;
+    sudo service inspircd status ;
+    br;
+  }
+
+  # this alias to start the irc server
+  alias ircon="ircon"
+
+  # this function for ircon alias
+  function ircon(){
+    clear && br 2 && sudo clear;
+    sudo service inspircd start;
+    irth;
+  }
+
+  # this alias to restart the irc server
+  alias ircrst="ircrst"
+
+  # this function for ircrst alias
+  function ircrst(){
+    clear && br 2 && sudo clear;
+    sudo service inspircd restart;
+    irth;
+  }
+
+  # this alias to stop the irc server
+  alias ircoff="ircoff"
+
+  # this function for ircoff alias
+  function ircoff(){
+    clear && br 2 && sudo clear;
+    sudo service inspircd stop;
+    irth;
   }
 
   #######################################################################
@@ -3942,7 +4999,7 @@ WSL sections can be skipped for Linux configurations.
       py)
         # all "$1" && c && echo -e && py "$1" && echo -e;;
         python "$@" && return 0;;
-      c || cpp) #update 07/28/2023
+      c || cpp) # update 07/28/2023
         file="$1";
         out="${file%.*}"
 

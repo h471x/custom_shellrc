@@ -1734,7 +1734,78 @@ function mailoff(){
 
 #######################################################################
 
-### Aliases
+### File Aliases
+
+# this alias to create a file
+alias tf="tf"
+
+# this function for tf alias
+function tf(){
+  touch "$@" && all "$@" && cv;
+}
+
+# this alias to delete file
+alias dlf="dlf"
+
+# this function for dlf alias
+function dlf(){
+  rm "$@" && cv;
+}
+
+# this alias to copy a file then display it
+alias cpf="cpf"
+
+# this function for cpf alias
+function cpf(){
+  if [[ $# -eq 2 ]]; then
+    if [[ -d "$1" ]]; then #here to check if the first argument is a directory
+      cp -r "$1" "$2" && op "$2" && all "$1";
+    else
+      cp "$1" "$2" && op "$2" && all "$1";
+    fi
+  elif [[ $# -eq 1 ]]; then
+    if [[ -d "$1" ]]; then #here to check if the first argument is a directory
+      cp -r "$1" "$dest" && op "$dest" && all "$1";
+    else
+      cp "$@" "$dest" && op "$dest" && all "$@";
+    fi
+  fi
+}
+
+# this alias to copy the content of a file
+alias cnf="cnf"
+
+# this function for cnf alias
+function cnf(){
+  cat "$1" > "$2" && dlf "$1" && all "$2";
+}
+
+# this alias to copy a file then display it
+alias mvf="mvf"
+
+# this function for cpf alias
+function mvf(){
+  if [[ $# -eq 2 ]]; then
+    mv "$1" "$2" && op "$2";
+  elif [[ $# -eq 1 ]]; then
+    mv $@ $dest && op $dest;
+    # if there is only one argument,
+    # it will move the file / directory
+    # to the the variable
+    # dest defined in dt alias
+  fi
+}
+
+# this alias to force delete
+alias rdf="allow_sudo && rdf"
+
+# this function for rdf alias
+function rdf(){
+  sudo rm -rfv "$@";
+  cv;
+}
+
+#######################################################################
 
 ### Basic Aliases
 
@@ -1992,79 +2063,6 @@ function all(){
       chmod 777 "$@" && cv;
     fi
   fi
-}
-
-#######################################################################
-
-### File Aliases
-
-# this alias to create a file
-alias tf="tf"
-
-# this function for tf alias
-function tf(){
-  touch "$@" && all "$@" && cv;
-}
-
-# this alias to delete file
-alias dlf="dlf"
-
-# this function for dlf alias
-function dlf(){
-  rm "$@" && cv;
-}
-
-# this alias to copy a file then display it
-alias cpf="cpf"
-
-# this function for cpf alias
-function cpf(){
-  if [[ $# -eq 2 ]]; then
-    if [[ -d "$1" ]]; then #here to check if the first argument is a directory
-      cp -r "$1" "$2" && op "$2" && all "$1";
-    else
-      cp "$1" "$2" && op "$2" && all "$1";
-    fi
-  elif [[ $# -eq 1 ]]; then
-    if [[ -d "$1" ]]; then #here to check if the first argument is a directory
-      cp -r "$1" "$dest" && op "$dest" && all "$1";
-    else
-      cp "$@" "$dest" && op "$dest" && all "$@";
-    fi
-  fi
-}
-
-# this alias to copy the content of a file
-alias cnf="cnf"
-
-# this function for cnf alias
-function cnf(){
-  cat "$1" > "$2" && dlf "$1" && all "$2";
-}
-
-# this alias to copy a file then display it
-alias mvf="mvf"
-
-# this function for cpf alias
-function mvf(){
-  if [[ $# -eq 2 ]]; then
-    mv "$1" "$2" && op "$2";
-  elif [[ $# -eq 1 ]]; then
-    mv $@ $dest && op $dest;
-    # if there is only one argument,
-    # it will move the file / directory
-    # to the the variable
-    # dest defined in dt alias
-  fi
-}
-
-# this alias to force delete
-alias rdf="allow_sudo && rdf"
-
-# this function for rdf alias
-function rdf(){
-  sudo rm -rfv "$@";
-  cv;
 }
 
 #######################################################################
