@@ -7,7 +7,7 @@ WSL sections can be skipped for Linux configurations.
 
 <hr style="border: 0; height: 1px; background: #21262d;">
 
-<details>
+<details open>
   <summary><strong> Prerequisites</strong></summary>
 
   - **Packages** : ``eza`` ``figlet`` ``git`` ``gh`` ``tmux`` ``neofetch``
@@ -4968,6 +4968,8 @@ WSL sections can be skipped for Linux configurations.
     # stop apache server
     sudo service apache2 stop &>/dev/null;
   }
+
+  #######################################################################
   ```
 </details>
 
