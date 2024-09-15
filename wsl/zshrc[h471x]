@@ -12,6 +12,20 @@ typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet
 
 #######################################################################
 
+### ZSH Basic Config
+
+set autocd         # change directory just by typing his name
+setopt promptsubst # enable command substitution in prompt
+
+# configure keybindings
+bindkey -e # emacs keybindings
+bindkey ' ' magic-space # do history expansion on space
+
+# Uncomment the following line to use case-sensitive completion.
+CASE_SENSITIVE="true"
+
+#######################################################################
+
 ### oh-my-zsh Config
 
 # Path to oh-my-zsh installation.
@@ -64,21 +78,6 @@ ZSH_HIGHLIGHT_STYLES[command-substitution-delimiter]='fg=#d30ccf,bold'
 source $ZSH/oh-my-zsh.sh
 
 #######################################################################
-
-### ZSH Basic Config
-
-set autocd         # change directory just by typing his name
-setopt promptsubst # enable command substitution in prompt
-
-# configure keybindings
-bindkey -e # emacs keybindings
-bindkey ' ' magic-space # do history expansion on space
-
-# Uncomment the following line to use case-sensitive completion.
-CASE_SENSITIVE="true"
-
-#######################################################################
-
 
 ### Tmux Config
 
@@ -146,7 +145,7 @@ QUESTION_MARK="$(printf '\xE2\x9D\x93')"
 
 #######################################################################
 
-### Sudo Alias
+### Sudo Aliases
 
 # this alias to give sudo
 # access before command execution
@@ -166,434 +165,51 @@ function allow_sudo(){
   fi
 }
 
-#######################################################################
+# this alias to simulate the sudo behaviour
+alias hndo="hndo"
 
-### Aliases
+# this function for hndo alias
+function hndo(){
+  local attempts=3
+  local attempts_num=$(echo $attempts)
+  local expected_hashed_password="5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
+  # this is "password" hashed
+  # use this command : echo -n password | sha256sum | awk '{print $1}'
 
-### Basic Aliases
+  c && br 2
 
-kill-line() {
-  if [[ $BUFFER == "" ]]; then
-    zle backward-kill-line
-  else
-    zle kill-whole-line
-  fi
-}
+  while [ $attempts -gt 0 ]; do
+    echo -ne "Your Password, Sir : "
+    read -s password
 
-zle -N kill-line
-bindkey "²²" kill-line
+    # Hash the entered password
+    hashed_input=$(echo -n "$password" | sha256sum | awk '{print $1}')
 
-# this alias to clear
-alias c="clear"
-
-# this alias to clear but with extra lines
-alias x="clear && echo -e && echo -e && echo -e && echo -e && echo -e && echo -e"
-
-# this alias to break a line
-alias br="br"
-
-# this function for br alias
-function br(){
-  if [[ $# -eq 1 ]]; then
-    for ((i=1; i<=$1;i++)); do
-      echo -e;
-    done
-  elif [[ $# -eq 0 ]]; then
-    echo -e;
-  fi
-}
-
-# this alias to show the welcome message
-alias cvi="cvii"
-
-# here to write a welcome message
-function cvii(){
-  clear && br 2;
-  echo "H    4    7    1    X" | figlet -t -c;
-  br 2;
-}
-
-x;
-
-# this alias to exit
-alias q='exit'
-
-# this alias to give full permission
-alias all="all"
-
-# this function for all alias
-function all(){
-  if [[ $# -eq 0 ]]; then
-    if [[ -d "$1" ]]; then
-      chmod 700 * && cv;
-    elif [[ -f "$1" ]]; then
-      chmod 777 * && cv;
-    fi
-  else
-    if [[ -d "$1" ]]; then
-      chmod 700 "$@" && cv;
-    elif [[ -f "$1" ]]; then
-      chmod 777 "$@" && cv;
-    fi
-  fi
-}
-
-#######################################################################
-
-### Navigation Aliases
-
-# this alias to have the current view
-# of working directory content using ls
-alias cv="cv"
-
-# this function for cv alias
-# UPDATED : 01/25/2024
-# to adjust the title
-# when we have more than 50 visible items
-function cv() {
-  local target="$1"
-  local folder_content="${target:-$PWD}"
-  local folder_name=$(basename $folder_content)
-  local visible_item=$(ls $folder_content | wc -l)
-  local total_item=$(ls -A $folder_content | wc -l)
-  local hidden_item=$((total_item - visible_item))
-
-  # this function for the header of cv alias
-  function show_header(){
-    local folder_header
-    if [[ $total_item -eq 0 ]]; then
-      folder_header="Empty(0)";
-      folder_icon=" "
-    elif [[ $hidden_item -eq 0 ]]; then
-      folder_header="total($visible_item)";
-      folder_icon=" "
+    if [ "$hashed_input" = "$expected_hashed_password" ]; then
+      c && br
+      eval "$@"
+      return
     else
-      folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
-      folder_icon=" "
-    fi
-    echo "${BOLD}${WHITE} $folder_icon $folder_name -> $folder_header ${RESET}";
-  }
-
-  # this function to show the content of the cv
-  function show_content(){
-    # local flag="${1:-}"
-    # ls $flag $folder_content;
-    eza --icons=always --no-quotes --group-directories-first $folder_content
-  }
-
-  # this function to show the all of the cv content
-  function show_all(){
-    c && br;
-
-    if [[ $visible_item -lt 30 ]]; then
-      show_header;
-      br;
-      show_content;
-      br;
-    else
-      show_content;
-      br 2;
-      show_header;
-      br;
-    fi
-  }
-  show_all;
-}
-
-# this alias to view the current directory content
-alias cvf="cvf"
-
-# this function for cvf alias
-# UPDATED : 01/25/2024
-# to adjust the title
-# when we have more than 50 visible items
-function cvf() {
-  local target="$1"
-  local folder_content="${target:-$PWD}"
-  local folder_name=$(basename $folder_content)
-  local visible_item=$(ls $folder_content | wc -l)
-  local total_item=$(ls -A $folder_content | wc -l)
-  local hidden_item=$((total_item - visible_item))
-
-  # this function for the header of cv alias
-  function show_header(){
-    local folder_header
-    if [[ $total_item -eq 0 ]]; then
-      folder_header="Empty(0)";
-      folder_icon=" "
-    elif [[ $hidden_item -eq 0 ]]; then
-      folder_header="total($visible_item)";
-      folder_icon=" "
-    else
-      folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
-      folder_icon=" "
-    fi
-    echo "${BOLD}${WHITE} $folder_icon $folder_name -> $folder_header ${RESET}";
-  }
-
-  # this function to show the content of the cv
-  function show_content(){
-    eza --icons=always --no-quotes -a --group-directories-first $folder_content;
-  }
-
-  # this function to show the cv
-  function show_all(){
-    c && br;
-
-    if [[ $hidden_item -lt 30 ]]; then
-      show_header;
-      br;
-      show_content;
-      br;
-    else
-      show_content;
-      br 2;
-      show_header;
-      br;
-    fi
-  }
-  show_all;
-}
-
-# this alias to view the current directory content
-# with specifications
-alias cvg="cvg"
-
-# this function for cvg alias
-function cvg(){
-  local folder_name=$(basename $PWD)
-  local item="$1"
-  local matched_items=$(ls -A | grep "$item" | wc -l)
-
-  function show_header(){
-    echo "${BOLD}   $folder_name -> contains $matched_items '$1' ${RESET}";
-  }
-
-  function show_content(){
-    eza --icons=always --color=always -a --group-directories-first | grep "$1";
-  }
-
-  # this function to show the cv
-  function show_all(){
-    c && br;
-
-    if [[ $matched_items -lt 20 ]]; then
-      show_header $1; br;
-      show_content $1; br;
-    else
-      show_content $1; br;
-      show_header $1;
-    fi
-  }
-  show_all $item;
-}
-
-# this alias to open a directory
-alias op="op"
-
-# this function for op alias
-function op() {
-  # Check if $1 is a symbolic link
-  if [[ -L "$1" ]]; then
-    # Resolve the real path of the symbolic link
-    real_path=$(readlink -f "$1")
-    # Check if the resolved path is a directory
-    if [[ -d "$real_path" ]]; then
-      if [[ $# -eq 1 ]]; then
-        cd "$real_path" && cv
-      elif [[ $# -eq 2 ]]; then
-        cd "$real_path" && cvg "$2"
+      attempts=$((attempts - 1))
+      br
+      echo -n "Wrong, Try Again"
+      br
+      if [ $attempts -gt 0 ]; then
+        continue
+      else
+        echo "hndo: $attempts_num incorrect password attempts"
+        return 1
       fi
-    # Check if the resolved path is a file
-    elif [[ -f "$real_path" ]]; then
-      vf "$real_path"
     fi
-  # If $1 is a directory (but not a symbolic link)
-  elif [[ -d "$1" ]]; then
-    if [[ $# -eq 1 ]]; then
-      cd "$1" && cv
-    elif [[ $# -eq 2 ]]; then
-      cd "$1" && cvg "$2"
-    fi
-  # If $1 is a file (but not a symbolic link)
-  elif [[ -f "$1" ]]; then
-    vf "$1"
-  fi
+  done
 }
 
-# this alias to create a directory
-alias dr="dr"
+# this alias to switch to root
+alias ad="ad"
 
-# this function for dr alias
-function dr(){
-  mkdir "$@" && cv;
-}
-
-# this alias to remove a directory
-alias rd="rd"
-
-# this function for rd alias
-function rd(){
-  rm -r "$@" && cv;
-}
-
-# this line to have destination location for copy / cut
-alias dt="dt"
-
-# this function for dst alias
-function dt(){
-  dest="$PWD" && c && echo -e && echo "d e s t   s a v e d" | figlet -t -c && sleep 0.6 && cv;
-}
-
-# this alias to open a directory
-# and make it as destination
-alias opd="opd"
-
-# this function for opd alias
-function opd(){
-  op "$1" && dt && nd;
-}
-
-# this alias to create a directory
-# and then directly enter to it
-alias opdr="opdr"
-
-# this function for opdr alias
-function opdr(){
-  dr "$*" && op "$*";
-}
-
-# this alias to go back from a directory
-alias b="b"
-
-# this function for b alias
-function b(){
-  if [[ $# -eq 0 ]]; then
-    cd .. && cv
-  else
-    for ((i=1; i<=$1;i++)); do
-      cd .. && cv
-    done
-  fi
-}
-
-# this alias to go to the previous directory
-alias nd="nd"
-
-# this function for nd alias
-function nd(){
-	cd - &>/dev/null;
-  cv;
-}
-
-#######################################################################
-
-### Explorer Alias
-
-# this alias to open the current
-# directory inside windows explorer
-# or bu the default explorer on Linux
-alias exop="exop"
-
-# this function for exop alias
-function exop() {
-  [ $# -eq 1 ] && cd "$1"
-
-  # check WSL
-  local is_wsl=$(
-    grep -qi microsoft /proc/version && echo true || echo false
-  )
-
-  if $is_wsl; then
-    explorer.exe .
-  else
-    xdg-open .
-  fi
-  cv
-}
-
-#######################################################################
-
-### Custom command not found
-
-# Printing command not found when it is the case
-command_not_found_handler() {
-  local command=$1
-  local command_found=0
-
-  # Check if the command is found in the .zshrc file
-  if grep -q -E "^alias $command=" "$HOME/.zshrc" ; then
-    command_found=1
-  fi
-
-  if [[ $command_found -eq 0 ]]; then
-    echo " ${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Command Not Found"
-  fi
-}
-
-#######################################################################
-
-### $SHELLrc Aliases
-
-# this alias to edit $SHELLrc
-alias ct="nvim ~/.zshrc"
-
-# this alias to reload the zshrc file
-alias rld="rld"
-
-# this function for rld alias
-function rld(){
-  c;
-
-  # local variables
-  local shellrc=.$(basename $SHELL)rc;
-  local backup_dir=$HOME/NTSOA/zshrc/wsl;
-  local backup_file=zshrc[$USER];
-  local saved_message="$shellrc backed up"
-
-  # source the config file and save it
-  source ~/$shellrc;
-  cat ~/$shellrc > $backup_dir/$backup_file;
-
-  # saved message display
-  c && br;
-  echo "${BOLD}${WHITE}$saved_message";
-  br && sleep 0.5;
-  op $backup_dir;
-}
-
-#######################################################################
-
-### Neovim Aliases
-
-# this alias to open the current directory inside neovim
-alias nvm="nvm"
-
-# this function for nvm aliases
-# if we have one argument then nvim will be launched with it,
-# otherwise open the current directory if there is no argument
-function nvm(){
-  nvim "${1:-.}";
-}
-
-# this alias to call neovim in a cooler way
-alias hnvim="nvim"
-
-# this alias to open nvim as root
-alias nvmr="allow_sudo && nvmr"
-
-# this function for nvmr alias
-function nvmr(){
-  sudo nvim "${1:-.}";
-}
-
-# this alias to edit a file
-alias ed="ed"
-
-# this function for ed alias
-function ed(){
-  # nvim -c "startinsert" "$1" && cv;
-  nvim "$1" && cv;
+# this function for ad alias
+function ad(){
+	c && echo -e && echo -e && sudo su && cv;
 }
 
 #######################################################################
@@ -1710,856 +1326,7 @@ function ghcls(){
 
 #######################################################################
 
-# this line to count line and words inside a file
-alias flc="flc"
-
-# this function for the cl alias
-function flc(){
-  if [[ -f "$1" ]]; then
-    if [ -z "$1" ]; then
-      echo "Please provide a filename"
-    elif [ -z "$2" ]; then
-      c && br;
-      echo -ne " ==> "
-      file "$1";
-      echo -ne " ==> ";
-      wc -l "$1" | awk '{print $1, "lines"}';
-      echo -ne " ==> ";
-      wc -w "$1" | awk '{print $1, "words"}';
-      br;
-    else
-      grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
-    fi
-  elif [[ -d "$1" ]]; then
-    dc "$1";
-  fi
-}
-
-# this alias to list
-alias list="list"
-
-# this function for list alias
-function list(){
-  local list_app="eza --icons=always --no-quotes"
-  eval $list_app
-}
-
-# this alias to save a file content to another file
-alias sv="sv"
-
-# this function for sv alias
-function sv(){
-  cat "$1" > "$2";
-}
-
-# this alias to open FL Studio
-alias fl="fl"
-
-# this function for fl alias
-function fl(){
-  cd /mnt/d/NTSOA/INSTALLED/FL\ STUDIO\ 12
-  cmd.exe /c start FL64.exe
-  cd - &>/dev/null;
-}
-
-# this alias to open apple music
-alias music="music"
-
-# this function for music alias
-function music(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start AppleMusic.exe
-  else
-    cd /mnt/c
-    cmd.exe /c start AppleMusic.exe
-    cd - &>/dev/null;
-  fi
-}
-
-# this alias to launch xampp
-alias xampp="xampp"
-
-# this function for xampp alias
-function xampp(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start xampp-control.exe
-  else
-    cd /mnt/c
-    cmd.exe /c start xampp-control.exe
-    cd - &>/dev/null;
-  fi
-}
-
-# this alias to open notepad
-alias ntp="ntp"
-
-# this function for ntp alias
-function ntp(){
-  if [[ $# -eq 0 ]]; then
-    cmd.exe /c start notepad.exe 2>/dev/null
-  elif [[ $# -eq 1 ]]; then
-    local formatted_path=$(wslpath -w .)
-    cmd.exe /c start notepad.exe "$formatted_path\\$1" 2>/dev/null
-  else
-    echo "${BOLD} ■■▶ Usage : ntp file_to_open" && br;
-  fi
-}
-
-# this alias to open VirtualBox
-alias vm="vm"
-
-# this function for vm alias
-function vm(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start VirtualBox.exe
-  else
-    cd /mnt/c
-    cmd.exe /c start VirtualBox.exe
-    cd - &>/dev/null;
-  fi
-}
-
-# this alias to launch ventoy
-alias ventoy="ventoy"
-
-# this function for ventoy alias
-function ventoy(){
-  cd "/mnt/d/NTSOA/INSTALLED/VENTOY/ventoy-1.0.99"
-  explorer.exe Ventoy2Disk.exe
-  cd -&>/dev/null
-}
-
-# this alias to open wireshark
-alias wsh="wsh"
-
-# this alias for wsh alias
-function wsh(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start wireshark.exe
-  else
-    cd /mnt/c
-    cmd.exe /c start wireshark.exe
-    cd - &>/dev/null;
-  fi
-}
-
-# this alias to open total commander
-alias tcmd="TOTALCMD64.exe && cv"
-
-# this alias to launch windows python
-alias python="python.exe"
-
-# this alias to launch windows go
-alias go="go"
-
-# this function for go alias
-function go(){
-  # check if we are inside wsl directory
-  # or inside a symbolic link
-  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
-    cmd.exe /c go $@
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
-  fi
-}
-
-# this alias to run rustc
-alias rustc="rustc"
-
-# this function for rustc alias
-function rustc(){
-  # check if we are inside wsl directory
-  # or inside a symbolic link
-  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
-    cmd.exe /c rustc $@
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
-  fi
-}
-
-# this alias to run cargo
-alias cargo="cargo"
-
-# this function for cargo alias
-function cargo(){
-  # check if we are inside wsl directory
-  # or inside a symbolic link
-  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
-    cmd.exe /c cargo $@
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
-  fi
-}
-
-# this alias to launch windows java
-alias java="java.exe"
-
-# this alias to launch javac windows
-alias javac="javac.exe"
-
-# this alias to launch jar windows
-alias jar="jar.exe"
-
-# Alias to call the windows pip
-alias pip="pip"
-
-# Function for pip alias
-function pip() {
-  # check if we are inside wsl directory
-  # or inside a symbolic link
-  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
-    cmd.exe /c pip "$@"
-  else
-    cd /mnt/c
-    cmd.exe /c pip "$@"
-    cd - &>/dev/null;
-  fi
-}
-
-# this alias to use windows nslookup
-alias nslookup="nslookup"
-
-# this function for nslookup alias
-function nslookup(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c nslookup "$@"
-  else
-    cd /mnt/c
-    cmd.exe /c nslookup "$@"
-    cd - &>/dev/null;
-  fi
-}
-
-# this alias to use windows arp
-alias arp="arp"
-
-# this function for arp alias
-function arp(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c arp "$@"
-  else
-    cd /mnt/c
-    cmd.exe /c arp "$@"
-    cd - &>/dev/null;
-  fi
-}
-
-# this alias to run jupyter notebook
-alias jptr="jptr"
-
-# this function for jptr alias
-function jptr(){
-  # check if we are inside wsl directory
-  # or inside a symbolic link
-  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
-    cmd.exe /c start jupyter notebook
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
-  fi
-}
-
-# this alias to open obs Studio
-alias obs="obs"
-
-# this function for obs alias
-function obs(){
-  cd /mnt/d/NTSOA/INSTALLED/OBS\ STUDIO/obs-studio/bin/64bit
-  cmd.exe /c start obs64.exe
-  cd - &>/dev/null
-}
-
-# this alias to launch gta san andreas
-alias gta="gta"
-
-# this function for gta alias
-function gta(){
-  cd /mnt/d/NTSOA/INSTALLED/GTA\ SAN\ ANDREAS
-  cmd.exe /c start /affinity 2 gta_sa.exe
-  cd - &>/dev/null
-}
-
-# this alias to open visual paradigm
-alias paradigm="paradigm"
-
-# this function for paradigm alias
-function paradigm(){
-  cd /mnt/d/NTSOA/INSTALLED/VISUAL\ PARADIGM/Visual\ Paradigm\ CE\ 17.2/bin
-  explorer.exe visual.lnk
-  cd - &>/dev/null
-}
-
-# this alias open Bluestacks
-alias android="android"
-
-# this function for android alias
-function android(){
-  cd /mnt/c/Program\ Files/BlueStacks_nxt
-  cmd.exe /c start HD-Player.exe
-  cd - &>/dev/null
-}
-
-# this alias to open Driver Booster 11
-alias boost="boost"
-
-# this function for boost alias
-function boost(){
-  cd "/mnt/d/NTSOA/INSTALLED/DRIVER BOOSTER/11.6.0"
-  cmd.exe /c start DriverBooster.exe
-  cd - &>/dev/null
-}
-
-# this alias to open gns3
-alias gns="gns"
-
-# this function for gns alias
-function gns(){
-  cd /mnt/d/NTSOA/INSTALLED/GNS3
-  cmd.exe /c start gns3.exe
-  cd - &>/dev/null
-}
-
-# this alias to launch the debug
-alias debug="debug"
-
-# this function for debug alias
-function debug(){
-  cd /mnt/d/NTSOA/INSTALLED/DOSBOX/DOSBox-0.74-3
-  cmd.exe /c start DOSBox.exe DEBUGX.COM
-  cd - &>/dev/null
-}
-
-# this alias to open x64dbg
-alias dbg64="dbg64"
-
-# this function for debug alias
-function dbg64(){
-  cd /mnt/d/NTSOA/INSTALLED/SHORTCUTS/
-  explorer.exe x64dbg.lnk
-  cd - &>/dev/null
-}
-
-# this alias to open x32dbg
-alias dbg32="dbg32"
-
-# this function for debug alias
-function dbg32(){
-  cd /mnt/d/NTSOA/INSTALLED/SHORTCUTS/
-  explorer.exe x32dbg.lnk
-  cd - &>/dev/null
-}
-
-# this alias to run an executable file or a script
-alias rn="rn"
-
-# this function for rn alias
-function rn(){
-  # this will look the extension of the file
-  # use of ${1%.*} to retrieve the file name
-  # explanation :
-  # ${file%pattern} ==> this will remove the matched
-  # pattern from the file from the end of the file
-  #
-  # use of ${1##*.} to retrieve extension
-  # explanation :
-  # ${file##*.} ==> this will remove the longest
-  # matched string from the beginning of the file
-  # 2024-02-12 00:27
-  case "${1##*.}" in
-    py)
-      # all "$1" && c && echo -e && py "$1" && echo -e;;
-      python "$@" && return 0;;
-    c || cpp) #update 07/28/2023
-      file="$1";
-      out="${file%.*}"
-
-      # Condition 1: Check if the file extension is c
-      extension='[[ "${file##*.}" == "c" ]]';
-
-      # Condition 2: Check if the file contains math library
-      math='grep -E "^#include <math.h>" "$file" >/dev/null';
-
-      # Ternary expressions to determine compiler and flags
-      compiler=$(eval "$extension" && echo "gcc" || echo "g++");
-      flags=$(eval "$math" && echo "-lm" || echo "");
-
-      # check if an old executable exists
-      if [[ -f "$out" ]]; then
-        dlf "$out";
-      fi
-
-      # Compile the C file
-      "$compiler" "$file" -o "$out" $flags;
-
-      # Execute the resulting executable
-      all "$out";
-      clear && br;
-      ./"$out";
-      br;;
-    js)
-      c && br 2 && node "$1" && br
-      ;;
-    com)
-      open_web_app "$1";
-      ;;
-    bat)
-      cmd.exe /c "$1";
-      ;;
-    html || pdf)
-      bwsop "$1"
-      ;;
-    *)
-      all "$1" && c && ./"$1";;
- esac
-}
-
-# this alias to update the package
-alias upd="allow_sudo && upd"
-
-# this function for up alias
-function upd(){
-  echo "u p d a t i n g .  .  ." | figlet -t -c;
-  br && sudo apt update && br;
-}
-
-# this alia to update the package
-alias upg="allow_sudo && upg"
-
-# this function for up alias
-function upg(){
-  echo "u p g r a d i n g . . ." | figlet -t -c;
-  br && sudo apt upgrade && br;
-}
-
-# this alias to install package
-alias ist="allow_sudo && ist"
-
-# this function for ist alias
-function ist(){
-  case "${1##*.}" in
-     git)
-      echo "   C l o n i n g .  .  . " | figlet;
-      br && echo "Package =======> "${1%.*}" ";
-      br && git clone "$1" && br;
-      ;;
-    *)
-      echo "   I n s t a l l i n g .  .  . " | figlet;
-      c && br && echo "Package =======> "$1" ";
-      br && sudo apt install "$1" && br;
-      ;;
-  esac
-}
-
-# this alias to install package
-alias rmv="rmv"
-
-# this function for ist alias
-function rmv(){
-  case "${1##*.}" in
-    deb)
-      c && echo -e && echo -e && sudo clear && echo -e && echo -e && echo "   r e m o v i n g .  .  . " | figlet | lolcat && echo -e && echo "Package =======> "${1%.*}" " && echo -e && sudo dpkg -r "$1" && echo -e;
-      ;;
-    *)
-      c && echo -e && echo -e && sudo clear && echo -e && echo -e && echo "   r e m o v  i n g .  .  . " | figlet | lolcat && echo -e && echo "Package =======> "$1" " && echo -e && sudo apt remove "$1" && echo -e;
-      ;;
-  esac
-}
-
-# this alias to view inside a file
-alias vf="vf"
-
-# this function for vf alias
-function vf() {
-  if [[ -f "$1" ]]; then
-    case "${1##*.}" in
-      db|sqlite*|xlsx|docx|pptx|ppt|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) 
-        explorer.exe "$1"
-        ;;
-      # open all files that have default app with windows explorer
-      html)
-        if [[ "$PWD" == "/mnt/"* ]]; then
-          explorer.exe "$1"
-        else
-          bwsop "$1"
-        fi
-        ;;
-      fxml)
-        cmd.exe /c start SceneBuilder.exe "$@"
-        ;;
-      *) nvim "$1" ;;
-    esac
-    return 0
-  elif [[ -d "$1" ]]; then
-    op "$1"
-  fi
-}
-
-# this alias to rename a file / directory; and display it after
-alias nm="nm"
-
-# this function for cpf alias
-function nm(){
-  mv "$1" "$2" && cv;
-}
-
-# this line to count line inside a file
-alias cl="linecount"
-
-# this function for the cl alias
-function linecount() {
-  if [ -z "$1" ]; then
-      echo "Please provide a filename"
-  elif [ -z "$2" ]; then
-      wc -l "$1" | awk '{print $1, "lines"}'
-  else
-      grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
-  fi
-};
-
-# this line to view a command manual
-alias mn="mn"
-
-# this function for mn alias
-function mn(){
-  if [[ $# -eq 1 ]]; then
-    man $1 | less
-  else
-    man $1 | grep $2 | less
-  fi
-}
-
-# this alias to view tthe manual entry for a command
-alias mns="mns"
-
-# this function for mn alias
-function mns(){
-  if [[ $(command -v "$1") ]]; then
-    local manual_path=~/NTSOA/manual
-    # here to check if the command exists
-    man "$1" | cat > $manual_path/"$1"_manual.txt;
-    all $manual_path/"$1"_manual.txt;
-    vf $manual_path/"$1"_manual.txt;
-    cv;
-  else
-    cv
-  fi
-}
-
-# this alias to enter the manual directory
-alias mnv="mnv"
-
-# this function for mnv alias
-function mnv(){
-  if [[ $# -eq 0 ]]; then
-    op /home/h471x/NTSOA/manual;
-  elif [[ $# -eq 1 ]]; then
-    op /home/h471x/NTSOA/manual "$1";
-  fi
-}
-
-# this alias to switch to root
-alias ad="ad"
-
-# this function for ad alias
-function ad(){
-	c && echo -e && echo -e && sudo su && cv;
-}
-
-# this alias to simulate the sudo behaviour
-alias hndo="hndo"
-
-# this function for hndo alias
-function hndo(){
-  local attempts=3
-  local attempts_num=$(echo $attempts)
-  local expected_hashed_password="5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
-  # this is "password" hashed
-  # use this command : echo -n password | sha256sum | awk '{print $1}'
-
-  c && br 2
-
-  while [ $attempts -gt 0 ]; do
-    echo -ne "Your Password, Sir : "
-    read -s password
-
-    # Hash the entered password
-    hashed_input=$(echo -n "$password" | sha256sum | awk '{print $1}')
-
-    if [ "$hashed_input" = "$expected_hashed_password" ]; then
-      c && br
-      eval "$@"
-      return
-    else
-      attempts=$((attempts - 1))
-      br
-      echo -n "Wrong, Try Again"
-      br
-      if [ $attempts -gt 0 ]; then
-        continue
-      else
-        echo "hndo: $attempts_num incorrect password attempts"
-        return 1
-      fi
-    fi
-  done
-}
-
-# this alias to create a file
-alias tf="tf"
-
-# this function for tf alias
-function tf(){
-  touch "$@" && all "$@" && cv;
-}
-
-# this alias to delete file
-alias dlf="dlf"
-
-# this function for dlf alias
-function dlf(){
-  rm "$@" && cv;
-}
-
-# this alias to copy a file then display it
-alias cpf="cpf"
-
-# this function for cpf alias
-function cpf(){
-  if [[ $# -eq 2 ]]; then
-    if [[ -d "$1" ]]; then #here to check if the first argument is a directory
-      cp -r "$1" "$2" && op "$2" && all "$1";
-    else
-      cp "$1" "$2" && op "$2" && all "$1";
-    fi
-  elif [[ $# -eq 1 ]]; then
-    if [[ -d "$1" ]]; then #here to check if the first argument is a directory
-      cp -r "$1" "$dest" && op "$dest" && all "$1";
-    else
-      cp "$@" "$dest" && op "$dest" && all "$@";
-    fi
-  fi
-}
-
-# this alias to copy the content of a file
-alias cnf="cnf"
-
-# this function for cnf alias
-function cnf(){
-  cat "$1" > "$2" && dlf "$1" && all "$2";
-}
-
-# this alias to copy a file then display it
-alias mvf="mvf"
-
-# this function for cpf alias
-function mvf(){
-  if [[ $# -eq 2 ]]; then
-    mv "$1" "$2" && op "$2";
-  elif [[ $# -eq 1 ]]; then
-    mv $@ $dest && op $dest;
-    # if there is only one argument,
-    # it will move the file / directory
-    # to the the variable
-    # dest defined in dt alias
-  fi
-}
-
-# this alias to force delete
-alias rdf="allow_sudo && rdf"
-
-# this function for rdf alias
-function rdf(){
-  sudo rm -rfv "$@";
-  cv;
-}
-
-# this alias to view the pc state
-alias pc="c && br 2 && neofetch --source ~/.config/neofetch/htx2.txt"
-
-# this alias to go to home directory
-alias hm="cd && cv"
-
-# this alias to view the windows explorer
-alias whm="cd /mnt/c/Users/lab_l/OneDrive/Bureau && op Home.lnk && nd"
-
-# this alias to open the evangile directory
-alias gospel="op /mnt/d/NTSOA/gospel"
-
-# this alias to enter the NTSOA directory
-alias hn="op /mnt/d/NTSOA"
-
-# this alias to open the dev folder
-alias dev="op /mnt/d/NTSOA/dev/github_repo/"
-
-# this alias to open the notes folder
-alias nt="op /mnt/d/NTSOA/dev/0\ NOTES"
-
-# this alias to open the kali linux Vm Shared folder
-alias kali="op /mnt/d/NTSOA/INSTALLED/KALI_LINUX"
-
-# this function to convert url to name
-function convert_url(){
-  url="$1"
-  domain="${url%.*}"
-
-  # Capitalize the first letter of the domain
-  capitalized_domain="$(tr '[:lower:]' '[:upper:]' <<< ${domain:0:1})${domain:1}"
-  echo "$capitalized_domain"
-}
-
-# this alias to open chatGpt app
-alias gpt="gpt"
-
-# this function for gpt alias
-function gpt(){
-  local gpt_id="febkkahnhhdppidjakkemnckfhnkidba"
-  local gpt_link="chatgpt.com"
-  local gpt_name="ChatGpt"
-  open_web_app $gpt_link $gpt_id $gpt_name
-}
-
-# this alias to open Google Gemini app
-alias gmn="gmn"
-
-# this function for gmn alias
-function gmn(){
-  local gmn_id="acehpdabncjaanhpihehcmhidhmbdcoo"
-  local gmn_link="gemini.google.com"
-  local gmn_name="Gemini"
-  open_web_app $gmn_link $gmn_id $gmn_name
-}
-
-# this alias to open ClaudeAI app
-alias cld="cld"
-
-# this function for cld alias
-fuction cld(){
-  local claude_id="fmpnliohjhemenmnlpbfagaolkdacoja"
-  local claude_link="claude.ai"
-  local claude_name="ClaudeAI"
-  open_web_app  $claude_link $claude_id $claude_name
-}
-
-# this alias to open reddit forum
-alias rdt="rdt"
-
-# this function for rdt alias
-function rdt(){
-  local reddit_id="lgnggepjiihbfdbedefdhcffnmhcahbm"
-  local reddit_link="reddit.com"
-  open_web_app $reddit_link $reddit_id
-}
-
-# this alias to open the GitHub app
-alias gthb="gthb"
-
-# this function for gthb alias
-function gthb(){
-  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
-
-  local github_id="mjoklplbddabcmpepnokjaffbmgbkkgg"
-  local github_link="github.com"
-  local github_name="GitHub"
-
-  if [[ "$is_a_git_repo" == "true" ]]; then
-    local has_remote=$(git remote -v)
-    if [ "$has_remote" ]; then
-      local repo_url=$(git config --get remote.origin.url)
-      local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
-      local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
-    else
-      local repo_owner=$(git config user.username)
-      local repo_name=$(basename "$(git rev-parse --show-toplevel)")
-    fi
-
-    local current_branch=$(git branch | awk '/\*/ {print $2}');
-
-    function check_view(){
-      echo -ne "${BOLD}${GREEN}Open ${WHITE}the repo ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ? (y/n) ";
-      read check_view
-      echo ${RESET}
-
-      if [ "$check_view" = "y" ]; then
-        cd /mnt/c
-
-        cmd.exe /c start chrome.exe \
-          --profile-directory=Default --app-id=$github_id \
-          --app=https://github.com/$repo_owner/$repo_name/tree/$current_branch \
-
-        cd - &>/dev/null
-        # gh repo view $repo_owner/$repo_name \
-        #   --web --branch $current_branch \
-        #   &>/dev/null
-      elif [ "$check_view" = "n" ];then
-        open_web_app $github_link $github_id $github_name
-      else
-        check_view
-      fi
-    }
-
-    # check if the repo has a remote
-    # on github otherwise open the pwa
-    if [ "$has_remote" ]; then
-      local is_remote_branch=$(git branch -r | grep "origin/$current_branch")
-
-      # check if the current branch has remote
-      if [ -n "$is_remote_branch" ]; then
-        check_view
-      else
-        echo "${BOLD} ■■▶ The remote repo ${LIGHT_BLUE}$repo_name ${WHITE}has no branch named ${GREEN}$current_branch ${WHITE}!" && br;
-      fi
-    else
-      open_web_app $github_link $github_id $github_name
-    fi
-  else
-    if [[ $# -eq 0 ]]; then
-      open_web_app $github_link $github_id $github_name
-    fi
-  fi
-}
-
-# this alias to view the history
-alias hst="hst"
-
-# this function for hst alias
-function hst(){
-  if [[ $# -eq 0 ]]; then
-    history | less && cv
-  else
-    re='^[0-9]+$'
-    # check if the argument is an integrer
-    if [[ $1 =~ $re ]]; then
-      history | tail -$1 | less && cv
-    else  # else if it's a text to grep
-      history | grep "$1" | less && cv
-    fi
-  fi
-}
-
-# this alias to specify which command in the history to search
-alias hsg="hsg"
-
-# this function for hsg alias
-function hsg(){
-  if [[ $# -eq 0 ]]; then
-    history | less && cv;
-  else
-    history | grep "$1" | less && cv;
-  fi
-}
-
-# this alias to show the network configuration
-alias ipsh="ipsh"
-
-# this function for ntsh alias
-function ipsh(){
-  c && br;
-  echo "  Available IP Adresses : ";
-  br;
-  local eth_ip=$(ip addr show eth0 | grep -oP 'inet \K[\d.]+');
-  local wifi_ip=$(ip addr show wifi0 | grep -oP 'inet \K[\d.]+');
-  echo " eth0  ==> $eth_ip" && br;
-  echo " wifi0  ==> $wifi_ip" && br;
-}
+### Services Aliases
 
 # this alias to start services
 alias svc_on="allow_sudo && svc_on"
@@ -2605,161 +1372,6 @@ function svc_show_stat(){
   fi
 
   br;
-}
-
-function clean_argument() {
-  local arg="$1"
-  # Replace spaces with backslashes
-  local clean_arg="${arg// /\\}"
-
-  # Replace special characters with escaped versions
-  local special_chars='[][{}()*+?.\\^$|]'
-  # Escape backslashes for sed
-  local escaped_special_chars="$(echo "$special_chars" | sed 's/\\/\\\\/g')"
-  local arg_pattern="s/[$escaped_special_chars]/\\\\&/g"
-
-  clean_arg="$(echo "$clean_arg" | sed -E "$arg_pattern")"
-  echo "$clean_arg"
-}
-
-# I don't know why but this alias
-# make the PC slow down
-# this alias to view saved wifi password
-# SOLVED: 05-11-2024 22:44
-# Just execute it inside the
-# hard drive of windows instead of WSL
-# directories, so just cd to whatever
-# hard drive of windows to make it run
-alias wpass="wpass"
-
-# this function for wpass alias
-function wpass(){
-  cd /mnt/c
-  if [[ $# -eq 0 ]]; then
-    # consider all arguments as one string
-    local wifi=$(
-      cmd.exe /c netsh wlan show profiles |
-        grep -i "All User Profile" |
-        awk '{print $5}' | shuf -n 1
-    )
-    local password=$(
-      cmd.exe /c netsh wlan show profiles "$wifi" key=clear |
-        grep "Key Content" |
-        awk '{print $4}'
-    )
-    echo "Wifi SSID : $wifi";
-    echo "Password  : $password";
-  else
-    # consider all arguments as one string
-    local wifi="$*"
-    local password=$(
-      cmd.exe /c netsh wlan show profiles "$wifi" key=clear |
-        grep "Key Content" |
-        awk '{print $4}'
-    )
-    echo "Wifi SSID : $wifi";
-    echo "Password  : $password";
-  fi
-  cd - &>/dev/null;
-}
-
-# Completion function for wpass
-_wpass_completion() {
-  cd /mnt/c
-  local cur
-
-  # Get the current word being completed
-  cur="${COMP_WORDS[COMP_CWORD]}"
-
-  # Fetch WiFi profiles
-  local profiles=$(cmd.exe /c netsh wlan show profiles |
-    grep -i "All User Profile" |
-    awk '{$1=$2=$3=""; print substr($0, 6)}' |
-    head -n 1000
-  )
-
-  # Generate completions
-  COMPREPLY=($(compgen -W "${profiles}" -- "${cur}"))
-  cd - &>/dev/null
-}
-
-# Register the completion function for wpass
-complete -F _wpass_completion wpass
-
-# this alias to "list known wifi"
-alias wls="wls"
-
-# this function for wls alias
-function wls(){
-  cd /mnt/c
-
-  function print_message(){
-    wifi="$1"
-    password="$2"
-    # Print Wi-Fi SSID and password
-    echo "Wifi SSID : $wifi"
-    echo "Password  : $password"
-    echo
-  }
-
-  function wifi_and_pass(){
-    num_profiles="$1"
-    grep_string="$2"
-    # Loop through each Wi-Fi profile
-    while IFS= read -r wifi; do
-      # Retrieve password for the current Wi-Fi profile
-      local password=$(
-        cmd.exe /c netsh wlan show profiles "$wifi" key=clear |
-          grep "Key Content" | awk '{print $4}'
-      )
-      print_message $wifi $password
-    done < <(
-      cmd.exe /c netsh wlan show profiles |
-        grep -i "$grep_string" |
-        grep 'All User Profile' |
-        awk '{$1=$2=$3=""; print substr($0, 6)}' |
-        head -n "$num_profiles"
-    )
-  }
-
-  function wifi_name(){
-    wifi_count=0
-    # Loop through each Wi-Fi profile
-    while IFS= read -r wifi; do
-      echo "- $wifi"
-      ((wifi_count++))
-    done < <(
-      cmd.exe /c netsh wlan show profiles |
-        grep 'All User Profile' |
-        awk '{$1=$2=$3=""; print substr($0, 6)}'
-    )
-  }
-
-  if [[ $# -eq 0 ]]; then
-    num_profiles=1
-    grep_string=$(
-      cmd.exe /c netsh wlan show profiles |
-        grep -i "All User Profile" |
-        awk '{print $5}' | shuf -n 1
-    )
-    wifi_and_pass $num_profiles $grep_string
-  elif [[ $# -eq 1 ]]; then
-    if [[ "$1" =~ ^[0-9]+$ ]]; then
-      num_profiles=$1
-      grep_string=""
-      wifi_and_pass $num_profiles $grep_string
-    elif [[ "$1" != "-a" ]]; then
-      num_profiles=99999999
-      grep_string="$1"
-      wifi_and_pass $num_profiles $grep_string
-    elif [[ "$1" -eq "-a" ]]; then
-      wifi_name
-      echo
-      echo "Known Wi-Fi Connections ($wifi_count) "
-    fi
-  fi
-
-  cd - &>/dev/null;
 }
 
 # this alias to view the ssh server status
@@ -3120,272 +1732,697 @@ function mailoff(){
   mails
 }
 
-# this alias to reach a network
-alias reach="allow_sudo && reach";
+#######################################################################
 
-# this function to check if pfsense is reachable
-# coded 01/29/2024
-function reach(){
-  c && br;
+### Aliases
 
-  local target_IP="$1"
-  local check_message="Checking $target_IP reachability..."
-  local check_IP="sudo ping -c 1 -W 5 "
-  local reachable="br && echo ' $check_message' && eval $check_IP $target_IP &> /dev/null;"
-  # the -c 1 means we send one packet to test it
-  # the -W 5 means if the ping have 5 seconds to check
-  # as always we run it in background in order to
-  # not see all the boring logs messages
+### Basic Aliases
 
-  if eval $reachable ;then
-    #if PfSense is reachable then
-    #we execute the next command after
-    #this function calling
-    # eval "$@"
-    echo " $target_IP is reachable"
-  else;
-    echo " $target_IP is not reachable"
+# this alias to update the package
+alias upd="allow_sudo && upd"
+
+# this function for up alias
+function upd(){
+  echo "u p d a t i n g .  .  ." | figlet -t -c;
+  br && sudo apt update && br;
+}
+
+# this alia to update the package
+alias upg="allow_sudo && upg"
+
+# this function for up alias
+function upg(){
+  echo "u p g r a d i n g . . ." | figlet -t -c;
+  br && sudo apt upgrade && br;
+}
+
+# this alias to install package
+alias ist="allow_sudo && ist"
+
+# this function for ist alias
+function ist(){
+  case "${1##*.}" in
+     git)
+      echo "   C l o n i n g .  .  . " | figlet;
+      br && echo "Package =======> "${1%.*}" ";
+      br && git clone "$1" && br;
+      ;;
+    *)
+      echo "   I n s t a l l i n g .  .  . " | figlet;
+      c && br && echo "Package =======> "$1" ";
+      br && sudo apt install "$1" && br;
+      ;;
+  esac
+}
+
+# this alias to install package
+alias rmv="rmv"
+
+# this function for ist alias
+function rmv(){
+  case "${1##*.}" in
+    deb)
+      c && echo -e && echo -e && sudo clear && echo -e && echo -e && echo "   r e m o v i n g .  .  . " | figlet | lolcat && echo -e && echo "Package =======> "${1%.*}" " && echo -e && sudo dpkg -r "$1" && echo -e;
+      ;;
+    *)
+      c && echo -e && echo -e && sudo clear && echo -e && echo -e && echo "   r e m o v  i n g .  .  . " | figlet | lolcat && echo -e && echo "Package =======> "$1" " && echo -e && sudo apt remove "$1" && echo -e;
+      ;;
+  esac
+}
+
+# this alias to rename a file / directory; and display it after
+alias nm="nm"
+
+# this function for cpf alias
+function nm(){
+  mv "$1" "$2" && cv;
+}
+
+# this line to count line inside a file
+alias cl="linecount"
+
+# this function for the cl alias
+function linecount() {
+  if [ -z "$1" ]; then
+      echo "Please provide a filename"
+  elif [ -z "$2" ]; then
+      wc -l "$1" | awk '{print $1, "lines"}'
+  else
+      grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
+  fi
+};
+
+# this line to view a command manual
+alias mn="mn"
+
+# this function for mn alias
+function mn(){
+  if [[ $# -eq 1 ]]; then
+    man $1 | less
+  else
+    man $1 | grep $2 | less
   fi
 }
 
-# this alias to open ThemeTool
-alias thm="thm"
+# this alias to view tthe manual entry for a command
+alias mns="mns"
 
-# this function for thm alias
-function thm(){
-  powershell.exe -command "Start-Process D:\NTSOA\INSTALLED\THEME_TOOL\ThemeTool.exe -Verb RunAs"
+# this function for mn alias
+function mns(){
+  if [[ $(command -v "$1") ]]; then
+    local manual_path=~/NTSOA/manual
+    # here to check if the command exists
+    man "$1" | cat > $manual_path/"$1"_manual.txt;
+    all $manual_path/"$1"_manual.txt;
+    vf $manual_path/"$1"_manual.txt;
+    cv;
+  else
+    cv
+  fi
 }
 
-# this alias to call the sqlite3.Exe file
-alias sqlite="sqlite"
+# this alias to enter the manual directory
+alias mnv="mnv"
 
-# this function for ssqlite alias
-function sqlite(){
+# this function for mnv alias
+function mnv(){
   if [[ $# -eq 0 ]]; then
-    echo "■■▶ Please specify a file.db  ";
+    op /home/h471x/NTSOA/manual;
+  elif [[ $# -eq 1 ]]; then
+    op /home/h471x/NTSOA/manual "$1";
+  fi
+}
+
+# this alias to view the pc state
+alias pc="c && br 2 && neofetch --source ~/.config/neofetch/htx2.txt"
+
+# this alias to view the history
+alias hst="hst"
+
+# this function for hst alias
+function hst(){
+  if [[ $# -eq 0 ]]; then
+    history | less && cv
   else
-    if [[ $# -eq 1 && "${1##*.}" -eq "db" ]]; then
+    re='^[0-9]+$'
+    # check if the argument is an integrer
+    if [[ $1 =~ $re ]]; then
+      history | tail -$1 | less && cv
+    else  # else if it's a text to grep
+      history | grep "$1" | less && cv
+    fi
+  fi
+}
+
+# this alias to specify which command in the history to search
+alias hsg="hsg"
+
+# this function for hsg alias
+function hsg(){
+  if [[ $# -eq 0 ]]; then
+    history | less && cv;
+  else
+    history | grep "$1" | less && cv;
+  fi
+}
+
+# this alias to count line and words inside a file
+alias flc="flc"
+
+# this function for the cl alias
+function flc(){
+  if [[ -f "$1" ]]; then
+    if [ -z "$1" ]; then
+      echo "Please provide a filename"
+    elif [ -z "$2" ]; then
       c && br;
-      sqlite3.exe $@;
-      cv;
+      echo -ne " ==> "
+      file "$1";
+      echo -ne " ==> ";
+      wc -l "$1" | awk '{print $1, "lines"}';
+      echo -ne " ==> ";
+      wc -w "$1" | awk '{print $1, "words"}';
+      br;
     else
-      sqlite3.exe $@;
+      grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
+    fi
+  elif [[ -d "$1" ]]; then
+    dc "$1";
+  fi
+}
+
+# this alias to list
+alias list="list"
+
+# this function for list alias
+function list(){
+  local list_app="eza --icons=always --no-quotes"
+  eval $list_app
+}
+
+# this alias to save a file content to another file
+alias sv="sv"
+
+# this function for sv alias
+function sv(){
+  cat "$1" > "$2";
+}
+
+kill-line() {
+  if [[ $BUFFER == "" ]]; then
+    zle backward-kill-line
+  else
+    zle kill-whole-line
+  fi
+}
+
+zle -N kill-line
+bindkey "²²" kill-line
+
+# this alias to clear
+alias c="clear"
+
+# this alias to clear but with extra lines
+alias x="clear && echo -e && echo -e && echo -e && echo -e && echo -e && echo -e"
+
+# this alias to break a line
+alias br="br"
+
+# this function for br alias
+function br(){
+  if [[ $# -eq 1 ]]; then
+    for ((i=1; i<=$1;i++)); do
+      echo -e;
+    done
+  elif [[ $# -eq 0 ]]; then
+    echo -e;
+  fi
+}
+
+# this alias to show the welcome message
+alias cvi="cvii"
+
+# here to write a welcome message
+function cvii(){
+  clear && br 2;
+  echo "H    4    7    1    X" | figlet -t -c;
+  br 2;
+}
+
+x;
+
+# this alias to exit
+alias q='exit'
+
+# this alias to give full permission
+alias all="all"
+
+# this function for all alias
+function all(){
+  if [[ $# -eq 0 ]]; then
+    if [[ -d "$1" ]]; then
+      chmod 700 * && cv;
+    elif [[ -f "$1" ]]; then
+      chmod 777 * && cv;
+    fi
+  else
+    if [[ -d "$1" ]]; then
+      chmod 700 "$@" && cv;
+    elif [[ -f "$1" ]]; then
+      chmod 777 "$@" && cv;
     fi
   fi
 }
 
-# this alias to call the windows nodeJS Program
-alias node="node"
+#######################################################################
 
-# this function for node alias
-function node(){
-  node.exe $@;
+### File Aliases
+
+# this alias to create a file
+alias tf="tf"
+
+# this function for tf alias
+function tf(){
+  touch "$@" && all "$@" && cv;
 }
 
-# this alias to launch eclipse IDE
-alias eclipse="eclipse"
+# this alias to delete file
+alias dlf="dlf"
 
-# this function for eclipse alias
-function eclipse(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start eclipse.exe ${@:-.}
-  else
-    cd /mnt/c
-    cmd.exe /c start eclipse.exe ${@:-.}
-    cd - &>/dev/null
-  fi
+# this function for dlf alias
+function dlf(){
+  rm "$@" && cv;
 }
 
-# this alias to launch Apache NetBeans IDE
-alias beans="beans"
+# this alias to copy a file then display it
+alias cpf="cpf"
 
-# this function for beans alias
-function beans(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start netbeans64.exe ${@:-.}
-  else
-    cd /mnt/c
-    cmd.exe /c start netbeans64.exe ${@:-.}
-    cd - &>/dev/null
-  fi
-}
-
-# this alias to launch intelijieda
-alias idea="idea"
-
-# this function for idea alias
-function idea(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start idea64.exe ${@:-.}
-  else
-    cd /mnt/c
-    cmd.exe /c start idea64.exe ${@:-.}
-    cd - &>/dev/null
-  fi
-}
-
-# this alias to open PyCharm
-alias charm="charm"
-
-# this function for charm alias
-function charm(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start pycharm64.exe ${@:-.}
-  else
-    cd /mnt/c
-    cmd.exe /c start pycharm64.exe ${@:-.}
-    cd - &>/dev/null
-  fi
-}
-
-# this alias to launch ppsspp
-alias psp="psp"
-
-# this function for psp alias
-function psp(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start PPSSPPWindows.exe $@
-  else
-    cd /mnt/c
-    cmd.exe /c start PPSSPPWindows.exe $@
-    cd - &>/dev/null
-  fi
-}
-
-# this alias to open tor browser
-alias tor="tor"
-
-# this function for tor alias
-function tor(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start tor.exe $@
-  else
-    cd /mnt/c
-    cmd.exe /c start tor.exe $@
-    cd - &>/dev/null
-  fi
-}
-
-# this alias for windows ngrok
-alias ngrok="ngrok"
-
-# this function for ngrok alias
-# IMPROVED: 05-29-2024 10:25
-function ngrok(){
-  # default ngrok command that redirects
-  # to a new terminal so the current one
-  # is available for other commands
-  local ngrok_cmd='cmd.exe /c start ngrok "$@"'
-
-  # check for dashes then do not
-  # redirect to another terminal
-  for arg in "$@"; do
-    if [[ "$arg" == -* || "$arg" == --* ]]; then
-      local ngrok_cmd='cmd.exe /c ngrok "$@"'
-      break
+# this function for cpf alias
+function cpf(){
+  if [[ $# -eq 2 ]]; then
+    if [[ -d "$1" ]]; then #here to check if the first argument is a directory
+      cp -r "$1" "$2" && op "$2" && all "$1";
+    else
+      cp "$1" "$2" && op "$2" && all "$1";
     fi
-  done
-
-  # Check the current directory
-  # because ngrok will work only
-  # on windows'directory rather
-  # than WSL's one so we move
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $ngrok_cmd
-  else
-    cd /mnt/c
-    eval $ngrok_cmd
-    cd - &>/dev/null
-  fi
-}
-
-# Completion function for ngrok
-_ngrok_completion() {
-  local cur
-  cur="${COMP_WORDS[COMP_CWORD]}"
-
-  # Define the list of possible completions
-  local commands="api completion config credits diagnose help http service start tcp tls tunnel update version"
-
-  # Provide completion options based on the current word being completed
-  COMPREPLY=($(compgen -W "${commands}" -- "$cur"))
-}
-
-# Register the completion function for ngrok
-complete -F _ngrok_completion ngrok
-
-# this alias to launch process explorer
-alias prex="prex"
-
-# this function for prex alias
-function prex(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start procexp64
-  else
-    cd /mnt/c
-    cmd.exe /c start procexp64
-    cd - &>/dev/null
-  fi
-}
-
-# Alias to call the windows npm
-alias npm="npm"
-
-# Function for npm alias
-function npm() {
-  local npm_cmd='cmd.exe /c start npm "$@"'
-  for arg in "$@"; do
-    if [[ ("$arg" != "--verbose" || "$arg" != "-g") && ("$arg" == -* || "$arg" == --*) ]]; then
-      local npm_cmd='cmd.exe /c npm "$@"'
-      break
+  elif [[ $# -eq 1 ]]; then
+    if [[ -d "$1" ]]; then #here to check if the first argument is a directory
+      cp -r "$1" "$dest" && op "$dest" && all "$1";
+    else
+      cp "$@" "$dest" && op "$dest" && all "$@";
     fi
-  done
-
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $npm_cmd
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!"
   fi
 }
 
-# Alias to call the windows npx
-alias npx="npx"
+# this alias to copy the content of a file
+alias cnf="cnf"
 
-# Function for npx alias
-function npx() {
-  local npx_cmd='cmd.exe /c start npx "$@"'
-  for arg in "$@"; do
-    if [[ "$arg" != "--verbose" && ("$arg" == -* || "$arg" == --*) ]]; then
-      local npx_cmd='cmd.exe /c npx "$@"'
-      break
-    fi
-  done
+# this function for cnf alias
+function cnf(){
+  cat "$1" > "$2" && dlf "$1" && all "$2";
+}
 
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $npx_cmd
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!"
+# this alias to copy a file then display it
+alias mvf="mvf"
+
+# this function for cpf alias
+function mvf(){
+  if [[ $# -eq 2 ]]; then
+    mv "$1" "$2" && op "$2";
+  elif [[ $# -eq 1 ]]; then
+    mv $@ $dest && op $dest;
+    # if there is only one argument,
+    # it will move the file / directory
+    # to the the variable
+    # dest defined in dt alias
   fi
 }
 
-# Alias to call the windows vue
-alias vue="vue"
+# this alias to force delete
+alias rdf="allow_sudo && rdf"
 
-# Function for vue alias
-function vue() {
-  local vue_cmd='cmd.exe /c start vue "$@"'
-  for arg in "$@"; do
-    if [[ "$arg" != "--verbose" && ("$arg" == -* || "$arg" == --*) ]]; then
-      local vue_cmd='cmd.exe /c vue "$@"'
-      break
+# this function for rdf alias
+function rdf(){
+  sudo rm -rfv "$@";
+  cv;
+}
+
+#######################################################################
+
+### Navigation Aliases
+
+# this alias to have the current view
+# of working directory content using ls
+alias cv="cv"
+
+# this function for cv alias
+# UPDATED : 01/25/2024
+# to adjust the title
+# when we have more than 50 visible items
+function cv() {
+  local target="$1"
+  local folder_content="${target:-$PWD}"
+  local folder_name=$(basename $folder_content)
+  local visible_item=$(ls $folder_content | wc -l)
+  local total_item=$(ls -A $folder_content | wc -l)
+  local hidden_item=$((total_item - visible_item))
+
+  # this function for the header of cv alias
+  function show_header(){
+    local folder_header
+    if [[ $total_item -eq 0 ]]; then
+      folder_header="Empty(0)";
+      folder_icon=" "
+    elif [[ $hidden_item -eq 0 ]]; then
+      folder_header="total($visible_item)";
+      folder_icon=" "
+    else
+      folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
+      folder_icon=" "
     fi
-  done
+    echo "${BOLD}${WHITE} $folder_icon $folder_name -> $folder_header ${RESET}";
+  }
 
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $vue_cmd
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!"
+  # this function to show the content of the cv
+  function show_content(){
+    # local flag="${1:-}"
+    # ls $flag $folder_content;
+    eza --icons=always --no-quotes --group-directories-first $folder_content
+  }
+
+  # this function to show the all of the cv content
+  function show_all(){
+    c && br;
+
+    if [[ $visible_item -lt 30 ]]; then
+      show_header;
+      br;
+      show_content;
+      br;
+    else
+      show_content;
+      br 2;
+      show_header;
+      br;
+    fi
+  }
+  show_all;
+}
+
+# this alias to view the current directory content
+alias cvf="cvf"
+
+# this function for cvf alias
+# UPDATED : 01/25/2024
+# to adjust the title
+# when we have more than 50 visible items
+function cvf() {
+  local target="$1"
+  local folder_content="${target:-$PWD}"
+  local folder_name=$(basename $folder_content)
+  local visible_item=$(ls $folder_content | wc -l)
+  local total_item=$(ls -A $folder_content | wc -l)
+  local hidden_item=$((total_item - visible_item))
+
+  # this function for the header of cv alias
+  function show_header(){
+    local folder_header
+    if [[ $total_item -eq 0 ]]; then
+      folder_header="Empty(0)";
+      folder_icon=" "
+    elif [[ $hidden_item -eq 0 ]]; then
+      folder_header="total($visible_item)";
+      folder_icon=" "
+    else
+      folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
+      folder_icon=" "
+    fi
+    echo "${BOLD}${WHITE} $folder_icon $folder_name -> $folder_header ${RESET}";
+  }
+
+  # this function to show the content of the cv
+  function show_content(){
+    eza --icons=always --no-quotes -a --group-directories-first $folder_content;
+  }
+
+  # this function to show the cv
+  function show_all(){
+    c && br;
+
+    if [[ $hidden_item -lt 30 ]]; then
+      show_header;
+      br;
+      show_content;
+      br;
+    else
+      show_content;
+      br 2;
+      show_header;
+      br;
+    fi
+  }
+  show_all;
+}
+
+# this alias to view the current directory content
+# with specifications
+alias cvg="cvg"
+
+# this function for cvg alias
+function cvg(){
+  local folder_name=$(basename $PWD)
+  local item="$1"
+  local matched_items=$(ls -A | grep "$item" | wc -l)
+
+  function show_header(){
+    echo "${BOLD}   $folder_name -> contains $matched_items '$1' ${RESET}";
+  }
+
+  function show_content(){
+    eza --icons=always --color=always -a --group-directories-first | grep "$1";
+  }
+
+  # this function to show the cv
+  function show_all(){
+    c && br;
+
+    if [[ $matched_items -lt 20 ]]; then
+      show_header $1; br;
+      show_content $1; br;
+    else
+      show_content $1; br;
+      show_header $1;
+    fi
+  }
+  show_all $item;
+}
+
+# this alias to open a directory
+alias op="op"
+
+# this function for op alias
+function op() {
+  # Check if $1 is a symbolic link
+  if [[ -L "$1" ]]; then
+    # Resolve the real path of the symbolic link
+    real_path=$(readlink -f "$1")
+    # Check if the resolved path is a directory
+    if [[ -d "$real_path" ]]; then
+      if [[ $# -eq 1 ]]; then
+        cd "$real_path" && cv
+      elif [[ $# -eq 2 ]]; then
+        cd "$real_path" && cvg "$2"
+      fi
+    # Check if the resolved path is a file
+    elif [[ -f "$real_path" ]]; then
+      vf "$real_path"
+    fi
+  # If $1 is a directory (but not a symbolic link)
+  elif [[ -d "$1" ]]; then
+    if [[ $# -eq 1 ]]; then
+      cd "$1" && cv
+    elif [[ $# -eq 2 ]]; then
+      cd "$1" && cvg "$2"
+    fi
+  # If $1 is a file (but not a symbolic link)
+  elif [[ -f "$1" ]]; then
+    vf "$1"
   fi
+}
+
+# this alias to create a directory
+alias dr="dr"
+
+# this function for dr alias
+function dr(){
+  mkdir "$@" && cv;
+}
+
+# this alias to remove a directory
+alias rd="rd"
+
+# this function for rd alias
+function rd(){
+  rm -r "$@" && cv;
+}
+
+# this line to have destination location for copy / cut
+alias dt="dt"
+
+# this function for dst alias
+function dt(){
+  dest="$PWD" && c && echo -e && echo "d e s t   s a v e d" | figlet -t -c && sleep 0.6 && cv;
+}
+
+# this alias to open a directory
+# and make it as destination
+alias opd="opd"
+
+# this function for opd alias
+function opd(){
+  op "$1" && dt && nd;
+}
+
+# this alias to create a directory
+# and then directly enter to it
+alias opdr="opdr"
+
+# this function for opdr alias
+function opdr(){
+  dr "$*" && op "$*";
+}
+
+# this alias to go back from a directory
+alias b="b"
+
+# this function for b alias
+function b(){
+  if [[ $# -eq 0 ]]; then
+    cd .. && cv
+  else
+    for ((i=1; i<=$1;i++)); do
+      cd .. && cv
+    done
+  fi
+}
+
+# this alias to go to the previous directory
+alias nd="nd"
+
+# this function for nd alias
+function nd(){
+	cd - &>/dev/null;
+  cv;
+}
+
+#######################################################################
+
+### Explorer Alias
+
+# this alias to open the current
+# directory inside windows explorer
+# or bu the default explorer on Linux
+alias exop="exop"
+
+# this function for exop alias
+function exop() {
+  [ $# -eq 1 ] && cd "$1"
+
+  # check WSL
+  local is_wsl=$(
+    grep -qi microsoft /proc/version && echo true || echo false
+  )
+
+  if $is_wsl; then
+    explorer.exe .
+  else
+    xdg-open .
+  fi
+  cv
+}
+
+#######################################################################
+
+### Custom command not found
+
+# Printing command not found when it is the case
+command_not_found_handler() {
+  local command=$1
+  local command_found=0
+
+  # Check if the command is found in the .zshrc file
+  if grep -q -E "^alias $command=" "$HOME/.zshrc" ; then
+    command_found=1
+  fi
+
+  if [[ $command_found -eq 0 ]]; then
+    echo " ${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Command Not Found"
+  fi
+}
+
+#######################################################################
+
+### $SHELLrc Aliases
+
+# this alias to edit $SHELLrc
+alias ct="nvim ~/.zshrc"
+
+# this alias to reload the zshrc file
+alias rld="rld"
+
+# this function for rld alias
+function rld(){
+  c;
+
+  # local variables
+  local shellrc=.$(basename $SHELL)rc;
+  local backup_dir=$HOME/NTSOA/zshrc/wsl;
+  local backup_file=zshrc[$USER];
+  local saved_message="$shellrc backed up"
+
+  # source the config file and save it
+  source ~/$shellrc;
+  cat ~/$shellrc > $backup_dir/$backup_file;
+
+  # saved message display
+  c && br;
+  echo "${BOLD}${WHITE}$saved_message";
+  br && sleep 0.5;
+  op $backup_dir;
+}
+
+#######################################################################
+
+### Neovim Aliases
+
+# this alias to open the current directory inside neovim
+alias nvm="nvm"
+
+# this function for nvm aliases
+# if we have one argument then nvim will be launched with it,
+# otherwise open the current directory if there is no argument
+function nvm(){
+  nvim "${1:-.}";
+}
+
+# this alias to call neovim in a cooler way
+alias hnvim="nvim"
+
+# this alias to open nvim as root
+alias nvmr="allow_sudo && nvmr"
+
+# this function for nvmr alias
+function nvmr(){
+  sudo nvim "${1:-.}";
+}
+
+# this alias to edit a file
+alias ed="ed"
+
+# this function for ed alias
+function ed(){
+  # nvim -c "startinsert" "$1" && cv;
+  nvim "$1" && cv;
 }
 
 #######################################################################
@@ -3421,6 +2458,141 @@ APP_PATH=$NPM_PATH:$POT_PLAYER_PATH:$FL_STUDIO_PATH:$NGROK_PATH
 
 # Including all the paths
 PATH=$BINARY_PATH:$BROWSER_PATH:$APP_PATH:$PATH
+
+#######################################################################
+
+### WSL Shortcuts Aliases
+
+# this alias to go to home directory
+alias hm="cd && cv"
+
+# this alias to view the windows explorer
+alias whm="cd /mnt/c/Users/lab_l/OneDrive/Bureau && op Home.lnk && nd"
+
+# this alias to open the evangile directory
+alias gospel="op /mnt/d/NTSOA/gospel"
+
+# this alias to enter the NTSOA directory
+alias hn="op /mnt/d/NTSOA"
+
+# this alias to open the dev folder
+alias dev="op /mnt/d/NTSOA/dev/github_repo/"
+
+# this alias to open the notes folder
+alias nt="op /mnt/d/NTSOA/dev/0\ NOTES"
+
+# this alias to open the kali linux Vm Shared folder
+alias kali="op /mnt/d/NTSOA/INSTALLED/KALI_LINUX"
+
+# this alias to open the download folder
+alias dwl="dwl"
+
+# this function for dwl alias
+function dwl(){
+  local download_folder_path=/mnt/c/Users/lab_l/Downloads
+  op $download_folder_path
+}
+
+# this alias to open the desktop
+alias dtp="dtp"
+
+# this function for dtp alias
+function dtp(){
+  local desktop_folder_path=/mnt/c/Users/lab_l/OneDrive/Bureau
+  op $desktop_folder_path
+}
+
+# this alias to view the books
+alias books='exop /mnt/d/NTSOA/"0 ENI"/"ENI 2023"/"ENI L1 LESSONS"/BOOKS'
+
+# this alias to enter internship_report
+alias intern='op /mnt/d/NTSOA/"0 ENI"/"ENI 2024"/"STAGE 2024"/internship_report'
+
+# this alias to play directly the typing game
+alias typing="typing"
+
+# this function for typing alias
+function typing(){
+  cd /mnt/d/NTSOA/dev/github_repo/typing
+  cmd.exe /c start python server.py
+  cmd.exe /c start chrome "http://localhost:8000"
+  cd - &>/dev/null
+}
+
+# this alias to access my musics
+alias msc="op /mnt/d/NTSOA/music/hiravao"
+
+# this alias to access pictures
+alias pct="op /mnt/c/Users/lab_l/OneDrive/Pictures"
+
+# this alias to view the setup
+alias setup="op /mnt/d/NTSOA/SETUP"
+
+# this alias to open dosbox config files
+alias dosbox="dosbox"
+
+# this function for dosbox alias
+function dosbox(){
+  op /mnt/c/Users/lab_l/AppData/Local/DOSBox
+}
+
+# this alias to open the state drive
+alias sd="op /mnt/d"
+
+# this alias to access directly the eni folder
+alias eni="eni"
+
+# this function for eni alias
+function eni(){
+  local eni_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/S4
+  op $eni_path
+}
+
+# this alias to access the ENI time schedule
+alias edt="edt"
+
+# this function for edt alias
+function edt(){
+  local edt_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/L2\ 2024
+  cd $edt_path
+
+  local recent_file=$(ls -t . | head -n1)
+  explorer.exe $recent_file
+
+  cd - &>/dev/null
+}
+
+# this alias to access the raw ENI time schedule
+alias edtr="edtr"
+
+# this function for edtr alias
+function edtr(){
+  local edt_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/RAW
+  cd $edt_path
+
+  local recent_file=$(ls -t . | head -n1)
+  explorer.exe $recent_file
+
+  # cv
+  cd - &>/dev/null
+}
+
+# this alias to set the recent file variable
+function rctf(){
+  echo $(ls -tR | head)
+}
+
+# this alias to view the devops folder
+alias dvps="op /mnt/d/NTSOA/DEVOPS/devops"
+
+# this alias to open recent file / directory
+alias rct="rct"
+
+# this function for rct alias
+function rct(){
+  local recent_file=$(ls -t . | head -n1)
+  op $recent_file
+}
 
 #######################################################################
 
@@ -3463,6 +2635,207 @@ alias cmd="cmd"
 function cmd(){
   powershell.exe -command "Start-Process cmd -Verb RunAs";
   x;
+}
+
+#######################################################################
+
+### WSL Network Aliases
+
+# this alias to show the network configuration
+alias ipsh="ipsh"
+
+# this function for ntsh alias
+function ipsh(){
+  c && br;
+  echo "  Available IP Adresses : ";
+  br;
+  local eth_ip=$(ip addr show eth0 | grep -oP 'inet \K[\d.]+');
+  local wifi_ip=$(ip addr show wifi0 | grep -oP 'inet \K[\d.]+');
+  echo " eth0  ==> $eth_ip" && br;
+  echo " wifi0  ==> $wifi_ip" && br;
+}
+
+function clean_argument() {
+  local arg="$1"
+  # Replace spaces with backslashes
+  local clean_arg="${arg// /\\}"
+
+  # Replace special characters with escaped versions
+  local special_chars='[][{}()*+?.\\^$|]'
+  # Escape backslashes for sed
+  local escaped_special_chars="$(echo "$special_chars" | sed 's/\\/\\\\/g')"
+  local arg_pattern="s/[$escaped_special_chars]/\\\\&/g"
+
+  clean_arg="$(echo "$clean_arg" | sed -E "$arg_pattern")"
+  echo "$clean_arg"
+}
+
+# I don't know why but this alias
+# make the PC slow down
+# this alias to view saved wifi password
+# SOLVED: 05-11-2024 22:44
+# Just execute it inside the
+# hard drive of windows instead of WSL
+# directories, so just cd to whatever
+# hard drive of windows to make it run
+alias wpass="wpass"
+
+# this function for wpass alias
+function wpass(){
+  cd /mnt/c
+  if [[ $# -eq 0 ]]; then
+    # consider all arguments as one string
+    local wifi=$(
+      cmd.exe /c netsh wlan show profiles |
+        grep -i "All User Profile" |
+        awk '{print $5}' | shuf -n 1
+    )
+    local password=$(
+      cmd.exe /c netsh wlan show profiles "$wifi" key=clear |
+        grep "Key Content" |
+        awk '{print $4}'
+    )
+    echo "Wifi SSID : $wifi";
+    echo "Password  : $password";
+  else
+    # consider all arguments as one string
+    local wifi="$*"
+    local password=$(
+      cmd.exe /c netsh wlan show profiles "$wifi" key=clear |
+        grep "Key Content" |
+        awk '{print $4}'
+    )
+    echo "Wifi SSID : $wifi";
+    echo "Password  : $password";
+  fi
+  cd - &>/dev/null;
+}
+
+# Completion function for wpass
+_wpass_completion() {
+  cd /mnt/c
+  local cur
+
+  # Get the current word being completed
+  cur="${COMP_WORDS[COMP_CWORD]}"
+
+  # Fetch WiFi profiles
+  local profiles=$(cmd.exe /c netsh wlan show profiles |
+    grep -i "All User Profile" |
+    awk '{$1=$2=$3=""; print substr($0, 6)}' |
+    head -n 1000
+  )
+
+  # Generate completions
+  COMPREPLY=($(compgen -W "${profiles}" -- "${cur}"))
+  cd - &>/dev/null
+}
+
+# Register the completion function for wpass
+complete -F _wpass_completion wpass
+
+# this alias to "list known wifi"
+alias wls="wls"
+
+# this function for wls alias
+function wls(){
+  cd /mnt/c
+
+  function print_message(){
+    wifi="$1"
+    password="$2"
+    # Print Wi-Fi SSID and password
+    echo "Wifi SSID : $wifi"
+    echo "Password  : $password"
+    echo
+  }
+
+  function wifi_and_pass(){
+    num_profiles="$1"
+    grep_string="$2"
+    # Loop through each Wi-Fi profile
+    while IFS= read -r wifi; do
+      # Retrieve password for the current Wi-Fi profile
+      local password=$(
+        cmd.exe /c netsh wlan show profiles "$wifi" key=clear |
+          grep "Key Content" | awk '{print $4}'
+      )
+      print_message $wifi $password
+    done < <(
+      cmd.exe /c netsh wlan show profiles |
+        grep -i "$grep_string" |
+        grep 'All User Profile' |
+        awk '{$1=$2=$3=""; print substr($0, 6)}' |
+        head -n "$num_profiles"
+    )
+  }
+
+  function wifi_name(){
+    wifi_count=0
+    # Loop through each Wi-Fi profile
+    while IFS= read -r wifi; do
+      echo "- $wifi"
+      ((wifi_count++))
+    done < <(
+      cmd.exe /c netsh wlan show profiles |
+        grep 'All User Profile' |
+        awk '{$1=$2=$3=""; print substr($0, 6)}'
+    )
+  }
+
+  if [[ $# -eq 0 ]]; then
+    num_profiles=1
+    grep_string=$(
+      cmd.exe /c netsh wlan show profiles |
+        grep -i "All User Profile" |
+        awk '{print $5}' | shuf -n 1
+    )
+    wifi_and_pass $num_profiles $grep_string
+  elif [[ $# -eq 1 ]]; then
+    if [[ "$1" =~ ^[0-9]+$ ]]; then
+      num_profiles=$1
+      grep_string=""
+      wifi_and_pass $num_profiles $grep_string
+    elif [[ "$1" != "-a" ]]; then
+      num_profiles=99999999
+      grep_string="$1"
+      wifi_and_pass $num_profiles $grep_string
+    elif [[ "$1" -eq "-a" ]]; then
+      wifi_name
+      echo
+      echo "Known Wi-Fi Connections ($wifi_count) "
+    fi
+  fi
+
+  cd - &>/dev/null;
+}
+
+# this alias to reach a network
+alias reach="allow_sudo && reach";
+
+# this function to check if pfsense is reachable
+# coded 01/29/2024
+function reach(){
+  c && br;
+
+  local target_IP="$1"
+  local check_message="Checking $target_IP reachability..."
+  local check_IP="sudo ping -c 1 -W 5 "
+  local reachable="br && echo ' $check_message' && eval $check_IP $target_IP &> /dev/null;"
+  # the -c 1 means we send one packet to test it
+  # the -W 5 means if the ping have 5 seconds to check
+  # as always we run it in background in order to
+  # not see all the boring logs messages
+
+  if eval $reachable ;then
+    #if PfSense is reachable then
+    #we execute the next command after
+    #this function calling
+    # eval "$@"
+    echo " $target_IP is reachable"
+  else;
+    echo " $target_IP is not reachable"
+  fi
 }
 
 #######################################################################
@@ -3595,6 +2968,127 @@ function open_web_app(){
 #######################################################################
 
 ### PWAs Aliases
+
+# this function to convert url to name
+function convert_url(){
+  url="$1"
+  domain="${url%.*}"
+
+  # Capitalize the first letter of the domain
+  capitalized_domain="$(tr '[:lower:]' '[:upper:]' <<< ${domain:0:1})${domain:1}"
+  echo "$capitalized_domain"
+}
+
+# this alias to open the GitHub app
+alias gthb="gthb"
+
+# this function for gthb alias
+function gthb(){
+  local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
+
+  local github_id="mjoklplbddabcmpepnokjaffbmgbkkgg"
+  local github_link="github.com"
+  local github_name="GitHub"
+
+  if [[ "$is_a_git_repo" == "true" ]]; then
+    local has_remote=$(git remote -v)
+    if [ "$has_remote" ]; then
+      local repo_url=$(git config --get remote.origin.url)
+      local repo_owner=$(echo "$repo_url" | awk -F '[/:]' '{print $(NF-1)}')
+      local repo_name="$(echo "$repo_url" | awk -F '/' '{print $NF}' | sed 's/.git$//')"
+    else
+      local repo_owner=$(git config user.username)
+      local repo_name=$(basename "$(git rev-parse --show-toplevel)")
+    fi
+
+    local current_branch=$(git branch | awk '/\*/ {print $2}');
+
+    function check_view(){
+      echo -ne "${BOLD}${GREEN}Open ${WHITE}the repo ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ? (y/n) ";
+      read check_view
+      echo ${RESET}
+
+      if [ "$check_view" = "y" ]; then
+        cd /mnt/c
+
+        cmd.exe /c start chrome.exe \
+          --profile-directory=Default --app-id=$github_id \
+          --app=https://github.com/$repo_owner/$repo_name/tree/$current_branch \
+
+        cd - &>/dev/null
+        # gh repo view $repo_owner/$repo_name \
+        #   --web --branch $current_branch \
+        #   &>/dev/null
+      elif [ "$check_view" = "n" ];then
+        open_web_app $github_link $github_id $github_name
+      else
+        check_view
+      fi
+    }
+
+    # check if the repo has a remote
+    # on github otherwise open the pwa
+    if [ "$has_remote" ]; then
+      local is_remote_branch=$(git branch -r | grep "origin/$current_branch")
+
+      # check if the current branch has remote
+      if [ -n "$is_remote_branch" ]; then
+        check_view
+      else
+        echo "${BOLD} ■■▶ The remote repo ${LIGHT_BLUE}$repo_name ${WHITE}has no branch named ${GREEN}$current_branch ${WHITE}!" && br;
+      fi
+    else
+      open_web_app $github_link $github_id $github_name
+    fi
+  else
+    if [[ $# -eq 0 ]]; then
+      open_web_app $github_link $github_id $github_name
+    fi
+  fi
+}
+
+# this alias to open chatGpt app
+alias gpt="gpt"
+
+# this function for gpt alias
+function gpt(){
+  local gpt_id="febkkahnhhdppidjakkemnckfhnkidba"
+  local gpt_link="chatgpt.com"
+  local gpt_name="ChatGpt"
+  open_web_app $gpt_link $gpt_id $gpt_name
+}
+
+# this alias to open Google Gemini app
+alias gmn="gmn"
+
+# this function for gmn alias
+function gmn(){
+  local gmn_id="acehpdabncjaanhpihehcmhidhmbdcoo"
+  local gmn_link="gemini.google.com"
+  local gmn_name="Gemini"
+  open_web_app $gmn_link $gmn_id $gmn_name
+}
+
+# this alias to open ClaudeAI app
+alias cld="cld"
+
+# this function for cld alias
+fuction cld(){
+  local claude_id="fmpnliohjhemenmnlpbfagaolkdacoja"
+  local claude_link="claude.ai"
+  local claude_name="ClaudeAI"
+  open_web_app  $claude_link $claude_id $claude_name
+}
+
+# this alias to open reddit forum
+alias rdt="rdt"
+
+# this function for rdt alias
+function rdt(){
+  local reddit_id="lgnggepjiihbfdbedefdhcffnmhcahbm"
+  local reddit_link="reddit.com"
+  open_web_app $reddit_link $reddit_id
+}
 
 # this alias to open Digital Clock Web App
 alias clock="allow_sudo && clock"
@@ -4220,116 +3714,635 @@ function htx(){
 
 #######################################################################
 
-### WSL Shortcuts Aliases
+### WSL Programs Aliases
 
-# this alias to open the download folder
-alias dwl="dwl"
+# this alias to run an executable file or a script
+alias rn="rn"
 
-# this function for dwl alias
-function dwl(){
-  local download_folder_path=/mnt/c/Users/lab_l/Downloads
-  op $download_folder_path
+# this function for rn alias
+function rn(){
+  # this will look the extension of the file
+  # use of ${1%.*} to retrieve the file name
+  # explanation :
+  # ${file%pattern} ==> this will remove the matched
+  # pattern from the file from the end of the file
+  #
+  # use of ${1##*.} to retrieve extension
+  # explanation :
+  # ${file##*.} ==> this will remove the longest
+  # matched string from the beginning of the file
+  # 2024-02-12 00:27
+  case "${1##*.}" in
+    py)
+      # all "$1" && c && echo -e && py "$1" && echo -e;;
+      python "$@" && return 0;;
+    c || cpp) #update 07/28/2023
+      file="$1";
+      out="${file%.*}"
+
+      # Condition 1: Check if the file extension is c
+      extension='[[ "${file##*.}" == "c" ]]';
+
+      # Condition 2: Check if the file contains math library
+      math='grep -E "^#include <math.h>" "$file" >/dev/null';
+
+      # Ternary expressions to determine compiler and flags
+      compiler=$(eval "$extension" && echo "gcc" || echo "g++");
+      flags=$(eval "$math" && echo "-lm" || echo "");
+
+      # check if an old executable exists
+      if [[ -f "$out" ]]; then
+        dlf "$out";
+      fi
+
+      # Compile the C file
+      "$compiler" "$file" -o "$out" $flags;
+
+      # Execute the resulting executable
+      all "$out";
+      clear && br;
+      ./"$out";
+      br;;
+    js)
+      c && br 2 && node "$1" && br
+      ;;
+    com)
+      open_web_app "$1";
+      ;;
+    bat)
+      cmd.exe /c "$1";
+      ;;
+    html || pdf)
+      bwsop "$1"
+      ;;
+    *)
+      all "$1" && c && ./"$1";;
+ esac
 }
 
-# this alias to open the desktop
-alias dtp="dtp"
+# this alias to view inside a file
+alias vf="vf"
 
-# this function for dtp alias
-function dtp(){
-  local desktop_folder_path=/mnt/c/Users/lab_l/OneDrive/Bureau
-  op $desktop_folder_path
+# this function for vf alias
+function vf() {
+  if [[ -f "$1" ]]; then
+    case "${1##*.}" in
+      db|sqlite*|xlsx|docx|pptx|ppt|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) 
+        explorer.exe "$1"
+        ;;
+      # open all files that have default app with windows explorer
+      html)
+        if [[ "$PWD" == "/mnt/"* ]]; then
+          explorer.exe "$1"
+        else
+          bwsop "$1"
+        fi
+        ;;
+      fxml)
+        cmd.exe /c start SceneBuilder.exe "$@"
+        ;;
+      *) nvim "$1" ;;
+    esac
+    return 0
+  elif [[ -d "$1" ]]; then
+    op "$1"
+  fi
 }
 
-# this alias to view the books
-alias books='exop /mnt/d/NTSOA/"0 ENI"/"ENI 2023"/"ENI L1 LESSONS"/BOOKS'
+# this alias to open ThemeTool
+alias thm="thm"
 
-# this alias to enter internship_report
-alias intern='op /mnt/d/NTSOA/"0 ENI"/"ENI 2024"/"STAGE 2024"/internship_report'
+# this function for thm alias
+function thm(){
+  powershell.exe -command "Start-Process D:\NTSOA\INSTALLED\THEME_TOOL\ThemeTool.exe -Verb RunAs"
+}
 
-# this alias to play directly the typing game
-alias typing="typing"
+# this alias to call the sqlite3.Exe file
+alias sqlite="sqlite"
 
-# this function for typing alias
-function typing(){
-  cd /mnt/d/NTSOA/dev/github_repo/typing
-  cmd.exe /c start python server.py
-  cmd.exe /c start chrome "http://localhost:8000"
+# this function for ssqlite alias
+function sqlite(){
+  if [[ $# -eq 0 ]]; then
+    echo "■■▶ Please specify a file.db  ";
+  else
+    if [[ $# -eq 1 && "${1##*.}" -eq "db" ]]; then
+      c && br;
+      sqlite3.exe $@;
+      cv;
+    else
+      sqlite3.exe $@;
+    fi
+  fi
+}
+
+# this alias to call the windows nodeJS Program
+alias node="node"
+
+# this function for node alias
+function node(){
+  node.exe $@;
+}
+
+# this alias to launch eclipse IDE
+alias eclipse="eclipse"
+
+# this function for eclipse alias
+function eclipse(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start eclipse.exe ${@:-.}
+  else
+    cd /mnt/c
+    cmd.exe /c start eclipse.exe ${@:-.}
+    cd - &>/dev/null
+  fi
+}
+
+# this alias to launch Apache NetBeans IDE
+alias beans="beans"
+
+# this function for beans alias
+function beans(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start netbeans64.exe ${@:-.}
+  else
+    cd /mnt/c
+    cmd.exe /c start netbeans64.exe ${@:-.}
+    cd - &>/dev/null
+  fi
+}
+
+# this alias to launch intelijieda
+alias idea="idea"
+
+# this function for idea alias
+function idea(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start idea64.exe ${@:-.}
+  else
+    cd /mnt/c
+    cmd.exe /c start idea64.exe ${@:-.}
+    cd - &>/dev/null
+  fi
+}
+
+# this alias to open PyCharm
+alias charm="charm"
+
+# this function for charm alias
+function charm(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start pycharm64.exe ${@:-.}
+  else
+    cd /mnt/c
+    cmd.exe /c start pycharm64.exe ${@:-.}
+    cd - &>/dev/null
+  fi
+}
+
+# this alias to launch ppsspp
+alias psp="psp"
+
+# this function for psp alias
+function psp(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start PPSSPPWindows.exe $@
+  else
+    cd /mnt/c
+    cmd.exe /c start PPSSPPWindows.exe $@
+    cd - &>/dev/null
+  fi
+}
+
+# this alias to open tor browser
+alias tor="tor"
+
+# this function for tor alias
+function tor(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start tor.exe $@
+  else
+    cd /mnt/c
+    cmd.exe /c start tor.exe $@
+    cd - &>/dev/null
+  fi
+}
+
+# this alias for windows ngrok
+alias ngrok="ngrok"
+
+# this function for ngrok alias
+# IMPROVED: 05-29-2024 10:25
+function ngrok(){
+  # default ngrok command that redirects
+  # to a new terminal so the current one
+  # is available for other commands
+  local ngrok_cmd='cmd.exe /c start ngrok "$@"'
+
+  # check for dashes then do not
+  # redirect to another terminal
+  for arg in "$@"; do
+    if [[ "$arg" == -* || "$arg" == --* ]]; then
+      local ngrok_cmd='cmd.exe /c ngrok "$@"'
+      break
+    fi
+  done
+
+  # Check the current directory
+  # because ngrok will work only
+  # on windows'directory rather
+  # than WSL's one so we move
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $ngrok_cmd
+  else
+    cd /mnt/c
+    eval $ngrok_cmd
+    cd - &>/dev/null
+  fi
+}
+
+# Completion function for ngrok
+_ngrok_completion() {
+  local cur
+  cur="${COMP_WORDS[COMP_CWORD]}"
+
+  # Define the list of possible completions
+  local commands="api completion config credits diagnose help http service start tcp tls tunnel update version"
+
+  # Provide completion options based on the current word being completed
+  COMPREPLY=($(compgen -W "${commands}" -- "$cur"))
+}
+
+# Register the completion function for ngrok
+complete -F _ngrok_completion ngrok
+
+# this alias to launch process explorer
+alias prex="prex"
+
+# this function for prex alias
+function prex(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start procexp64
+  else
+    cd /mnt/c
+    cmd.exe /c start procexp64
+    cd - &>/dev/null
+  fi
+}
+
+# Alias to call the windows npm
+alias npm="npm"
+
+# Function for npm alias
+function npm() {
+  local npm_cmd='cmd.exe /c start npm "$@"'
+  for arg in "$@"; do
+    if [[ ("$arg" != "--verbose" || "$arg" != "-g") && ("$arg" == -* || "$arg" == --*) ]]; then
+      local npm_cmd='cmd.exe /c npm "$@"'
+      break
+    fi
+  done
+
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $npm_cmd
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!"
+  fi
+}
+
+# Alias to call the windows npx
+alias npx="npx"
+
+# Function for npx alias
+function npx() {
+  local npx_cmd='cmd.exe /c start npx "$@"'
+  for arg in "$@"; do
+    if [[ "$arg" != "--verbose" && ("$arg" == -* || "$arg" == --*) ]]; then
+      local npx_cmd='cmd.exe /c npx "$@"'
+      break
+    fi
+  done
+
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $npx_cmd
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!"
+  fi
+}
+
+# Alias to call the windows vue
+alias vue="vue"
+
+# Function for vue alias
+function vue() {
+  local vue_cmd='cmd.exe /c start vue "$@"'
+  for arg in "$@"; do
+    if [[ "$arg" != "--verbose" && ("$arg" == -* || "$arg" == --*) ]]; then
+      local vue_cmd='cmd.exe /c vue "$@"'
+      break
+    fi
+  done
+
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $vue_cmd
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!"
+  fi
+}
+
+# this alias to open FL Studio
+alias fl="fl"
+
+# this function for fl alias
+function fl(){
+  cd /mnt/d/NTSOA/INSTALLED/FL\ STUDIO\ 12
+  cmd.exe /c start FL64.exe
+  cd - &>/dev/null;
+}
+
+# this alias to open apple music
+alias music="music"
+
+# this function for music alias
+function music(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start AppleMusic.exe
+  else
+    cd /mnt/c
+    cmd.exe /c start AppleMusic.exe
+    cd - &>/dev/null;
+  fi
+}
+
+# this alias to launch xampp
+alias xampp="xampp"
+
+# this function for xampp alias
+function xampp(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start xampp-control.exe
+  else
+    cd /mnt/c
+    cmd.exe /c start xampp-control.exe
+    cd - &>/dev/null;
+  fi
+}
+
+# this alias to open notepad
+alias ntp="ntp"
+
+# this function for ntp alias
+function ntp(){
+  if [[ $# -eq 0 ]]; then
+    cmd.exe /c start notepad.exe 2>/dev/null
+  elif [[ $# -eq 1 ]]; then
+    local formatted_path=$(wslpath -w .)
+    cmd.exe /c start notepad.exe "$formatted_path\\$1" 2>/dev/null
+  else
+    echo "${BOLD} ■■▶ Usage : ntp file_to_open" && br;
+  fi
+}
+
+# this alias to open VirtualBox
+alias vm="vm"
+
+# this function for vm alias
+function vm(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start VirtualBox.exe
+  else
+    cd /mnt/c
+    cmd.exe /c start VirtualBox.exe
+    cd - &>/dev/null;
+  fi
+}
+
+# this alias to launch ventoy
+alias ventoy="ventoy"
+
+# this function for ventoy alias
+function ventoy(){
+  cd "/mnt/d/NTSOA/INSTALLED/VENTOY/ventoy-1.0.99"
+  explorer.exe Ventoy2Disk.exe
+  cd -&>/dev/null
+}
+
+# this alias to open wireshark
+alias wsh="wsh"
+
+# this alias for wsh alias
+function wsh(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c start wireshark.exe
+  else
+    cd /mnt/c
+    cmd.exe /c start wireshark.exe
+    cd - &>/dev/null;
+  fi
+}
+
+# this alias to open total commander
+alias tcmd="TOTALCMD64.exe && cv"
+
+# this alias to launch windows python
+alias python="python.exe"
+
+# this alias to launch windows go
+alias go="go"
+
+# this function for go alias
+function go(){
+  # check if we are inside wsl directory
+  # or inside a symbolic link
+  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
+    cmd.exe /c go $@
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
+  fi
+}
+
+# this alias to run rustc
+alias rustc="rustc"
+
+# this function for rustc alias
+function rustc(){
+  # check if we are inside wsl directory
+  # or inside a symbolic link
+  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
+    cmd.exe /c rustc $@
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
+  fi
+}
+
+# this alias to run cargo
+alias cargo="cargo"
+
+# this function for cargo alias
+function cargo(){
+  # check if we are inside wsl directory
+  # or inside a symbolic link
+  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
+    cmd.exe /c cargo $@
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
+  fi
+}
+
+# this alias to launch windows java
+alias java="java.exe"
+
+# this alias to launch javac windows
+alias javac="javac.exe"
+
+# this alias to launch jar windows
+alias jar="jar.exe"
+
+# Alias to call the windows pip
+alias pip="pip"
+
+# Function for pip alias
+function pip() {
+  # check if we are inside wsl directory
+  # or inside a symbolic link
+  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
+    cmd.exe /c pip "$@"
+  else
+    cd /mnt/c
+    cmd.exe /c pip "$@"
+    cd - &>/dev/null;
+  fi
+}
+
+# this alias to use windows nslookup
+alias nslookup="nslookup"
+
+# this function for nslookup alias
+function nslookup(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c nslookup "$@"
+  else
+    cd /mnt/c
+    cmd.exe /c nslookup "$@"
+    cd - &>/dev/null;
+  fi
+}
+
+# this alias to use windows arp
+alias arp="arp"
+
+# this function for arp alias
+function arp(){
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    cmd.exe /c arp "$@"
+  else
+    cd /mnt/c
+    cmd.exe /c arp "$@"
+    cd - &>/dev/null;
+  fi
+}
+
+# this alias to run jupyter notebook
+alias jptr="jptr"
+
+# this function for jptr alias
+function jptr(){
+  # check if we are inside wsl directory
+  # or inside a symbolic link
+  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
+    cmd.exe /c start jupyter notebook
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
+  fi
+}
+
+# this alias to open obs Studio
+alias obs="obs"
+
+# this function for obs alias
+function obs(){
+  cd /mnt/d/NTSOA/INSTALLED/OBS\ STUDIO/obs-studio/bin/64bit
+  cmd.exe /c start obs64.exe
   cd - &>/dev/null
 }
 
-# this alias to access my musics
-alias msc="op /mnt/d/NTSOA/music/hiravao"
+# this alias to launch gta san andreas
+alias gta="gta"
 
-# this alias to access pictures
-alias pct="op /mnt/c/Users/lab_l/OneDrive/Pictures"
-
-# this alias to view the setup
-alias setup="op /mnt/d/NTSOA/SETUP"
-
-# this alias to open dosbox config files
-alias dosbox="dosbox"
-
-# this function for dosbox alias
-function dosbox(){
-  op /mnt/c/Users/lab_l/AppData/Local/DOSBox
-}
-
-# this alias to open the state drive
-alias sd="op /mnt/d"
-
-# this alias to access directly the eni folder
-alias eni="eni"
-
-# this function for eni alias
-function eni(){
-  local eni_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/S4
-  op $eni_path
-}
-
-# this alias to access the ENI time schedule
-alias edt="edt"
-
-# this function for edt alias
-function edt(){
-  local edt_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/L2\ 2024
-  cd $edt_path
-
-  local recent_file=$(ls -t . | head -n1)
-  explorer.exe $recent_file
-
+# this function for gta alias
+function gta(){
+  cd /mnt/d/NTSOA/INSTALLED/GTA\ SAN\ ANDREAS
+  cmd.exe /c start /affinity 2 gta_sa.exe
   cd - &>/dev/null
 }
 
-# this alias to access the raw ENI time schedule
-alias edtr="edtr"
+# this alias to open visual paradigm
+alias paradigm="paradigm"
 
-# this function for edtr alias
-function edtr(){
-  local edt_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/RAW
-  cd $edt_path
-
-  local recent_file=$(ls -t . | head -n1)
-  explorer.exe $recent_file
-
-  # cv
+# this function for paradigm alias
+function paradigm(){
+  cd /mnt/d/NTSOA/INSTALLED/VISUAL\ PARADIGM/Visual\ Paradigm\ CE\ 17.2/bin
+  explorer.exe visual.lnk
   cd - &>/dev/null
 }
 
-# this alias to set the recent file variable
-function rctf(){
-  echo $(ls -tR | head)
+# this alias open Bluestacks
+alias android="android"
+
+# this function for android alias
+function android(){
+  cd /mnt/c/Program\ Files/BlueStacks_nxt
+  cmd.exe /c start HD-Player.exe
+  cd - &>/dev/null
 }
 
-# this alias to view the devops folder
-alias dvps="op /mnt/d/NTSOA/DEVOPS/devops"
+# this alias to open Driver Booster 11
+alias boost="boost"
 
-# this alias to open recent file / directory
-alias rct="rct"
+# this function for boost alias
+function boost(){
+  cd "/mnt/d/NTSOA/INSTALLED/DRIVER BOOSTER/11.6.0"
+  cmd.exe /c start DriverBooster.exe
+  cd - &>/dev/null
+}
 
-# this function for rct alias
-function rct(){
-  local recent_file=$(ls -t . | head -n1)
-  op $recent_file
+# this alias to open gns3
+alias gns="gns"
+
+# this function for gns alias
+function gns(){
+  cd /mnt/d/NTSOA/INSTALLED/GNS3
+  cmd.exe /c start gns3.exe
+  cd - &>/dev/null
+}
+
+# this alias to launch the debug
+alias debug="debug"
+
+# this function for debug alias
+function debug(){
+  cd /mnt/d/NTSOA/INSTALLED/DOSBOX/DOSBox-0.74-3
+  cmd.exe /c start DOSBox.exe DEBUGX.COM
+  cd - &>/dev/null
+}
+
+# this alias to open x64dbg
+alias dbg64="dbg64"
+
+# this function for debug alias
+function dbg64(){
+  cd /mnt/d/NTSOA/INSTALLED/SHORTCUTS/
+  explorer.exe x64dbg.lnk
+  cd - &>/dev/null
+}
+
+# this alias to open x32dbg
+alias dbg32="dbg32"
+
+# this function for debug alias
+function dbg32(){
+  cd /mnt/d/NTSOA/INSTALLED/SHORTCUTS/
+  explorer.exe x32dbg.lnk
+  cd - &>/dev/null
 }
 
 #######################################################################
