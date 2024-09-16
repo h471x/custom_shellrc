@@ -92,7 +92,6 @@ WSL sections can be skipped for Linux configurations.
   # This is for fastfile Oh-My-Zsh Plugin
   fastfile_var_prefix='$'
 
-
   # Declare the variable for zsh-syntax-highlighting styles
   typeset -A ZSH_HIGHLIGHT_STYLES
 

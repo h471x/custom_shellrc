@@ -52,7 +52,6 @@ DISABLE_AUTO_UPDATE="true"
 # This is for fastfile Oh-My-Zsh Plugin
 fastfile_var_prefix='$'
 
-
 # Declare the variable for zsh-syntax-highlighting styles
 typeset -A ZSH_HIGHLIGHT_STYLES
 
