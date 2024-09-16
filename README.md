@@ -13,6 +13,7 @@ WSL sections can be skipped for Linux configurations.
   - **Packages** : ``eza`` ``figlet`` ``git`` ``gh`` ``tmux`` ``neofetch``
   - **Services** : ``sshd`` ``apache2`` ``mariadb`` ``postgres`` ``postfix``
   - **Plugins** : ``oh-my-zsh`` ``powerlevel10k``
+  - **Terminal** : ``QTerminal``
   - **Fonts** : ``Nerd Font``
 </details>
 
@@ -38,8 +39,6 @@ WSL sections can be skipped for Linux configurations.
   ```
 </details>
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
 <details>
   <summary><strong> ZSH Basic Config</strong></summary>
 
@@ -59,8 +58,6 @@ WSL sections can be skipped for Linux configurations.
   #######################################################################
   ```
 </details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
 
 <details>
   <summary><strong> oh-my-zsh config</strong></summary>
@@ -120,8 +117,6 @@ WSL sections can be skipped for Linux configurations.
   ```
 </details>
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
 <details>
   <summary><strong> Tmux Config</strong></summary>
 
@@ -149,8 +144,6 @@ WSL sections can be skipped for Linux configurations.
   #######################################################################
   ```
 </details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
 
 <details>
   <summary><strong>ANSI Color Codes</strong></summary>
@@ -213,8 +206,6 @@ WSL sections can be skipped for Linux configurations.
   #######################################################################
   ```
 </details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
 
 <details>
   <summary><strong> Basic Aliases</strong></summary>
@@ -482,8 +473,6 @@ WSL sections can be skipped for Linux configurations.
   ```
 </details>
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
 <details>
   <summary><strong> Navigation Aliases</strong></summary>
 
@@ -738,8 +727,6 @@ WSL sections can be skipped for Linux configurations.
   ```
 </details>
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
 <details>
   <summary><strong> Sudo Aliases</strong></summary>
 
@@ -814,8 +801,6 @@ WSL sections can be skipped for Linux configurations.
   #######################################################################
   ```
 </details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
 
 <details>
   <summary><strong> Git Aliases</strong></summary>
@@ -1267,8 +1252,6 @@ WSL sections can be skipped for Linux configurations.
   #######################################################################
   ```
 </details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
 
 <details>
   <summary><strong> GitHub CLI Aliases</strong></summary>
@@ -1943,8 +1926,6 @@ WSL sections can be skipped for Linux configurations.
   ```
 </details>
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
 <details>
   <summary><strong> Services Aliases</strong></summary>
 
@@ -2436,8 +2417,6 @@ WSL sections can be skipped for Linux configurations.
   ```
 </details>
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
 <details>
   <summary><strong> File Aliases</strong></summary>
 
@@ -2591,8 +2570,6 @@ WSL sections can be skipped for Linux configurations.
   ```
 </details>
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
 <details>
   <summary><strong> Explorer Alias</strong></summary>
 
@@ -2625,8 +2602,6 @@ WSL sections can be skipped for Linux configurations.
   ```
 </details>
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
 <details>
   <summary><strong> Custom command not found</strong></summary>
 
@@ -2651,8 +2626,6 @@ WSL sections can be skipped for Linux configurations.
   #######################################################################
   ```
 </details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
 
 <details>
   <summary><strong> $SHELLrc Aliases</strong></summary>
@@ -2693,8 +2666,6 @@ WSL sections can be skipped for Linux configurations.
   ```
 </details>
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
 <details>
   <summary><strong> Neovim Aliases</strong></summary>
 
@@ -2734,163 +2705,6 @@ WSL sections can be skipped for Linux configurations.
   #######################################################################
   ```
 </details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
-
-<details>
-  <summary><strong> Linux Paths</strong></summary>
-
-  ```sh
-  ### Kali Linux Paths
-
-  # Binary
-  CUPP_PATH=/usr/share/cupp
-  GO_PATH=/usr/local/go/bin
-  HOME_PATH=$HOME/bin
-  SCP_PATH=/usr/bin/scp
-
-  PATH=$CUPP_PATH:$HOME_PATH:$GO_PATH:$SCP_PATH:$PATH
-
-  # here to hide the java options
-  unset _JAVA_OPTIONS
-
-  #######################################################################
-  ```
-</details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
-
-<details>
-  <summary><strong> Linux Shortcuts Aliases</strong></summary>
-
-  ```sh
-  ### Kali Linux Shortcuts Aliases
-
-  # this alias to view the usb device connected here
-  alias usb="op /media/h471x"
-
-  # this alias to open the shared folder
-  alias sf="op /media/sf_ENI_2023"
-
-  # this alias to view the pc state
-  alias pc="c && br 2 && neofetch --source ~/.config/neofetch/htx2.txt"
-
-  # this alias to go to home directory
-  alias hm="cd && cv"
-
-  # this alias to access / directory
-  alias rt="cd / && cv"
-
-  # this alias to enter the NTSOA directory
-  alias hn="op ~/NTSOA"
-
-  # this alias to go to the download folder
-  alias dwl="op /home/h471x/Downloads"
-
-  # this alias to open the HACK directory
-  alias hack="op /home/h471x/NTSOA/hack"
-
-  # this alias to open the ENI CYBERSECURITY directory
-  alias cs="op /home/h471x/NTSOA/ENI\ CYBERSECURITY"
-
-  # this alias to enter the devops course
-  alias dvps="op /home/h471x/NTSOA/COURSE/DEVOPS/NOTES "
-
-  # this alias to view the aws informations
-  alias awsd="op /home/h471x/NTSOA/COURSE/DEVOPS/AWS "
-
-  # this alias to go to the to desktop
-  alias dtp="op /home/h471x/Desktop"
-
-  # this alias to go to the to dev
-  alias dev="op /home/h471x/NTSOA/dev"
-
-  # this alias to open the windows dev shared folder
-  alias wdev="op /media/sf_DEV"
-
-  # this alias to open the text notes
-  alias nt="op /home/h471x/NTSOA/notes"
-
-  # this alias to open HTX USB
-  alias htx="op /media/h471x/HTX\ USB"
-
-  # this alias to open the shareed folder
-  alias kali="op /media/sf_KALI_LINUX"
-
-  # this alias to open the books shared folder
-  alias books="op /media/sf_BOOKS"
-
-  # this alias to open ENI shared folder
-  alias eni="op /media/sf_0_ENI/ENI\ 2024"
-
-  # this alias to view the pictures folder
-  alias pct="pct"
-
-  # this function for pct alias
-  function pct(){
-    op /home/$USER/Pictures;
-  }
-
-  # this alias to directly go to JPG version of the time schedule
-  alias ej="c && op /home/h471x/NTSOA/EDT\ ENI/JPG/L2\ 2024"
-
-  # this alias to convert pdf to jpg for EDT
-  alias ei="ei"
-
-  # this function for ei alias
-  function ei(){
-    # useful variables
-    local input_pdf="$1"
-    local output_image="$(basename "$input_pdf" .pdf).jpg";
-    local kali_edt_path=/home/h471x/NTSOA/EDT\ ENI/JPG/L2\ 2024;
-    local windows_edt_path=/media/sf_0_ENI/ENI\ 2024/0\ EDT/L2\ 2024
-
-    # convert pdf to jpg using imagemagick convert
-    convert -density 500 "$input_pdf" "$output_image";
-
-    # full access to the files
-    all "$input_pdf";
-    all "$output_image";
-
-    # moving to the right directories
-    cp "$output_image" $windows_edt_path;
-    mv "$output_image" $kali_edt_path;
-
-    # Success message
-    c && br 2;
-    echo "${GREEN}${BOLD} ==> SUCCESS ${WHITE}"
-    br;
-    echo "${BOLD} $input_pdf -> $output_image ${RESET}";
-    br;
-    sleep 3;
-
-    # open the edt list
-    op $windows_edt_path;
-  }
-
-  # this alias to edit the time schedule
-  alias edt="edt"
-
-  # this function for edt alias
-  function edt(){
-    cd /home/h471x/NTSOA/'EDT ENI'/ODS;
-    op "EDT ENI L2 2024.ods"
-    op /home/h471x/NTSOA/'EDT ENI'/PDF;
-  }
-
-  # this alias to view the time schedule
-  alias edt="edtv"
-
-  # this function for edt alias
-  function edtv(){
-    op /home/h471x/NTSOA/'EDT ENI';
-  }
-
-  #######################################################################
-  ```
-</details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
 
 <details>
   <summary><strong> Linux Network Aliases</strong></summary>
@@ -3356,8 +3170,6 @@ WSL sections can be skipped for Linux configurations.
   ```
 </details>
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
 <details>
   <summary><strong> Linux Programs Aliases</strong></summary>
 
@@ -3629,193 +3441,6 @@ WSL sections can be skipped for Linux configurations.
   ```
 </details>
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
-<details>
-  <summary><strong> WSL Paths</strong></summary>
-
-  ```sh
-  ### WSL Paths 
-
-  # Binaries
-  WSL_PATH=/home/h471x/.local/bin/:/usr/bin/scp
-  SQLITE_PATH=/mnt/c/Program\ Files/sqlite
-  QT_PATH=/mnt/d/NTSOA/INSTALLED/QT/Tools/QtCreator/bin
-  PYTHON_PATH=/mnt/d/NTSOA/INSTALLED/PYTHON
-  VIRTUAL_BOX_PATH="/mnt/c/'Virtual Box'"
-  WIRESHARK_PATH=/mnt/c/Program\ Files/Wireshark
-  TOTAL_CMD_PATH=/mnt/c/Program\ Files/totalcmd
-  THEME_TOOL_PATH=/mnt/d/NTSOA/INSTALLED/THEME_TOOL
-  WINDOWS_APP_PATH=$VIRTUAL_BOX_PATH:$WIRESHARK_PATH:$TOTAL_CMD_PATH:$THEME_TOOL_PATH
-
-  # Path to Binaries
-  # For better use : add to windows path instead
-  BINARY_PATH=$WSL_PATH:$SQLITE_PATH:$QT_PATH:$WINDOWS_APP_PATH:$PYTHON_PATH
-
-  # Browsers
-  CHROME_PATH=/mnt/c/Program\ Files/Google/chrome/Application/
-  EDGE_PATH=/mnt/c/Program\ Files\ (x86)/Microsoft/Edge/Application/
-  BROWSER_PATH=$CHROME_PATH:$EDGE_PATH
-
-  # Applications
-  NPM_PATH=/mnt/c/Users/lab_l/AppData/Roaming/npm/npm
-  NGROK_PATH=/mnt/d/NTSOA/INSTALLED/NGROK/
-  POT_PLAYER_PATH=/mnt/d/NTSOA/INSTALLED/POT\ PLAYER/PotPlayer
-  FL_STUDIO_PATH=/mnt/d/NTSOA/INSTALLED/FL\ STUDIO\ 12
-  APP_PATH=$NPM_PATH:$POT_PLAYER_PATH:$FL_STUDIO_PATH:$NGROK_PATH
-
-  # Including all the paths
-  PATH=$BINARY_PATH:$BROWSER_PATH:$APP_PATH:$PATH
-
-  #######################################################################
-  ```
-</details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
-
-<details>
-  <summary><strong> WSL Shortcuts Aliases</strong></summary>
-
-  ```sh
-  ### WSL Shortcuts
-
-  # this alias to go to home directory
-  alias hm="cd && cv"
-
-  # this alias to view the windows explorer
-  alias whm="cd /mnt/c/Users/lab_l/OneDrive/Bureau && op Home.lnk && nd"
-
-  # this alias to open the evangile directory
-  alias gospel="op /mnt/d/NTSOA/gospel"
-
-  # this alias to enter the NTSOA directory
-  alias hn="op /mnt/d/NTSOA"
-
-  # this alias to open the dev folder
-  alias dev="op /mnt/d/NTSOA/dev/github_repo/"
-
-  # this alias to open the notes folder
-  alias nt="op /mnt/d/NTSOA/dev/0\ NOTES"
-
-  # this alias to open the kali linux Vm Shared folder
-  alias kali="op /mnt/d/NTSOA/INSTALLED/KALI_LINUX"
-
-  # this alias to open the download folder
-  alias dwl="dwl"
-
-  # this function for dwl alias
-  function dwl(){
-    local download_folder_path=/mnt/c/Users/lab_l/Downloads
-    op $download_folder_path
-  }
-
-  # this alias to open the desktop
-  alias dtp="dtp"
-
-  # this function for dtp alias
-  function dtp(){
-    local desktop_folder_path=/mnt/c/Users/lab_l/OneDrive/Bureau
-    op $desktop_folder_path
-  }
-
-  # this alias to view the books
-  alias books='exop /mnt/d/NTSOA/"0 ENI"/"ENI 2023"/"ENI L1 LESSONS"/BOOKS'
-
-  # this alias to enter internship_report
-  alias intern='op /mnt/d/NTSOA/"0 ENI"/"ENI 2024"/"STAGE 2024"/internship_report'
-
-  # this alias to play directly the typing game
-  alias typing="typing"
-
-  # this function for typing alias
-  function typing(){
-    cd /mnt/d/NTSOA/dev/github_repo/typing
-    cmd.exe /c start python server.py
-    cmd.exe /c start chrome "http://localhost:8000"
-    cd - &>/dev/null
-  }
-
-  # this alias to access my musics
-  alias msc="op /mnt/d/NTSOA/music/hiravao"
-
-  # this alias to access pictures
-  alias pct="op /mnt/c/Users/lab_l/OneDrive/Pictures"
-
-  # this alias to view the setup
-  alias setup="op /mnt/d/NTSOA/SETUP"
-
-  # this alias to open dosbox config files
-  alias dosbox="dosbox"
-
-  # this function for dosbox alias
-  function dosbox(){
-    op /mnt/c/Users/lab_l/AppData/Local/DOSBox
-  }
-
-  # this alias to open the state drive
-  alias sd="op /mnt/d"
-
-  # this alias to access directly the eni folder
-  alias eni="eni"
-
-  # this function for eni alias
-  function eni(){
-    local eni_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/S4
-    op $eni_path
-  }
-
-  # this alias to access the ENI time schedule
-  alias edt="edt"
-
-  # this function for edt alias
-  function edt(){
-    local edt_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/L2\ 2024
-    cd $edt_path
-
-    local recent_file=$(ls -t . | head -n1)
-    explorer.exe $recent_file
-
-    cd - &>/dev/null
-  }
-
-  # this alias to access the raw ENI time schedule
-  alias edtr="edtr"
-
-  # this function for edtr alias
-  function edtr(){
-    local edt_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/RAW
-    cd $edt_path
-
-    local recent_file=$(ls -t . | head -n1)
-    explorer.exe $recent_file
-
-    # cv
-    cd - &>/dev/null
-  }
-
-  # this alias to set the recent file variable
-  function rctf(){
-    echo $(ls -tR | head)
-  }
-
-  # this alias to view the devops folder
-  alias dvps="op /mnt/d/NTSOA/DEVOPS/devops"
-
-  # this alias to open recent file / directory
-  alias rct="rct"
-
-  # this function for rct alias
-  function rct(){
-    local recent_file=$(ls -t . | head -n1)
-    op $recent_file
-  }
-
-  #######################################################################
-  ```
-</details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
-
 <details>
   <summary><strong> WSL Terminal Aliases</strong></summary>
 
@@ -3864,8 +3489,6 @@ WSL sections can be skipped for Linux configurations.
   #######################################################################
   ```
 </details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
 
 <details>
   <summary><strong> WSL Network Aliases</strong></summary>
@@ -4074,8 +3697,6 @@ WSL sections can be skipped for Linux configurations.
   ```
 </details>
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
 <details>
   <summary><strong> WSL Browser</strong></summary>
 
@@ -4134,8 +3755,6 @@ WSL sections can be skipped for Linux configurations.
   #######################################################################
   ```
 </details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
 
 <details>
   <summary><strong> WSL PWA Alias</strong></summary>
@@ -4216,8 +3835,6 @@ WSL sections can be skipped for Linux configurations.
 #######################################################################
   ```
 </details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
 
 <details>
   <summary><strong> WSL PWAs</strong></summary>
@@ -4972,8 +4589,6 @@ WSL sections can be skipped for Linux configurations.
   ```
 </details>
 
-<hr style="border: 0; height: 1px; background: #21262d;">
-
 <details>
   <summary><strong> WSL Programs Aliases</strong></summary>
 
@@ -5071,14 +4686,6 @@ WSL sections can be skipped for Linux configurations.
     elif [[ -d "$1" ]]; then
       op "$1"
     fi
-  }
-
-  # this alias to open ThemeTool
-  alias thm="thm"
-
-  # this function for thm alias
-  function thm(){
-    powershell.exe -command "Start-Process D:\NTSOA\INSTALLED\THEME_TOOL\ThemeTool.exe -Verb RunAs"
   }
 
   # this alias to call the sqlite3.Exe file
@@ -5313,16 +4920,6 @@ WSL sections can be skipped for Linux configurations.
     fi
   }
 
-  # this alias to open FL Studio
-  alias fl="fl"
-
-  # this function for fl alias
-  function fl(){
-    cd /mnt/d/NTSOA/INSTALLED/FL\ STUDIO\ 12
-    cmd.exe /c start FL64.exe
-    cd - &>/dev/null;
-  }
-
   # this alias to open apple music
   alias music="music"
 
@@ -5378,16 +4975,6 @@ WSL sections can be skipped for Linux configurations.
       cmd.exe /c start VirtualBox.exe
       cd - &>/dev/null;
     fi
-  }
-
-  # this alias to launch ventoy
-  alias ventoy="ventoy"
-
-  # this function for ventoy alias
-  function ventoy(){
-    cd "/mnt/d/NTSOA/INSTALLED/VENTOY/ventoy-1.0.99"
-    explorer.exe Ventoy2Disk.exe
-    cd -&>/dev/null
   }
 
   # this alias to open wireshark
@@ -5519,16 +5106,6 @@ WSL sections can be skipped for Linux configurations.
     fi
   }
 
-  # this alias to open obs Studio
-  alias obs="obs"
-
-  # this function for obs alias
-  function obs(){
-    cd /mnt/d/NTSOA/INSTALLED/OBS\ STUDIO/obs-studio/bin/64bit
-    cmd.exe /c start obs64.exe
-    cd - &>/dev/null
-  }
-
   # this alias to launch gta san andreas
   alias gta="gta"
 
@@ -5559,61 +5136,9 @@ WSL sections can be skipped for Linux configurations.
     cd - &>/dev/null
   }
 
-  # this alias to open Driver Booster 11
-  alias boost="boost"
-
-  # this function for boost alias
-  function boost(){
-    cd "/mnt/d/NTSOA/INSTALLED/DRIVER BOOSTER/11.6.0"
-    cmd.exe /c start DriverBooster.exe
-    cd - &>/dev/null
-  }
-
-  # this alias to open gns3
-  alias gns="gns"
-
-  # this function for gns alias
-  function gns(){
-    cd /mnt/d/NTSOA/INSTALLED/GNS3
-    cmd.exe /c start gns3.exe
-    cd - &>/dev/null
-  }
-
-  # this alias to launch the debug
-  alias debug="debug"
-
-  # this function for debug alias
-  function debug(){
-    cd /mnt/d/NTSOA/INSTALLED/DOSBOX/DOSBox-0.74-3
-    cmd.exe /c start DOSBox.exe DEBUGX.COM
-    cd - &>/dev/null
-  }
-
-  # this alias to open x64dbg
-  alias dbg64="dbg64"
-
-  # this function for debug alias
-  function dbg64(){
-    cd /mnt/d/NTSOA/INSTALLED/SHORTCUTS/
-    explorer.exe x64dbg.lnk
-    cd - &>/dev/null
-  }
-
-  # this alias to open x32dbg
-  alias dbg32="dbg32"
-
-  # this function for debug alias
-  function dbg32(){
-    cd /mnt/d/NTSOA/INSTALLED/SHORTCUTS/
-    explorer.exe x32dbg.lnk
-    cd - &>/dev/null
-  }
-
   #######################################################################
   ```
 </details>
-
-<hr style="border: 0; height: 1px; background: #21262d;">
 
 <details>
   <summary><strong> P10k Config</strong></summary>
