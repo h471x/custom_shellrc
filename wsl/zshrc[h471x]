@@ -3342,7 +3342,7 @@ function pyenv(){
 
         # Loop through each directory in the current working directory
         for dir in "$PWD"/*/ "$PWD"/.*/; do
-          if [[ -d "$dir/Scripts" ]]; then
+          if [[ -f "$dir/Scripts/python.exe" ]]; then
             envs+=("$dir")
           fi
         done
@@ -3427,7 +3427,7 @@ function pyenv(){
 
         # Loop through each directory in the current working directory
         for dir in "$PWD"/*/ "$PWD"/.*/; do
-          if [[ -d "$dir/Scripts" ]]; then
+          if [[ -f "$dir/Scripts/python.exe" ]]; then
             local dir="$(basename $dir)"
             local display_dir="${dir#.}"
             echo -ne "${BOLD} Deleting ${LIGHT_BLUE}$display_dir ${WHITE}python environment... ${RESET}"
