@@ -3410,7 +3410,14 @@ function pyenv(){
     else
       if [[ "$1" == "delete" ]]; then
         if [[ -n "$VIRTUAL_ENV" ]]; then
+          # since I made it hidden handle the leading dot
+          local env_name=$(basename "$VIRTUAL_ENV")
+          local env_dir=$(dirname "$VIRTUAL_ENV")/.$env_name
+
+          echo -ne "${BOLD} Deleting ${LIGHT_BLUE}$env_name ${WHITE}python environment... ${RESET}"
+          rm -rf $env_dir
           unset VIRTUAL_ENV
+          echo "${BOLD}${GREEN} ${RESET}"
         fi
 
         # an array to store the envs
@@ -3428,14 +3435,25 @@ function pyenv(){
         # Loop through each directory in the current working directory
         for dir in "$PWD"/*/ "$PWD"/.*/; do
           if [[ -f "$dir/Scripts/python.exe" ]]; then
-            local dir="$(basename $dir)"
-            local display_dir="${dir#.}"
-            echo -ne "${BOLD} Deleting ${LIGHT_BLUE}$display_dir ${WHITE}python environment... ${RESET}"
-            rm -rf $dir
-            echo "${BOLD}${GREEN} ${RESET}"
+            envs+=("$dir")
           fi
         done
 
+        if [[ ${#envs[@]} -eq 0 ]]; then
+          return
+        fi
+
+        if [[ ${#envs[@]} -ge 1 ]]; then
+          for i in {1..${#envs[@]}}; do
+            index=$((i))
+            dir_name=$(basename "${envs[$index]}")
+            display_dir="${dir_name#.}"
+
+            echo -ne "${BOLD} Deleting ${LIGHT_BLUE}$display_dir ${WHITE}python environment... ${RESET}"
+            rm -rf $dir_name
+            echo "${BOLD}${GREEN} ${RESET}"
+          done
+        fi
       else
         local env_name=".$1"
         local display_env="${env_name#.}"
