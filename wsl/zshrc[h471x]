@@ -787,11 +787,11 @@ function svc_show_stat(){
   local check_command="$2";
 
   if [[ "$check_command" == *"Active: active"* ]]; then
-    echo "${BOLD}$service_name Active [${GREEN}✓${WHITE}]";
+    echo "${BOLD}$service_name Active ${BOLD}${GREEN} ${RESET}";
   elif [[ "$check_command" =~ ^[0-9]+$ ]]; then
-    echo "${BOLD}$service_name Active [${GREEN}✓${WHITE}]";
+    echo "${BOLD}$service_name Active ${BOLD}${GREEN} ${RESET}";
   else
-    echo "${BOLD}$service_name Off [${RED}x${WHITE}]";
+    echo "${BOLD}$service_name Off ${BOLD}${RED}✘ ${WHITE}";
   fi
 
   br;
@@ -805,7 +805,7 @@ function sth(){
   c && br;
   if [[ $(pgrep sshd) ]]; then
     c && br;
-    echo "${BOLD}Ssh Server Active [${GREEN}✓${WHITE}]"
+    echo "${BOLD}Ssh Server Active ${BOLD}${GREEN} ${RESET}"
     br;
 
     local is_wsl=$(grep -qi microsoft /proc/version && echo true || echo false)
@@ -823,7 +823,7 @@ function sth(){
     echo "Ssh Connection via $wifi_iface Interface";
     echo "${BOLD}${WHITE}==> ssh $USER@$wifi_ip";
   else
-    echo "${BOLD}Ssh Server Off [${RED}x${WHITE}]"
+    echo "${BOLD}Ssh Server Off ${BOLD}${RED}✘ ${WHITE}"
   fi
 }
 
@@ -859,7 +859,7 @@ function sshoff(){
 function stap(){
   c && br;
   if [[ $(pgrep apache2) ]]; then
-    echo "${BOLD}Apache Server Active [${GREEN}✓${WHITE}]"
+    echo "${BOLD}Apache Server Active ${BOLD}${GREEN} ${RESET}"
     br;
 
     local eth_iface="eth0"
@@ -870,7 +870,7 @@ function stap(){
       # at least it is on kali linux
       local wifi_iface="wlan0"
     fi
-    
+
     local loopback_iface="lo"
     local wlan_ip=$(ifconfig $wifi_iface | grep "inet " | awk '{print $2}');
     local loopback_ip=$(ifconfig $loopback_iface | grep "inet " | awk '{print $2}');
@@ -879,7 +879,7 @@ function stap(){
     echo "$loopback_iface    Interface Connection (Private) : ${BRIGHT_BLUE}http://$loopback_ip ${WHITE}";
     br;
   else
-    echo "${BOLD}Apache Server Off [${RED}x${WHITE}]"
+    echo "${BOLD}Apache Server Off ${BOLD}${RED}✘ ${WHITE}"
     br
   fi
 }
@@ -939,9 +939,9 @@ alias sqls="allow_sudo && sqls"
 function sqls(){
   c && br;
   if [[ $(pgrep mariadb) ]]; then
-    echo "${BOLD}MySQL Server Active [${GREEN}✓${WHITE}]"
+    echo "${BOLD}MySQL Server Active ${BOLD}${GREEN} ${RESET}"
   else
-    echo "${BOLD}MySQL Server Down [${RED}x${WHITE}]"
+    echo "${BOLD}MySQL Server Down ${BOLD}${RED}✘ ${WHITE}"
   fi
 }
 
@@ -957,7 +957,7 @@ function psqlon(){
     echo "${BOLD}${WHITE}[${GREEN}+${WHITE}] Starting ${WHITE}PostgreSQL Server ...";
     sudo service postgresql start &>/dev/null;
     c && br;
-    echo "${BOLD}PostgreSQL Server Active [${GREEN}✓${WHITE}]";
+    echo "${BOLD}PostgreSQL Server Active ${BOLD}${GREEN} ${RESET}";
     br;
 
     function check_postgres_shell(){
@@ -983,7 +983,7 @@ alias psqloff="allow_sudo && psqloff"
 # this function for sqloff alias
 function psqloff(){
   c && br;
-  echo "${BOLD}${WHITE}[${RED}x${WHITE}] Stopping ${WHITE}PostgreSQL Server ...";
+  echo "${BOLD}${WHITE}${BOLD}${RED}✘ ${WHITE} Stopping ${WHITE}PostgreSQL Server ...";
   sudo service postgresql stop &>/dev/null;
   psqls;
 }
@@ -996,9 +996,9 @@ function psqls(){
   c && br;
 
   if [[ $(pgrep postgres) ]]; then
-    echo "${BOLD}PostgreSQL Server Active [${GREEN}✓${WHITE}]";
+    echo "${BOLD}PostgreSQL Server Active ${BOLD}${GREEN} ${RESET}";
   else
-    echo "${BOLD}PostgreSQL Server Off [${RED}x${WHITE}]";
+    echo "${BOLD}PostgreSQL Server Off ${BOLD}${RED}✘ ${WHITE}";
   fi
 
   br;
@@ -1015,17 +1015,17 @@ function webon(){
   # Apache Server
   echo -ne "${BOLD}${WHITE} ==> Starting ${GREEN}Apache ${WHITE}Server ..."
   sudo service apache2 start &>/dev/null;
-  echo -e "[${GREEN}✓${WHITE}]";
+  echo -e "${BOLD}${GREEN} ${RESET}";
 
   # MySQL Server
   echo -ne "${BOLD} ==> Starting ${GREEN}MySQL ${WHITE} Server ..."
   sudo service mariadb start &>/dev/null;
-  echo -e "[${GREEN}✓${WHITE}]";
+  echo -e "${BOLD}${GREEN} ${RESET}";
 
   # Postfix Server
   echo -ne "${BOLD} ==> Starting ${GREEN}Mail ${WHITE}  Server ..."
   sudo service postfix start &>/dev/null;
-  echo -e "[${GREEN}✓${WHITE}]";
+  echo -e "${BOLD}${GREEN} ${RESET}";
 
   # Status
   br;
@@ -1060,17 +1060,17 @@ function weboff(){
   # Apache Server
   echo -ne "${BOLD}${WHITE} ==> Stopping ${RED}Apache ${WHITE}Server ..."
   sudo service apache2 stop &>/dev/null;
-  echo -e "[${RED}x${WHITE}]";
+  echo -e "${BOLD}${RED}✘ ${WHITE}";
 
   # MySQL Server
   echo -ne "${BOLD} ==> Stopping ${RED}MySQL ${WHITE} Server ..."
   sudo service mariadb stop &>/dev/null;
-  echo -e "[${RED}x${WHITE}]";
+  echo -e "${BOLD}${RED}✘ ${WHITE}";
 
   # Postfix Server
   echo -ne "${BOLD} ==> Stopping ${RED}Mail ${WHITE}  Server ..."
   sudo service postfix stop &>/dev/null;
-  echo -e "[${RED}x${WHITE}]";
+  echo -e "${BOLD}${RED}✘ ${WHITE}";
 
   # Status
   br;
@@ -1139,7 +1139,7 @@ function rdb(){
   fi
   c && br
   local user=${1:-root}
-  echo "${BOLD}MySQL Server Active [${GREEN}✓${WHITE}]"
+  echo "${BOLD}MySQL Server Active ${BOLD}${GREEN} ${RESET}"
   echo "${BOLD}User : $user"
   local is_root='[[ "$user" == "root" ]]';
   local flag=$(eval "$is_root" && echo "" || echo "-p");
@@ -1180,9 +1180,9 @@ alias mails="allow_sudo && mails"
 function mails(){
   c && br;
   if sudo service postfix status &>/dev/null; then
-    echo "${BOLD}Mail Server Active [${GREEN}✓${WHITE}]"
+    echo "${BOLD}Mail Server Active ${BOLD}${GREEN} ${RESET}"
   else
-    echo "${BOLD}Mail Server Down [${RED}x${WHITE}]"
+    echo "${BOLD}Mail Server Down ${BOLD}${RED}✘ ${WHITE}"
   fi
 }
 
@@ -1420,7 +1420,7 @@ command_not_found_handler() {
   fi
 
   if [[ $command_found -eq 0 ]]; then
-    echo " ${BOLD}${WHITE}[${RED}x${WHITE}]${WHITE} Command Not Found"
+    echo " ${BOLD}${WHITE}${BOLD}[${RED}x${WHITE}]${WHITE} Command Not Found"
   fi
 }
 
@@ -2182,16 +2182,16 @@ function clock(){
   local clock_link="localhost"
   local clock_name="Digital Clock"
 
-  # start apache server if not running
-  if ! pgrep apache2 > /dev/null; then
-    sudo service apache2 start &>/dev/null;
-  fi
+  # # start apache server if not running
+  # if ! pgrep apache2 > /dev/null; then
+  #   sudo service apache2 start &>/dev/null;
+  # fi
 
   # open clock PWA or Progressive Web App
   open_web_app $clock_link $clock_id $clock_name;
 
   # stop apache server
-  sudo service apache2 stop &>/dev/null;
+  # sudo service apache2 stop &>/dev/null;
 }
 
 # this alias to open the GitLab app
