@@ -1501,13 +1501,27 @@ function ed(){
 
 ### Kali Linux Paths
 
-# Binary
+# Function to add directories to $PATH
+# if they're not already included
+# to avoid redondancy when reloading zshrc
+function add_to_path() {
+  local DIR="$1"
+  if [[ ":$PATH:" != *":$DIR:"* ]]; then
+    export PATH="$DIR:$PATH"
+  fi
+}
+
+# Define paths
 CUPP_PATH=/usr/share/cupp
 GO_PATH=/usr/local/go/bin
 HOME_PATH=$HOME/bin
 SCP_PATH=/usr/bin/scp
 
-PATH=$CUPP_PATH:$HOME_PATH:$GO_PATH:$SCP_PATH:$PATH
+# Add the paths using the function
+add_to_path $CUPP_PATH
+add_to_path $HOME_PATH
+add_to_path $GO_PATH
+add_to_path $SCP_PATH
 
 # here to hide the java options
 unset _JAVA_OPTIONS
