@@ -3309,6 +3309,95 @@ function python() {
   fi
 }
 
+# this function to create a linux python environment
+function create_env(){
+  local env_name="$1"
+  python -m venv $env_name
+}
+
+# this function to activate a linux python
+# environment, a functionality found on
+# the activate script
+function activate_env(){
+  # reset the PATH first
+  # reset_path
+
+  # get the env name
+  local env_name="$1"
+  local display_env="${env_name#.}"
+
+  # get the virtual environment
+  # this will be displayed on
+  # our prompt but the real
+  # environment path is given below
+  export VIRTUAL_ENV=$PWD/$display_env
+
+  # # handle hidden env
+  # local env_dir=$(dirname "$VIRTUAL_ENV")/$env_name
+
+  # # incude the virtual env to path
+  # PATH=$env_dir/bin:$PATH
+  # export PATH
+}
+
+# This function finds all Python virtual
+# environments in the current directory and returns them as an array.
+function find_envs() {
+  local envs=()
+
+  # Enable 'nullglob' to prevent errors when using glob patterns (e.g., "$PWD"/*/)
+  # In Zsh, if a glob pattern doesn't match any files or directories, an error like
+  # "no matches found" is thrown. By setting 'nullglob', unmatched glob patterns
+  # will expand to an empty string instead of causing an error. This allows safe iteration
+  # through directories even when no matches are found.
+  # We'll turn it off later (with 'unsetopt nullglob') to restore the default behavior,
+  # ensuring that this change is only temporary within the script.
+  setopt nullglob
+
+  for dir in "$PWD"/*/ "$PWD"/.*/; do
+    [[ -f "$dir/Scripts/python.exe" ]] && envs+=("$dir")
+  done
+  echo "${envs[@]}"
+}
+
+# this function to remove
+# python virtual env from path
+function reset_path(){
+  if [[ -n "$VIRTUAL_ENV" ]]; then
+    # get the path to VIRTUAL_ENV
+    local env_dir=$(dirname $VIRTUAL_ENV)
+    local env_name=.$(basename $VIRTUAL_ENV)
+
+    # Remove the env from the path
+    export PATH=$(echo $PATH | sed "s|^$env_dir/$env_name/bin:||")
+  fi
+}
+
+# this function to unset the VIRTUAL_ENV
+# global variable and restore the PATH to
+# the original one, yet this is the code
+# behind python environment deactivate
+function disable_env(){
+  # reset the path
+  # reset_path
+
+  # unset the virtual environment
+  unset VIRTUAL_ENV
+}
+
+# This function deletes the specified Python virtual
+# environment and unsets the VIRTUAL_ENV variable.
+function delete_env() {
+  local env_name="$1"
+
+  dir_name=$(basename "$env_name")
+  display_dir="${dir_name#.}"
+
+  echo -ne "${BOLD} Deleting ${LIGHT_BLUE}$display_dir ${WHITE}python environment... ${RESET}"
+  rm -rf $dir_name
+  echo "${BOLD}${GREEN} ${RESET}"
+}
+
 # this alias to create a python environment
 # from windows python and activate it
 # SOLVED : 10-05-2024 22:23
@@ -3329,54 +3418,34 @@ function pyenv(){
         unset VIRTUAL_ENV
       else
         # an array to store the envs
-        local envs=()
+        local envs=($(find_envs))
 
-        # Enable 'nullglob' to prevent errors when using glob patterns (e.g., "$PWD"/*/)
-        # In Zsh, if a glob pattern doesn't match any files or directories, an error like
-        # "no matches found" is thrown. By setting 'nullglob', unmatched glob patterns 
-        # will expand to an empty string instead of causing an error. This allows safe iteration 
-        # through directories even when no matches are found.
-        # We'll turn it off later (with 'unsetopt nullglob') to restore the default behavior, 
-        # ensuring that this change is only temporary within the script.
-        setopt nullglob
-
-        # Loop through each directory in the current working directory
-        for dir in "$PWD"/*/ "$PWD"/.*/; do
-          if [[ -f "$dir/Scripts/python.exe" ]]; then
-            envs+=("$dir")
-          fi
-        done
-
-        # Check if any virtual environments were found
         if [[ ${#envs[@]} -eq 0 ]]; then
-          # making the env a hidden file
           local env_name=".virenv"
           local display_env="${env_name#.}"
 
+          # creating a new env
           echo -ne "${BOLD} Creating ${LIGHT_BLUE}$display_env ${WHITE}python environment... ${RESET}"
-          python -m venv $env_name
+          create_env "$env_name"
           echo "${BOLD}${GREEN} ${RESET}"
 
-          echo -ne "${BOLD} Activating ${LIGHT_BLUE}$display_env ${WHITE}environment ... ${RESET}"
-          export VIRTUAL_ENV=$PWD/$display_env
+          # activating the new env
+          echo -ne "${BOLD} Activating ${LIGHT_BLUE}$display_env ${WHITE}environment... ${RESET}"
+          activate_env "$env_name"
           echo "${BOLD}${GREEN} ${RESET}"
 
           return 0
         fi
 
-        # If only one environment found, activate it
         if [[ ${#envs[@]} -eq 1 ]]; then
-          local selected_env="${envs[1]}"
-          local dir_path=$(dirname "$selected_env") # Get the directory path
-
-          # handle hidden env directory
-          local dir=$(basename "$selected_env")
-          local display_dir="${dir#.}"
-          local display_env="${dir_path}/${display_dir}"
-
-          export VIRTUAL_ENV="$display_env"
+          # activate if it has atched on env
+          local env_name=$(basename ${envs[1]})
+          activate_env "$env_name"
         elif [[ ${#envs[@]} -gt 1 ]]; then
+          # prompt user to choose the env to activate
           echo "\n${BOLD}${GREEN} Multiple ${WHITE}virtual ${LIGHT_BLUE}environments ${WHITE}found (${#envs[@]}) ${RESET}\n"
+
+          # loop through envs
           for i in {1..${#envs[@]}}; do
             index=$((i))
             dir_name=$(basename "${envs[$index]}")
@@ -3384,22 +3453,18 @@ function pyenv(){
             echo "${BOLD}${WHITE} $index) $display_dir ${RESET}"
           done
 
-          # Read user choice (zsh-compatible)
-          echo -n "\n${BOLD}${WHITE} Your selection : ${RESET}"
+          # get the choice
+          echo -n "\n${BOLD}${WHITE} Your selection : "
           read choice
 
           # Validate the choice
           if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice > 0 && choice <= ${#envs[@]} )); then
             local index=$((choice))
-
-            # handle hidden env directory
             local selected_env="${envs[$index]}"
-            local base_dir="$(dirname $selected_env)"
+            local env_name=$(basename $selected_env)
 
-            local env_name=$(basename "$selected_env")
-            local display_env="${env_name#.}"
-
-            export VIRTUAL_ENV="$base_dir/$display_env"
+            # activate the selected env
+            activate_env "$env_name"
             return 0
           else
             echo "Invalid selection."
@@ -3410,34 +3475,13 @@ function pyenv(){
     else
       if [[ "$1" == "delete" ]]; then
         if [[ -n "$VIRTUAL_ENV" ]]; then
-          # since I made it hidden handle the leading dot
-          local env_name=$(basename "$VIRTUAL_ENV")
-          local env_dir=$(dirname "$VIRTUAL_ENV")/.$env_name
-
-          echo -ne "${BOLD} Deleting ${LIGHT_BLUE}$env_name ${WHITE}python environment... ${RESET}"
-          rm -rf $env_dir
-          unset VIRTUAL_ENV
-          echo "${BOLD}${GREEN} ${RESET}"
+          # disable the current env
+          # if it has been set
+          disable_env
         fi
 
         # an array to store the envs
-        local envs=()
-
-        # Enable 'nullglob' to prevent errors when using glob patterns (e.g., "$PWD"/*/)
-        # In Zsh, if a glob pattern doesn't match any files or directories, an error like
-        # "no matches found" is thrown. By setting 'nullglob', unmatched glob patterns 
-        # will expand to an empty string instead of causing an error. This allows safe iteration 
-        # through directories even when no matches are found.
-        # We'll turn it off later (with 'unsetopt nullglob') to restore the default behavior, 
-        # ensuring that this change is only temporary within the script.
-        setopt nullglob
-
-        # Loop through each directory in the current working directory
-        for dir in "$PWD"/*/ "$PWD"/.*/; do
-          if [[ -f "$dir/Scripts/python.exe" ]]; then
-            envs+=("$dir")
-          fi
-        done
+        local envs=($(find_envs))
 
         if [[ ${#envs[@]} -eq 0 ]]; then
           return
@@ -3446,28 +3490,31 @@ function pyenv(){
         if [[ ${#envs[@]} -ge 1 ]]; then
           for i in {1..${#envs[@]}}; do
             index=$((i))
-            dir_name=$(basename "${envs[$index]}")
-            display_dir="${dir_name#.}"
-
-            echo -ne "${BOLD} Deleting ${LIGHT_BLUE}$display_dir ${WHITE}python environment... ${RESET}"
-            rm -rf $dir_name
-            echo "${BOLD}${GREEN} ${RESET}"
+            delete_env "${envs[$index]}"
           done
         fi
       else
         local env_name=".$1"
         local display_env="${env_name#.}"
 
+        if [[ -n "$VIRTUAL_ENV" ]]; then
+          # disable the current env
+          # if it has been set
+          disable_env
+        fi
+
         # if it is already an env inside $PWD
         if [[ -d "$PWD/$env_name/Scripts" ]]; then
           export VIRTUAL_ENV=$PWD/$display_env
         else
+          # creating a new env
           echo -ne "${BOLD} Creating ${LIGHT_BLUE}$display_env ${WHITE}python environment... ${RESET}"
-          python -m venv $env_name
+          create_env "$env_name"
           echo "${BOLD}${GREEN} ${RESET}"
 
-          echo -ne "${BOLD} Activating ${LIGHT_BLUE}$display_env ${WHITE}environment ... ${RESET}"
-          export VIRTUAL_ENV=$PWD/$display_env
+          # activating the new env
+          echo -ne "${BOLD} Activating ${LIGHT_BLUE}$display_env ${WHITE}environment... ${RESET}"
+          activate_env "$env_name"
           echo "${BOLD}${GREEN} ${RESET}"
         fi
         return 0
