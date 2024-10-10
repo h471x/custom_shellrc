@@ -3258,6 +3258,19 @@ function vsce() {
   fi
 }
 
+# this to call windows workbox
+alias workbox="workbox"
+
+# this function for workbox alias
+function workbox() {
+  local workbox_cmd='cmd.exe /c workbox "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $workbox_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
+
 # Alias to call the windows vue
 alias vue="vue"
 
