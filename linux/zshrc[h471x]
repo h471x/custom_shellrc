@@ -822,7 +822,7 @@ function sth(){
       local wifi_iface="wlan0"
     fi
 
-    local wifi_ip=$(ifconfig $wifi_iface | grep inet | awk '{print $2}');
+    local wifi_ip=$(ifconfig $wifi_iface | grep inet | awk '{print $2}' | grep -v ":");
     # echo " Connect Via  ==>  ssh $USER@$ip";
     # check_ngrok="cmd.exe /c 'tasklist | findstr /I "ngrok"'"
     echo "Ssh Connection via $wifi_iface Interface";
