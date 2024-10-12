@@ -3271,6 +3271,19 @@ function workbox() {
   fi
 }
 
+# this to call windows deno
+alias deno="deno"
+
+# this function for deno alias
+function deno() {
+  local deno_cmd='cmd.exe /c deno "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $deno_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
+
 # Alias to call the windows vue
 alias vue="vue"
 
