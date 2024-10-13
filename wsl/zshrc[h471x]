@@ -3116,43 +3116,43 @@ function prompt_install(){
   fi
 }
 
-# this function to install npm aliases
-function install_npm_alias(){
+# this function to install aliases
+function install_alias(){
   # check if the alias already existed
   local file_name="/home/$USER/.zshrc"
 
   prompt_install "$1"
-  local node_script="$script"
-  echo $node_script
+  local script="$script"
+  # echo $script
 
-  if grep -q "$node_script" "$file_name"; then
-    echo "Alias $node_script already exists in $file_name"
+  if grep -q "$script" "$file_name"; then
+    echo "Alias $script already exists in $file_name"
     return
   fi
 
   # filename will be our zshrc
-  local location="alias vue"
+  local location="# from the terminal to zshrc"
 
   # Get dynamically the line of where we should inject the new alias
   # Get the second occurrence since we mention it in the location variable
   local line_number=$(grep -n "$location" "$file_name" | sed -n '2p' | cut -d: -f1)
 
-  # Since there is a comment on the line above, get that line by subtracting 1
-  local line_number=$((line_number - 1))
+  # Get 2 lines below the matching line
+  local line_number=$((line_number + 2))
 
   # only install it only if it is defined
-  if [[ -n "$node_script" ]]; then
-    local node_script_cmd="${node_script}_cmd"
+  if [[ -n "$script" ]]; then
+    local script_cmd="${script}_cmd"
     {
       head -n $((line_number - 1)) "$file_name"
-      echo "# this to call windows $node_script"
-      echo "alias $node_script=\"$node_script\""
+      echo "# this to call windows $script"
+      echo "alias $script=\"$script\""
       echo ''
-      echo "# this function for $node_script alias"
-      echo "function $node_script() {"
-      echo "  local $node_script_cmd='cmd.exe /c $node_script \"\$@\"';"
+      echo "# this function for $script alias"
+      echo "function $script() {"
+      echo "  local $script_cmd='cmd.exe /c $script \"\$@\"';"
       echo '  if [[ "$PWD" == "/mnt/"* ]]; then'
-      echo "    eval \$$node_script_cmd;"
+      echo "    eval \$$script_cmd;"
       echo '  else'
       echo '    echo "${BOLD}${RED}Please execute this command inside Windows directory!";'
       echo '  fi'
@@ -3160,6 +3160,8 @@ function install_npm_alias(){
       echo ''
       tail -n +$line_number "$file_name"
     } >temp && mv temp "$file_name"
+
+    source "$file_name"
   fi
 }
 
@@ -3196,7 +3198,7 @@ function npm() {
     # install alias only if we install
     # an npm script globally
     if [[ -n "$package_name" ]]; then
-      install_npm_alias $package_name
+      install_alias $package_name
     else
       eval "$npm_cmd"
     fi
@@ -3279,6 +3281,22 @@ function deno() {
   local deno_cmd='cmd.exe /c deno "$@"';
   if [[ "$PWD" == "/mnt/"* ]]; then
     eval $deno_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
+
+# Here to inject aliases
+# from the terminal to zshrc
+
+# this to call windows curl
+alias curl="curl"
+
+# this function for curl alias
+function curl() {
+  local curl_cmd='cmd.exe /c curl "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $curl_cmd;
   else
     echo "${BOLD}${RED}Please execute this command inside Windows directory!";
   fi
