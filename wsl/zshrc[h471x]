@@ -3123,9 +3123,10 @@ function install_alias(){
 
   prompt_install "$1"
   local script="$script"
+  local alias_name="alias $script"
   # echo $script
 
-  if grep -q "$script" "$file_name"; then
+  if grep -q "$alias_name" "$file_name"; then
     echo "Alias $script already exists in $file_name"
     return
   fi
@@ -3288,6 +3289,45 @@ function deno() {
 
 # Here to inject aliases
 # from the terminal to zshrc
+
+# this to call windows gem
+alias gem="gem"
+
+# this function for gem alias
+function gem() {
+  local gem_cmd='cmd.exe /c gem "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $gem_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
+
+# this to call windows irb
+alias irb="irb"
+
+# this function for irb alias
+function irb() {
+  local irb_cmd='cmd.exe /c irb "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $irb_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
+
+# this to call windows ruby
+alias ruby="ruby"
+
+# this function for ruby alias
+function ruby() {
+  local ruby_cmd='cmd.exe /c ruby "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $ruby_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
 
 # this to call windows curl
 alias curl="curl"
