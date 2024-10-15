@@ -3116,6 +3116,15 @@ function prompt_install(){
   fi
 }
 
+# this alias to create a new folder
+# for new program installation in windows
+alias install_win="install_win"
+
+# this function for install_win alias
+function install_win(){
+  mkdir /mnt/d/NTSOA/INSTALLED/"$1"
+}
+
 # this function to install aliases
 function install_alias(){
   # check if the alias already existed
@@ -3289,6 +3298,19 @@ function deno() {
 
 # Here to inject aliases
 # from the terminal to zshrc
+
+# this to call windows ipconfig
+alias ipconfig="ipconfig"
+
+# this function for ipconfig alias
+function ipconfig() {
+  local ipconfig_cmd='cmd.exe /c ipconfig "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $ipconfig_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
 
 # this to call windows gem
 alias gem="gem"
