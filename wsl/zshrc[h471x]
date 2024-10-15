@@ -3299,6 +3299,19 @@ function deno() {
 # Here to inject aliases
 # from the terminal to zshrc
 
+# this to call windows iperf3
+alias iperf3="iperf3"
+
+# this function for iperf3 alias
+function iperf3() {
+  local iperf3_cmd='cmd.exe /c iperf3 "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $iperf3_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
+
 # this to call windows ipconfig
 alias ipconfig="ipconfig"
 
