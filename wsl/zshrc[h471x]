@@ -3299,6 +3299,19 @@ function deno() {
 # Here to inject aliases
 # from the terminal to zshrc
 
+# this to call windows cmake
+alias cmake="cmake"
+
+# this function for cmake alias
+function cmake() {
+  local cmake_cmd='cmd.exe /c cmake "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $cmake_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
+
 # this to call windows iperf3
 alias iperf3="iperf3"
 
