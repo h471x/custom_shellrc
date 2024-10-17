@@ -3243,12 +3243,6 @@ alias tsc="tsc"
 # Function for tsc alias
 function tsc() {
   local tsc_cmd='cmd.exe /c tsc "$@"'
-  # for arg in "$@"; do
-  #   if [[ "$arg" != "--verbose" && ("$arg" == -* || "$arg" == --*) ]]; then
-  #     local tsc_cmd='cmd.exe /c tsc "$@"'
-  #     break
-  #   fi
-  # done
 
   if [[ "$PWD" == "/mnt/"* ]]; then
     eval $tsc_cmd
