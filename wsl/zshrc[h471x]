@@ -3293,6 +3293,19 @@ function deno() {
 # Here to inject aliases
 # from the terminal to zshrc
 
+# this to call windows putty
+alias putty="putty"
+
+# this function for putty alias
+function putty() {
+  local putty_cmd='cmd.exe /c putty "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $putty_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
+
 # this to call windows cmake
 alias cmake="cmake"
 
