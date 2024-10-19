@@ -3293,6 +3293,19 @@ function deno() {
 # Here to inject aliases
 # from the terminal to zshrc
 
+# this to call windows rustlings
+alias rustlings="rustlings"
+
+# this function for rustlings alias
+function rustlings() {
+  local rustlings_cmd='cmd.exe /c rustlings "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $rustlings_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
+
 # this to call windows putty
 alias putty="putty"
 
