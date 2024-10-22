@@ -3293,6 +3293,58 @@ function deno() {
 # Here to inject aliases
 # from the terminal to zshrc
 
+# this to call windows acrobat
+alias acrobat="acrobat"
+
+# this function for acrobat alias
+function acrobat() {
+  local acrobat_cmd='cmd.exe /c acrobat "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $acrobat_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
+
+# this to call windows jar
+alias jar="jar"
+
+# this function for jar alias
+function jar() {
+  local jar_cmd='cmd.exe /c jar "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $jar_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
+
+# this to call windows javac
+alias javac="javac"
+
+# this function for javac alias
+function javac() {
+  local javac_cmd='cmd.exe /c javac "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $javac_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
+
+# this to call windows java
+alias java="java"
+
+# this function for java alias
+function java() {
+  local java_cmd='cmd.exe /c java "$@"';
+  if [[ "$PWD" == "/mnt/"* ]]; then
+    eval $java_cmd;
+  else
+    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
+  fi
+}
+
 # this to call windows rustlings
 alias rustlings="rustlings"
 
@@ -3867,15 +3919,6 @@ function cargo(){
     echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
   fi
 }
-
-# this alias to launch windows java
-alias java="java.exe"
-
-# this alias to launch javac windows
-alias javac="javac.exe"
-
-# this alias to launch jar windows
-alias jar="jar.exe"
 
 # this alias to use windows nslookup
 alias nslookup="nslookup"
