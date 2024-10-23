@@ -2857,6 +2857,15 @@ function rn(){
       clear && br;
       ./"$out";
       br;;
+    java)
+      file="$1";
+      out="${file%.*}"
+      compiler="javac"
+      interpreter="java"
+
+      "$compiler" "$file"
+      "$interpreter" "$out"
+      ;;
     js)
       c && br 2 && node "$1" && br
       ;;
