@@ -202,11 +202,11 @@ alias cl="linecount"
 # this function for the cl alias
 function linecount() {
   if [ -z "$1" ]; then
-      echo "Please provide a filename"
+    echo "Please provide a filename"
   elif [ -z "$2" ]; then
-      wc -l "$1" | awk '{print $1, "lines"}'
+    wc -l "$1" | awk '{print $1, "lines"}'
   else
-      grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
+    grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
   fi
 };
 
@@ -671,9 +671,8 @@ function allow_sudo(){
   sudo -n true &>/dev/null
   if [ $? -eq 1 ]; then
     sudo echo && return 0 || return 1
-  else
-    return 0
   fi
+  return 0
 }
 
 # this alias to simulate the sudo behaviour
@@ -2810,6 +2809,86 @@ function dotfyle(){
 
 ### WSL Programs Aliases
 
+# CREATED : 10-24-2024 18:57
+# Checks if the current directory
+# is a Windows directory.
+# Exits if not,
+# otherwise executes the script.
+# This function is a big deal
+# for me since I will refactor
+# tons of codes with it
+function check_win(){
+  if [[ "$PWD" != "/mnt/"* && ! -L "$PWD" ]]; then
+    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
+    # exit the script
+    return 1
+  fi
+  return 0
+}
+
+# CREATED : 10-24-2024 19:19
+# this alias to forcefully
+# run a windows command inside
+# WSL by temporarely move to C drive
+alias force_run="force_run"
+
+# this function for force_run alias
+function force_run(){
+  if [[ "$PWD" != "/mnt/"* && ! -L "$PWD" ]]; then
+    cd /mnt/c
+    eval "$@"
+    cd - &>/dev/null
+  else
+    eval "$@"
+  fi
+}
+
+# this alias to run C/C++ program
+alias run_c_cpp="check_win && run_c_cpp"
+
+# this function to execute C/C++ program
+function run_c_cpp(){
+  file="$1";
+  out="${file%.*}"
+
+  # Condition 1: Check if the file extension is c
+  extension='[[ "${file##*.}" == "c" ]]';
+
+  # Condition 2: Check if the file contains math library
+  math='grep -E "^#include <math.h>" "$file" >/dev/null';
+
+  # Ternary expressions to determine compiler and flags
+  compiler=$(eval "$extension" && echo "gcc" || echo "g++");
+  flags=$(eval "$math" && echo "-lm" || echo "");
+
+  # check if an old executable exists
+  if [[ -f "$out" ]]; then
+    dlf "$out";
+  fi
+
+  # Compile the C file
+  "$compiler" "$file" -o "$out" $flags;
+
+  # Execute the resulting executable
+  all "$out";
+  clear && br;
+  ./"$out";
+}
+
+# this alias to run Java program
+alias run_java="check_win && run_java"
+
+# this function for run_java alias
+function run_java(){
+  file="$1";
+  out="${file%.*}"
+  compiler="javac"
+  interpreter="java"
+
+  "$compiler" "$file"
+  "$interpreter" "$out"
+}
+
 # this alias to run an executable file or a script
 alias rn="rn"
 
@@ -2830,41 +2909,12 @@ function rn(){
     py)
       # all "$1" && c && echo -e && py "$1" && echo -e;;
       python "$@" && return 0;;
-    c || cpp) # update 07/28/2023
-      file="$1";
-      out="${file%.*}"
-
-      # Condition 1: Check if the file extension is c
-      extension='[[ "${file##*.}" == "c" ]]';
-
-      # Condition 2: Check if the file contains math library
-      math='grep -E "^#include <math.h>" "$file" >/dev/null';
-
-      # Ternary expressions to determine compiler and flags
-      compiler=$(eval "$extension" && echo "gcc" || echo "g++");
-      flags=$(eval "$math" && echo "-lm" || echo "");
-
-      # check if an old executable exists
-      if [[ -f "$out" ]]; then
-        dlf "$out";
-      fi
-
-      # Compile the C file
-      "$compiler" "$file" -o "$out" $flags;
-
-      # Execute the resulting executable
-      all "$out";
-      clear && br;
-      ./"$out";
+    c || cpp)
+      # UPDATED : 10-24-2024 18:45
+      run_c_cpp "$1"
       br;;
     java)
-      file="$1";
-      out="${file%.*}"
-      compiler="javac"
-      interpreter="java"
-
-      "$compiler" "$file"
-      "$interpreter" "$out"
+      run_java "$1"
       ;;
     js)
       c && br 2 && node "$1" && br
@@ -3165,16 +3215,11 @@ function install_alias(){
     {
       head -n $((line_number - 1)) "$file_name"
       echo "# this to call windows $script"
-      echo "alias $script=\"$script\""
+      echo "alias $script=\"check_win && $script\""
       echo ''
       echo "# this function for $script alias"
       echo "function $script() {"
-      echo "  local $script_cmd='cmd.exe /c $script \"\$@\"';"
-      echo '  if [[ "$PWD" == "/mnt/"* ]]; then'
-      echo "    eval \$$script_cmd;"
-      echo '  else'
-      echo '    echo "${BOLD}${RED}Please execute this command inside Windows directory!";'
-      echo '  fi'
+      echo "  cmd.exe /c $script \"\$@\""
       echo '}'
       echo ''
       tail -n +$line_number "$file_name"
@@ -3247,228 +3292,142 @@ function npx() {
 }
 
 # Alias to call the windows typescript
-alias tsc="tsc"
+alias tsc="check_win && tsc"
 
 # Function for tsc alias
 function tsc() {
-  local tsc_cmd='cmd.exe /c tsc "$@"'
-
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $tsc_cmd
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!"
-  fi
+  cmd.exe /c tsc "$@"
 }
 
 # this to call windows vsce
-alias vsce="vsce"
+alias vsce="check_win && vsce"
 
 # this function for vsce alias
 function vsce() {
-  local vsce_cmd='cmd.exe /c vsce "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $vsce_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c vsce "$@"
 }
 
 # this to call windows workbox
-alias workbox="workbox"
+alias workbox="check_win && workbox"
 
 # this function for workbox alias
 function workbox() {
-  local workbox_cmd='cmd.exe /c workbox "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $workbox_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c workbox "$@"
 }
 
 # this to call windows deno
-alias deno="deno"
+alias deno="check_win && deno"
 
 # this function for deno alias
 function deno() {
-  local deno_cmd='cmd.exe /c deno "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $deno_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c deno "$@"
 }
 
 # Here to inject aliases
 # from the terminal to zshrc
 
 # this to call windows acrobat
-alias acrobat="acrobat"
+alias acrobat="check_win && acrobat"
 
 # this function for acrobat alias
 function acrobat() {
-  local acrobat_cmd='cmd.exe /c acrobat "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $acrobat_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c acrobat "$@"
 }
 
 # this to call windows jar
-alias jar="jar"
+alias jar="check_win && jar"
 
 # this function for jar alias
 function jar() {
-  local jar_cmd='cmd.exe /c jar "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $jar_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c jar "$@"
 }
 
 # this to call windows javac
-alias javac="javac"
+alias javac="check_win && javac"
 
 # this function for javac alias
 function javac() {
-  local javac_cmd='cmd.exe /c javac "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $javac_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c javac "$@"
 }
 
 # this to call windows java
-alias java="java"
+alias java="check_win && java"
 
 # this function for java alias
 function java() {
-  local java_cmd='cmd.exe /c java "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $java_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c java "$@"
 }
 
 # this to call windows rustlings
-alias rustlings="rustlings"
+alias rustlings="check_win && rustlings"
 
 # this function for rustlings alias
 function rustlings() {
-  local rustlings_cmd='cmd.exe /c rustlings "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $rustlings_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c rustlings "$@"
 }
 
 # this to call windows putty
-alias putty="putty"
+alias putty="check_win && putty"
 
 # this function for putty alias
 function putty() {
-  local putty_cmd='cmd.exe /c putty "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $putty_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c putty "$@"
 }
 
 # this to call windows cmake
-alias cmake="cmake"
+alias cmake="check_win && cmake"
 
 # this function for cmake alias
 function cmake() {
-  local cmake_cmd='cmd.exe /c cmake "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $cmake_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c cmake "$@"
 }
 
 # this to call windows iperf3
-alias iperf3="iperf3"
+alias iperf3="check_win && iperf3"
 
 # this function for iperf3 alias
 function iperf3() {
-  local iperf3_cmd='cmd.exe /c iperf3 "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $iperf3_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c iperf3 "$@"
 }
 
 # this to call windows ipconfig
-alias ipconfig="ipconfig"
+alias ipconfig="check_win && ipconfig"
 
 # this function for ipconfig alias
 function ipconfig() {
-  local ipconfig_cmd='cmd.exe /c ipconfig "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $ipconfig_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c ipconfig "$@"
 }
 
 # this to call windows gem
-alias gem="gem"
+alias gem="check_win && gem"
 
 # this function for gem alias
 function gem() {
-  local gem_cmd='cmd.exe /c gem "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $gem_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c gem "$@"
 }
 
 # this to call windows irb
-alias irb="irb"
+alias irb="check_win && irb"
 
 # this function for irb alias
 function irb() {
-  local irb_cmd='cmd.exe /c irb "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $irb_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c irb "$@"
 }
 
 # this to call windows ruby
-alias ruby="ruby"
+alias ruby="check_win && ruby"
 
 # this function for ruby alias
 function ruby() {
-  local ruby_cmd='cmd.exe /c ruby "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $ruby_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c ruby "$@"
 }
 
 # this to call windows curl
-alias curl="curl"
+alias curl="check_win && curl"
 
 # this function for curl alias
 function curl() {
-  local curl_cmd='cmd.exe /c curl "$@"';
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    eval $curl_cmd;
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows directory!";
-  fi
+  cmd.exe /c curl "$@"
 }
 
 # Alias to call the windows vue
@@ -3506,13 +3465,7 @@ alias music="music"
 
 # this function for music alias
 function music(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start AppleMusic.exe
-  else
-    cd /mnt/c
-    cmd.exe /c start AppleMusic.exe
-    cd - &>/dev/null;
-  fi
+  force_run cmd.exe /c start AppleMusic.exe
 }
 
 # this alias to launch xampp
@@ -3520,13 +3473,7 @@ alias xampp="xampp"
 
 # this function for xampp alias
 function xampp(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start xampp-control.exe
-  else
-    cd /mnt/c
-    cmd.exe /c start xampp-control.exe
-    cd - &>/dev/null;
-  fi
+  force_run cmd.exe /c start xampp-control.exe
 }
 
 # this alias to open notepad
@@ -3549,13 +3496,7 @@ alias vm="vm"
 
 # this function for vm alias
 function vm(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start VirtualBox.exe
-  else
-    cd /mnt/c
-    cmd.exe /c start VirtualBox.exe
-    cd - &>/dev/null;
-  fi
+  force_run cmd.exe /c start VirtualBox.exe
 }
 
 # this alias to launch ventoy
@@ -3573,13 +3514,7 @@ alias wsh="wsh"
 
 # this alias for wsh alias
 function wsh(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c start wireshark.exe
-  else
-    cd /mnt/c
-    cmd.exe /c start wireshark.exe
-    cd - &>/dev/null;
-  fi
+  force_run cmd.exe /c start wireshark.exe
 }
 
 # this alias to open total commander
@@ -3888,45 +3823,27 @@ function pip() {
 }
 
 # this alias to launch windows go
-alias go="go"
+alias go="check_win && go"
 
 # this function for go alias
 function go(){
-  # check if we are inside wsl directory
-  # or inside a symbolic link
-  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
-    cmd.exe /c go $@
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
-  fi
+  cmd.exe /c go $@
 }
 
 # this alias to run rustc
-alias rustc="rustc"
+alias rustc="check_win && rustc"
 
 # this function for rustc alias
 function rustc(){
-  # check if we are inside wsl directory
-  # or inside a symbolic link
-  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
-    cmd.exe /c rustc $@
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
-  fi
+  cmd.exe /c rustc $@
 }
 
 # this alias to run cargo
-alias cargo="cargo"
+alias cargo="check_win && cargo"
 
 # this function for cargo alias
 function cargo(){
-  # check if we are inside wsl directory
-  # or inside a symbolic link
-  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
-    cmd.exe /c cargo $@
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
-  fi
+  cmd.exe /c cargo $@
 }
 
 # this alias to use windows nslookup
@@ -3934,13 +3851,7 @@ alias nslookup="nslookup"
 
 # this function for nslookup alias
 function nslookup(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c nslookup "$@"
-  else
-    cd /mnt/c
-    cmd.exe /c nslookup "$@"
-    cd - &>/dev/null;
-  fi
+  force_run cmd.exe /c nslookup "$@"
 }
 
 # this alias to use windows arp
@@ -3948,27 +3859,15 @@ alias arp="arp"
 
 # this function for arp alias
 function arp(){
-  if [[ "$PWD" == "/mnt/"* ]]; then
-    cmd.exe /c arp "$@"
-  else
-    cd /mnt/c
-    cmd.exe /c arp "$@"
-    cd - &>/dev/null;
-  fi
+  force_run cmd.exe /c arp "$@"
 }
 
 # this alias to run jupyter notebook
-alias jptr="jptr"
+alias jptr="check_win && jptr"
 
 # this function for jptr alias
 function jptr(){
-  # check if we are inside wsl directory
-  # or inside a symbolic link
-  if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
-    cmd.exe /c start jupyter notebook
-  else
-    echo "${BOLD}${RED}Please execute this command inside Windows (/mnt/*) directory!"
-  fi
+  cmd.exe /c start jupyter notebook
 }
 
 # this alias to open obs Studio
