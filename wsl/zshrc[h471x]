@@ -3070,30 +3070,23 @@ function tor(){
 alias ngrok="ngrok"
 
 # this function for ngrok alias
-# IMPROVED: 05-29-2024 10:25
+# CREATED: 05-29-2024 10:25
+# UPDATED: 10-25-2024 19:49
 function ngrok(){
-  # default ngrok command that redirects
-  # to a new terminal so the current one
-  # is available for other commands
-  local ngrok_cmd='cmd.exe /c start ngrok "$@"'
-
   # check for dashes then do not
   # redirect to another terminal
   for arg in "$@"; do
     if [[ "$arg" == -* || "$arg" == --* ]]; then
-      local ngrok_cmd='cmd.exe /c ngrok "$@"'
+      force_run cmd.exe /c ngrok "$@"
+      break
+    else
+      # default ngrok command that redirects
+      # to a new terminal so the current one
+      # is available for other commands
+      force_run cmd.exe /c start ngrok "$@"
       break
     fi
   done
-
-  if [[ "$PWD" != "/mnt/"* && ! -L "$PWD" ]]; then
-    cd /mnt/c
-    eval "$ngrok_cmd"
-    cd - &>/dev/null
-  else
-    eval "$ngrok_cmd"
-  fi
-  # force_run $ngrok_cmd
 }
 
 # Completion function for ngrok
