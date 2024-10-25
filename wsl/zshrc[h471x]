@@ -300,6 +300,22 @@ function flc(){
       wc -l "$1" | awk '{print $1, "lines"}';
       echo -ne " ==> ";
       wc -w "$1" | awk '{print $1, "words"}';
+
+      # Display the file size using Bash arithmetic
+      file_size=$(stat -c%s "$1")
+      if (( file_size < 1024 )); then
+        echo " ==> Size : $file_size bytes"
+      elif (( file_size < 1048576 )); then
+        size_kb=$(awk "BEGIN {printf \"%.2f\", $file_size/1024}")
+        echo " ==> Size : $size_kb KB"
+      elif (( file_size < 1073741824 )); then
+        size_mb=$(awk "BEGIN {printf \"%.2f\", $file_size/1048576}")
+        echo " ==> Size : $size_mb MB"
+      else
+        size_gb=$(awk "BEGIN {printf \"%.2f\", $file_size/1073741824}")
+        echo " ==> Size : $size_gb GB"
+      fi
+
       br;
     else
       grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
@@ -3070,7 +3086,14 @@ function ngrok(){
     fi
   done
 
-  force_run eval $ngrok_cmd
+  if [[ "$PWD" != "/mnt/"* && ! -L "$PWD" ]]; then
+    cd /mnt/c
+    eval "$ngrok_cmd"
+    cd - &>/dev/null
+  else
+    eval "$ngrok_cmd"
+  fi
+  # force_run $ngrok_cmd
 }
 
 # Completion function for ngrok
