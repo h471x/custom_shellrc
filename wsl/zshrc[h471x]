@@ -2794,20 +2794,20 @@ alias htx="htx"
 
 # this function for htx alias
 function htx(){
-  local router_id="fcecbfgdamkglkbpdcandefokgomhpli"
+  local router_id="hadedjhngljijoeemkcdnpkfdiadbgfe"
   local router_IP="192.168.8.1"
   local router_name="h471x Router"
 
   # start apache server if not running
-  if ! pgrep apache2 > /dev/null; then
-    sudo service apache2 start &>/dev/null;
-  fi
+  # if ! pgrep apache2 > /dev/null; then
+  #   sudo service apache2 start &>/dev/null;
+  # fi
 
   # open clock PWA or Progressive Web App
   open_web_app $router_IP $router_id $router_name;
 
   # stop apache server
-  sudo service apache2 stop &>/dev/null;
+  # sudo service apache2 stop &>/dev/null;
 }
 
 # this alias to open DotFyle Web App
@@ -3295,6 +3295,14 @@ function deno() {
 
 # Here to inject aliases
 # from the terminal to zshrc
+
+# this to call windows code
+alias code="check_win && code"
+
+# this function for code alias
+function code() {
+  cmd.exe /c code "$@"
+}
 
 # this to call windows acrobat
 alias acrobat="check_win && acrobat"
