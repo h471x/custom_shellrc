@@ -3532,6 +3532,22 @@ function pypush() {
   twine upload dist/*
 }
 
+
+function admin_python() {
+  # Create an array to hold arguments for PowerShell
+  local arg_list=()
+
+  # Loop through all the provided arguments and escape them correctly
+  for arg in "$@"; do
+    arg_list+=("\"$arg\"") # Add quotes to each argument
+  done
+
+  # Join the array into a single string with commas for PowerShell
+  local args_string=$(IFS=, ; echo "${arg_list[*]}")
+
+  powershell.exe -command "Start-Process $(wslpath -w $PYTHON_PATH)\python.exe -ArgumentList $args_string -Verb RunAs -Wait"
+}
+
 # this alias to launch windows python
 alias python="python"
 
@@ -3540,6 +3556,23 @@ alias python="python"
 # Check if the VIRTUAL_ENV is set
 # then use python.exe in there
 function python() {
+  # Check if the script is being run with sudo
+  if [[ $EUID -eq 0 ]]; then
+    echo "Running with sudo"
+    # Create an array to hold arguments for PowerShell
+    local arg_list=()
+
+    # Loop through all the provided arguments and escape them correctly
+    for arg in "$@"; do
+      arg_list+=("\"$arg\"") # Add quotes to each argument
+    done
+
+    # Join the array into a single string with commas for PowerShell
+    local args_string=$(IFS=, ; echo "${arg_list[*]}")
+
+    powershell.exe -command "Start-Process $(wslpath -w $PYTHON_PATH)\python.exe -ArgumentList $args_string -Verb RunAs"
+  fi
+
   if [[ -n "$VIRTUAL_ENV" ]]; then
     # since I made it hidden handle the leading dot
     local env_dir=$(dirname "$VIRTUAL_ENV")/.$(basename "$VIRTUAL_ENV")
