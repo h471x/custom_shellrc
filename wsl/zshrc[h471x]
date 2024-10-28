@@ -1524,7 +1524,7 @@ function ed(){
 ### WSL Paths
 
 # Binaries
-WSL_PATH=/home/h471x/.local/bin/:/usr/bin/scp
+WSL_PATH=/usr/bin/scp
 PYTHON_SCRIPTS_PATH=/usr/bin/python_scripts
 NPM_SCRIPTS_PATH=/usr/bin/node:/usr/bin/node_scripts
 RUST_SCRIPTS_PATH=/usr/bin/rust_scripts
@@ -3295,6 +3295,14 @@ function deno() {
 
 # Here to inject aliases
 # from the terminal to zshrc
+
+# this to call windows ping
+alias ping="check_win && ping"
+
+# this function for ping alias
+function ping() {
+  cmd.exe /c ping "$@"
+}
 
 # this to call windows code
 alias code="check_win && code"
