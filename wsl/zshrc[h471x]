@@ -1680,6 +1680,9 @@ function rctf(){
   echo $(ls -tR | head)
 }
 
+# this alias to open learning directory
+alias learn="op /mnt/d/NTSOA/dev/github_repo/h471x_repo/learning"
+
 # this alias to view the devops folder
 alias dvps="op /mnt/d/NTSOA/DEVOPS/devops"
 
@@ -2905,6 +2908,19 @@ function run_java(){
   "$interpreter" "$out"
 }
 
+# this alias to run rust code
+alias run_rust="check_win && run_rust"
+
+# this function for run_rust alias
+function run_rust(){
+  file="$1";
+  out="${file%.*}"
+  compiler="rustc"
+
+  "$compiler" "$file"
+  ./"$out".exe
+}
+
 # this alias to run an executable file or a script
 alias rn="rn"
 
@@ -2931,6 +2947,9 @@ function rn(){
       br;;
     java)
       run_java "$1"
+      ;;
+    rs)
+      run_rust "$1"
       ;;
     js)
       c && br 2 && node "$1" && br
