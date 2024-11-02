@@ -3315,6 +3315,38 @@ function deno() {
 # Here to inject aliases
 # from the terminal to zshrc
 
+# this to call windows yo
+alias yo="check_win && yo"
+
+# this function for yo alias
+function yo() {
+  cmd.exe /c yo "$@"
+}
+
+# this to call windows generator-code
+alias generator-code="check_win && generator-code"
+
+# this function for generator-code alias
+function generator-code() {
+  cmd.exe /c generator-code "$@"
+}
+
+# this to call windows msfvenom
+alias msfvenom="check_win && msfvenom"
+
+# this function for msfvenom alias
+function msfvenom() {
+  cmd.exe /c msfvenom "$@"
+}
+
+# this to call windows msfconsole
+alias msfconsole="check_win && msfconsole"
+
+# this function for msfconsole alias
+function msfconsole() {
+  cmd.exe /c msfconsole "$@"
+}
+
 # this to call windows ping
 alias ping="check_win && ping"
 
@@ -3857,6 +3889,22 @@ function pip() {
       cmd.exe /c pip "$@"
     fi
     cd - &>/dev/null
+  fi
+}
+
+# this alias to check if a python package
+# is already installed or not
+alias pycheck="pycheck"
+
+# this function for pycheck alias
+function pycheck(){
+  local package="$1"
+
+  if pip show $package 2>&1 | grep -q "WARNING"; then
+    echo -n "${BOLD}${WHITE} Installing ${GREEN}$package ${WHITE}...${RESET}\n"
+    pip install $package
+  else
+    pip show $package
   fi
 }
 
