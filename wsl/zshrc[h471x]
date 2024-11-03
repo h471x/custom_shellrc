@@ -1561,6 +1561,9 @@ PATH=$BINARY_PATH:$BROWSER_PATH:$APP_PATH:$PATH
 
 ### WSL Shortcuts
 
+# this alias for cert shortcut
+alias cert="op /mnt/d/NTSOA/credentials/certifications"
+
 # this alias to go to home directory
 alias hm="cd && cv"
 
@@ -3176,7 +3179,7 @@ function install_win(){
 # this function to install aliases
 function install_alias(){
   # check if the alias already existed
-  local file_name="/home/$USER/.zshrc"
+  local file_name="/home/$USER/.$(basename $SHELL)rc"
 
   prompt_install "$1"
   local script="$script"
@@ -3210,6 +3213,45 @@ function install_alias(){
       echo "function $script() {"
       echo "  cmd.exe /c $script \"\$@\""
       echo '}'
+      echo ''
+      tail -n +$line_number "$file_name"
+    } >temp && mv temp "$file_name"
+
+    source "$file_name"
+  fi
+}
+
+# this function to install path aliases
+function install_path(){
+  # check if the alias already existed
+  local file_name="/home/$USER/.$(basename $SHELL)rc"
+
+  prompt_install "$PWD"
+  local script="$script"
+  local alias_name="alias $script"
+  # echo $script
+
+  if grep -q "$alias_name" "$file_name"; then
+    echo "Alias $script already exists in $file_name"
+    return
+  fi
+
+  # filename will be our zshrc
+  local location="### WSL Shortcuts"
+
+  # Get dynamically the line of where we should inject the new alias
+  # Get the second occurrence since we mention it in the location variable
+  local line_number=$(grep -n "$location" "$file_name" | head -n1 | cut -d: -f1)
+
+  # Get 2 lines below the matching line
+  local line_number=$((line_number + 2))
+
+  # only install it only if it is defined
+  if [[ -n "$script" ]]; then
+    {
+      head -n $((line_number - 1)) "$file_name"
+      echo "# this alias for $script shortcut"
+      echo "alias $script=\"op $PWD\""
       echo ''
       tail -n +$line_number "$file_name"
     } >temp && mv temp "$file_name"
