@@ -3226,17 +3226,18 @@ function install_path(){
   # check if the alias already existed
   local file_name="/home/$USER/.$(basename $SHELL)rc"
 
-  prompt_install "$PWD"
+  prompt_install "$(basename $PWD)"
   local script="$script"
   local alias_name="alias $script"
-  # echo $script
+  local path_to_install="$PWD"
 
   if grep -q "$alias_name" "$file_name"; then
     echo "Alias $script already exists in $file_name"
     return
   fi
 
-  # filename will be our zshrc
+  # location of the path alias
+  # will be 2 lines below this
   local location="### WSL Shortcuts"
 
   # Get dynamically the line of where we should inject the new alias
@@ -3251,7 +3252,7 @@ function install_path(){
     {
       head -n $((line_number - 1)) "$file_name"
       echo "# this alias for $script shortcut"
-      echo "alias $script=\"op $PWD\""
+      echo "alias $script=\"op $path_to_install\""
       echo ''
       tail -n +$line_number "$file_name"
     } >temp && mv temp "$file_name"
