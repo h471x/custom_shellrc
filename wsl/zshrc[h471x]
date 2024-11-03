@@ -1561,6 +1561,9 @@ PATH=$BINARY_PATH:$BROWSER_PATH:$APP_PATH:$PATH
 
 ### WSL Shortcuts
 
+# this alias for cybsec shortcut
+alias cybsec="op /mnt/d/NTSOA/dev/github_repo/h471x_repo/cybsec"
+
 # this alias for cert shortcut
 alias cert="op /mnt/d/NTSOA/credentials/certifications"
 
@@ -3252,7 +3255,7 @@ function install_path(){
     {
       head -n $((line_number - 1)) "$file_name"
       echo "# this alias for $script shortcut"
-      echo "alias $script=\"op $path_to_install\""
+      echo "alias $script='op \"$path_to_install\"'"
       echo ''
       tail -n +$line_number "$file_name"
     } >temp && mv temp "$file_name"
