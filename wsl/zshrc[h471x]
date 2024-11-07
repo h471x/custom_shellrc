@@ -3361,6 +3361,14 @@ function deno() {
 # Here to inject aliases
 # from the terminal to zshrc
 
+# this to call windows docker
+alias docker="check_win && docker"
+
+# this function for docker alias
+function docker() {
+  cmd.exe /c docker "$@"
+}
+
 # this to call windows yo
 alias yo="check_win && yo"
 
