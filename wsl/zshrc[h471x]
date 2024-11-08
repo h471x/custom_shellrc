@@ -1445,19 +1445,6 @@ command_not_found_handler() {
 
 # this alias to edit $SHELLrc
 alias ct="nvim ~/.zshrc"
-# alias ct="ct"
-
-# # this function for ct alias
-# function ct(){
-#   local formatted_path=$(wslpath -w ~)
-#   if [[ "$PWD" == "/mnt/"* ]]; then
-#     cmd.exe /c code $formatted_path/.zshrc
-#   else
-#     cd /mnt/c
-#     cmd.exe /c code $formatted_path/.zshrc
-#     cd - &>/dev/null
-#   fi
-# }
 
 # this alias to reload the zshrc file
 alias rld="rld"
