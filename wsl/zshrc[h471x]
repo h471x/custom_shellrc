@@ -3353,7 +3353,7 @@ alias neohtop="check_win && neohtop"
 
 # this function for neohtop alias
 function neohtop() {
-  cmd.exe /c neohtop "$@"
+  cmd.exe /c start neohtop
 }
 
 # this to call windows docker
