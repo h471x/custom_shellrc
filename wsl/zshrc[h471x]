@@ -3348,6 +3348,14 @@ function deno() {
 # Here to inject aliases
 # from the terminal to zshrc
 
+# this to call windows neohtop
+alias neohtop="check_win && neohtop"
+
+# this function for neohtop alias
+function neohtop() {
+  cmd.exe /c neohtop "$@"
+}
+
 # this to call windows docker
 alias docker="check_win && docker"
 
