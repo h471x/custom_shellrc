@@ -96,7 +96,8 @@ LIGHT_YELLOW="\e[93m"
 LIGHT_BLUE="\e[94m"
 LIGHT_MAGENTA="\e[95m"
 LIGHT_CYAN="\e[96m"
-WHITE="\e[97m"
+# WHITE="\e[97m"
+WHITE="\e[38;2;201;209;217m"
 
 # Background Color
 BG_BLACK="\e[40m"
@@ -3640,7 +3641,7 @@ function pypush() {
   twine upload dist/*
 }
 
-
+# this function to run python as admin
 function admin_python() {
   # Create an array to hold arguments for PowerShell
   local arg_list=()
