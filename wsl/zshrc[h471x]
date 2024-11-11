@@ -31,6 +31,12 @@ CASE_SENSITIVE="true"
 # Path to oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
+# Default editor used by crontab
+DEFAULT_EDITOR=$(which nvim || which vim || which nano)
+
+export EDITOR="$DEFAULT_EDITOR"
+export VISUAL="$DEFAULT_EDITOR"
+
 # Oh-My-Zsh custom theme
 ZSH_THEME="powerlevel10k/powerlevel10k"
 # ZSH_THEME="archcraft"
