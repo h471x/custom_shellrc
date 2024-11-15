@@ -3002,7 +3002,7 @@ alias thm="thm"
 
 # this function for thm alias
 function thm(){
-  powershell.exe -command "Start-Process D:\NTSOA\INSTALLED\THEME_TOOL\ThemeTool.exe -Verb RunAs"
+  powershell.exe -command "Start-Process C:\Users\lab_l\Downloads\SecureUxTheme-amd64\ThemeTool.exe -Verb RunAs"
 }
 
 # this alias to call the sqlite3.Exe file
