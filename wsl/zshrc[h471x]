@@ -1556,7 +1556,7 @@ PATH=$BINARY_PATH:$BROWSER_PATH:$APP_PATH:$PATH
 ### WSL Shortcuts
 
 # this alias for cybsec shortcut
-alias cybsec="op /mnt/d/NTSOA/dev/github_repo/h471x_repo/cybsec"
+alias cybsec="op /mnt/d/NTSOA/dev/github_repo/h471x_repo/learning/learn_python/cybsec"
 
 # this alias for cert shortcut
 alias cert="op /mnt/d/NTSOA/credentials/certifications"
@@ -1604,7 +1604,7 @@ function dtp(){
 alias books='exop /mnt/d/NTSOA/"0 ENI"/"ENI 2023"/"ENI L1 LESSONS"/BOOKS'
 
 # this alias to enter internship_report
-alias intern='op /mnt/d/NTSOA/"0 ENI"/"ENI 2024"/"STAGE 2024"/internship_report'
+alias intern='op /mnt/c/Users/lab_l/Downloads/internship/internship_report'
 
 # this alias to play directly the typing game
 alias typing="typing"
@@ -3334,6 +3334,14 @@ alias vsce="check_win && vsce"
 # this function for vsce alias
 function vsce() {
   cmd.exe /c vsce "$@"
+}
+
+# this to call windows vsc
+alias vsc="vsc"
+
+# this function for vsce alias
+function vsc() {
+  cmd.exe /c start code .
 }
 
 # this to call windows workbox
