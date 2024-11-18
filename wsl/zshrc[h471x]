@@ -3336,14 +3336,6 @@ function vsce() {
   cmd.exe /c vsce "$@"
 }
 
-# this to call windows vsc
-alias vsc="vsc"
-
-# this function for vsce alias
-function vsc() {
-  cmd.exe /c start code .
-}
-
 # this to call windows workbox
 alias workbox="check_win && workbox"
 
