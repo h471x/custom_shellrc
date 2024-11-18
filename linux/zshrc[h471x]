@@ -96,7 +96,8 @@ LIGHT_YELLOW="\e[93m"
 LIGHT_BLUE="\e[94m"
 LIGHT_MAGENTA="\e[95m"
 LIGHT_CYAN="\e[96m"
-WHITE="\e[97m"
+# WHITE="\e[97m"
+WHITE="\e[38;2;201;209;217m"
 
 # Background Color
 BG_BLACK="\e[40m"
@@ -1516,12 +1517,14 @@ CUPP_PATH=/usr/share/cupp
 GO_PATH=/usr/local/go/bin
 HOME_PATH=$HOME/bin
 SCP_PATH=/usr/bin/scp
+SIPP_PATH=/home/h471x/Desktop/sipp
 
 # Add the paths using the function
 add_to_path $CUPP_PATH
 add_to_path $HOME_PATH
 add_to_path $GO_PATH
 add_to_path $SCP_PATH
+add_to_path $SIPP_PATH
 
 # here to hide the java options
 unset _JAVA_OPTIONS
