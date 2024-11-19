@@ -1604,7 +1604,7 @@ function dtp(){
 alias books='exop /mnt/d/NTSOA/"0 ENI"/"ENI 2023"/"ENI L1 LESSONS"/BOOKS'
 
 # this alias to enter internship_report
-alias intern='op /mnt/c/Users/lab_l/Downloads/internship/internship_report'
+alias intern='op /mnt/d/NTSOA/0 ENI/ENI 2024/STAGE 2024/internship_report'
 
 # this alias to play directly the typing game
 alias typing="typing"
