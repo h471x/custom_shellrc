@@ -3642,9 +3642,9 @@ alias pypush="pypush"
 # this function for pypush alias
 function pypush() {
   local token_path=/mnt/d/NTSOA/credentials/recovery_codes/pypi_h471x_token.txt
-  export TWINE_USERNAME=__token__
-  export TWINE_PASSWORD=$(cat $token_path)
-  twine upload dist/*
+  local TWINE_USERNAME=__token__
+  local TWINE_PASSWORD=$(cat $token_path)
+  twine upload --username $TWINE_USERNAME --password $TWINE_PASSWORD dist/*
 }
 
 # this function to run python as admin
