@@ -1464,8 +1464,8 @@ function rld(){
   local shellrc=.$(basename $SHELL)rc;
   local is_wsl=$(grep -qi microsoft /proc/version && echo true || echo false)
   local platform=$($is_wsl && echo "wsl" || echo "linux")
-  local backup_dir=$HOME/NTSOA/zshrc/$platform;
-  local backup_file=zshrc[$USER];
+  local backup_dir=$HOME/NTSOA/custom_shellrc/$platform;
+  local backup_file=zshrc[$USER].sh;
   local saved_message="$shellrc backed up"
 
   # source the config file and save it
@@ -1577,7 +1577,7 @@ alias hn="op /mnt/d/NTSOA"
 alias dev="op /mnt/d/NTSOA/dev/github_repo/"
 
 # this alias to open the notes folder
-alias nt="op /mnt/d/NTSOA/dev/0\ NOTES"
+alias nt="op /mnt/g/NTSOA/dev/0\ NOTES"
 
 # this alias to open the kali linux Vm Shared folder
 alias kali="op /mnt/d/NTSOA/INSTALLED/KALI_LINUX"
@@ -1681,7 +1681,7 @@ function rctf(){
 }
 
 # this alias to open learning directory
-alias learn="op /mnt/d/NTSOA/dev/github_repo/h471x_repo/learning"
+alias learn="op /mnt/g/NTSOA/dev/github_repo/h471x_repo/learning"
 
 # this alias to view the devops folder
 alias dvps="op /mnt/d/NTSOA/DEVOPS/devops"
@@ -2823,6 +2823,8 @@ function dotfyle(){
   local dotfyle_name="DotFyle"
   open_web_app $dotfyle_link $dotfyle_id $dotfyle_name
 }
+
+
 
 #######################################################################
 
