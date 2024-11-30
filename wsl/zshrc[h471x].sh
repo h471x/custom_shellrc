@@ -1574,7 +1574,7 @@ alias gospel="op /mnt/d/NTSOA/gospel"
 alias hn="op /mnt/d/NTSOA"
 
 # this alias to open the dev folder
-alias dev="op /mnt/d/NTSOA/dev/github_repo/"
+alias dev="op /mnt/g/NTSOA/dev/github_repo/"
 
 # this alias to open the notes folder
 alias nt="op /mnt/g/NTSOA/dev/0\ NOTES"
@@ -1604,7 +1604,7 @@ function dtp(){
 alias books='exop /mnt/d/NTSOA/"0 ENI"/"ENI 2023"/"ENI L1 LESSONS"/BOOKS'
 
 # this alias to enter internship_report
-alias intern='op /mnt/d/NTSOA/"0 ENI"/"ENI 2024"/"STAGE 2024"/internship_report'
+alias intern='op /mnt/g/NTSOA/"0 ENI"/"ENI 2024"/"STAGE 2024"/internship_report'
 
 # this alias to play directly the typing game
 alias typing="typing"
@@ -3330,6 +3330,14 @@ function tsc() {
   cmd.exe /c tsc "$@"
 }
 
+# this alias to open vscode on $PWD
+alias vsc="check_win && vsc"
+
+# this function for vsc alias
+function vsc {
+  cmd.exe /c start code .
+}
+
 # this to call windows vsce
 alias vsce="check_win && vsce"
 
@@ -3643,7 +3651,7 @@ alias pypush="pypush"
 
 # this function for pypush alias
 function pypush() {
-  local token_path=/mnt/d/NTSOA/credentials/recovery_codes/pypi_h471x_token.txt
+  local token_path=/mnt/g/NTSOA/credentials/recovery_codes/pypi_h471x_token.txt
   local TWINE_USERNAME=__token__
   local TWINE_PASSWORD=$(cat $token_path)
   twine upload --username $TWINE_USERNAME --password $TWINE_PASSWORD dist/*
@@ -4019,7 +4027,7 @@ alias obs="obs"
 
 # this function for obs alias
 function obs(){
-  cd /mnt/d/NTSOA/INSTALLED/OBS\ STUDIO/obs-studio/bin/64bit
+  cd /mnt/g/NTSOA/INSTALLED/OBS\ STUDIO/obs-studio/bin/64bit
   cmd.exe /c start obs64.exe
   cd - &>/dev/null
 }
