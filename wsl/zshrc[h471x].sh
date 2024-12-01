@@ -1524,12 +1524,12 @@ NPM_SCRIPTS_PATH=/usr/bin/node:/usr/bin/node_scripts
 RUST_SCRIPTS_PATH=/usr/bin/rust_scripts
 BINARY_SCRIPTS_PATH=$PYTHON_SCRIPTS_PATH:$NPM_SCRIPTS_PATH:$RUST_SCRIPTS_PATH
 SQLITE_PATH=/mnt/c/Program\ Files/sqlite
-QT_PATH=/mnt/d/NTSOA/INSTALLED/QT/Tools/QtCreator/bin
-PYTHON_PATH=/mnt/d/NTSOA/INSTALLED/PYTHON
+QT_PATH=/mnt/g/NTSOA/INSTALLED/QT/Tools/QtCreator/bin
+PYTHON_PATH=/mnt/g/NTSOA/INSTALLED/PYTHON
 VIRTUAL_BOX_PATH="/mnt/c/'Virtual Box'"
 WIRESHARK_PATH=/mnt/c/Program\ Files/Wireshark
 TOTAL_CMD_PATH=/mnt/c/Program\ Files/totalcmd
-THEME_TOOL_PATH=/mnt/d/NTSOA/INSTALLED/THEME_TOOL
+THEME_TOOL_PATH=/mnt/g/NTSOA/INSTALLED/THEME_TOOL
 WINDOWS_APP_PATH=$VIRTUAL_BOX_PATH:$WIRESHARK_PATH:$TOTAL_CMD_PATH:$THEME_TOOL_PATH
 
 # Path to Binaries
@@ -1543,9 +1543,9 @@ BROWSER_PATH=$CHROME_PATH:$EDGE_PATH
 
 # Applications
 NPM_PATH=/mnt/c/Users/lab_l/AppData/Roaming/npm/npm
-NGROK_PATH=/mnt/d/NTSOA/INSTALLED/NGROK/
-POT_PLAYER_PATH=/mnt/d/NTSOA/INSTALLED/POT\ PLAYER/PotPlayer
-FL_STUDIO_PATH=/mnt/d/NTSOA/INSTALLED/FL\ STUDIO\ 12
+NGROK_PATH=/mnt/g/NTSOA/INSTALLED/NGROK/
+POT_PLAYER_PATH=/mnt/g/NTSOA/INSTALLED/POT\ PLAYER/PotPlayer
+FL_STUDIO_PATH=/mnt/g/NTSOA/INSTALLED/FL\ STUDIO\ 12
 APP_PATH=$NPM_PATH:$POT_PLAYER_PATH:$FL_STUDIO_PATH:$NGROK_PATH
 
 # Including all the paths
@@ -1556,10 +1556,10 @@ PATH=$BINARY_PATH:$BROWSER_PATH:$APP_PATH:$PATH
 ### WSL Shortcuts
 
 # this alias for cybsec shortcut
-alias cybsec="op /mnt/d/NTSOA/dev/github_repo/h471x_repo/learning/learn_python/cybsec"
+alias cybsec="op /mnt/g/NTSOA/dev/github_repo/h471x_repo/learning/learn_python/cybsec"
 
 # this alias for cert shortcut
-alias cert="op /mnt/d/NTSOA/credentials/certifications"
+alias cert="op /mnt/g/NTSOA/credentials/certifications"
 
 # this alias to go to home directory
 alias hm="cd && cv"
@@ -1568,10 +1568,10 @@ alias hm="cd && cv"
 alias whm="cd /mnt/c/Users/lab_l/OneDrive/Bureau && op Home.lnk && nd"
 
 # this alias to open the evangile directory
-alias gospel="op /mnt/d/NTSOA/gospel"
+alias gospel="op /mnt/g/NTSOA/gospel"
 
 # this alias to enter the NTSOA directory
-alias hn="op /mnt/d/NTSOA"
+alias hn="op /mnt/g/NTSOA"
 
 # this alias to open the dev folder
 alias dev="op /mnt/g/NTSOA/dev/github_repo/"
@@ -1580,7 +1580,7 @@ alias dev="op /mnt/g/NTSOA/dev/github_repo/"
 alias nt="op /mnt/g/NTSOA/dev/0\ NOTES"
 
 # this alias to open the kali linux Vm Shared folder
-alias kali="op /mnt/d/NTSOA/INSTALLED/KALI_LINUX"
+alias kali="op /mnt/g/NTSOA/INSTALLED/KALI_LINUX"
 
 # this alias to open the download folder
 alias dwl="dwl"
@@ -1601,7 +1601,7 @@ function dtp(){
 }
 
 # this alias to view the books
-alias books='exop /mnt/d/NTSOA/"0 ENI"/"ENI 2023"/"ENI L1 LESSONS"/BOOKS'
+alias books='exop /mnt/g/NTSOA/"0 ENI"/"ENI 2023"/"ENI L1 LESSONS"/BOOKS'
 
 # this alias to enter internship_report
 alias intern='op /mnt/g/NTSOA/"0 ENI"/"ENI 2024"/"STAGE 2024"/internship_report'
@@ -1611,20 +1611,20 @@ alias typing="typing"
 
 # this function for typing alias
 function typing(){
-  cd /mnt/d/NTSOA/dev/github_repo/typing
+  cd /mnt/g/NTSOA/dev/github_repo/typing
   cmd.exe /c start python server.py
   cmd.exe /c start chrome "http://localhost:8000"
   cd - &>/dev/null
 }
 
 # this alias to access my musics
-alias msc="op /mnt/d/NTSOA/music/hiravao"
+alias msc="op /mnt/g/NTSOA/music/hiravao"
 
 # this alias to access pictures
 alias pct="op /mnt/c/Users/lab_l/OneDrive/Pictures"
 
 # this alias to view the setup
-alias setup="op /mnt/d/NTSOA/SETUP"
+alias setup="op /mnt/g/NTSOA/SETUP"
 
 # this alias to open dosbox config files
 alias dosbox="dosbox"
@@ -1642,7 +1642,7 @@ alias eni="eni"
 
 # this function for eni alias
 function eni(){
-  local eni_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/S4
+  local eni_path=/mnt/g/NTSOA/0\ ENI/ENI\ 2024/S4
   op $eni_path
 }
 
@@ -1651,7 +1651,7 @@ alias edt="edt"
 
 # this function for edt alias
 function edt(){
-  local edt_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/L2\ 2024
+  local edt_path=/mnt/g/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/L2\ 2024
   cd $edt_path
 
   local recent_file=$(ls -t . | head -n1)
@@ -1665,7 +1665,7 @@ alias edtr="edtr"
 
 # this function for edtr alias
 function edtr(){
-  local edt_path=/mnt/d/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/RAW
+  local edt_path=/mnt/g/NTSOA/0\ ENI/ENI\ 2024/0\ EDT/RAW
   cd $edt_path
 
   local recent_file=$(ls -t . | head -n1)
@@ -1684,7 +1684,7 @@ function rctf(){
 alias learn="op /mnt/g/NTSOA/dev/github_repo/h471x_repo/learning"
 
 # this alias to view the devops folder
-alias dvps="op /mnt/d/NTSOA/DEVOPS/devops"
+alias dvps="op /mnt/g/NTSOA/DEVOPS/devops"
 
 # this alias to open recent file / directory
 alias rct="rct"
@@ -2772,7 +2772,7 @@ function cbr(){
     local cbr_name="Cyber Chef"
     open_web_app $cbr_link $cbr_id $cbr_name
   else
-    cd /mnt/d/NTSOA/dev/github_repo/forks/cyber_chef
+    cd /mnt/g/NTSOA/dev/github_repo/forks/cyber_chef
     bwsop CyberChef_v10.18.8.html
     cd -&>/dev/null
   fi
@@ -3172,7 +3172,7 @@ alias install_win="install_win"
 
 # this function for install_win alias
 function install_win(){
-  mkdir /mnt/d/NTSOA/INSTALLED/"$1"
+  mkdir /mnt/g/NTSOA/INSTALLED/"$1"
 }
 
 # this function to install aliases
@@ -3558,7 +3558,7 @@ alias fl="fl"
 
 # this function for fl alias
 function fl(){
-  cd /mnt/d/NTSOA/INSTALLED/FL\ STUDIO\ 12
+  cd /mnt/g/NTSOA/INSTALLED/FL\ STUDIO\ 12
   cmd.exe /c start FL64.exe
   cd - &>/dev/null;
 }
@@ -3607,7 +3607,7 @@ alias ventoy="ventoy"
 
 # this function for ventoy alias
 function ventoy(){
-  cd "/mnt/d/NTSOA/INSTALLED/VENTOY/ventoy-1.0.99"
+  cd "/mnt/g/NTSOA/INSTALLED/VENTOY/ventoy-1.0.99"
   explorer.exe Ventoy2Disk.exe
   cd -&>/dev/null
 }
@@ -4037,7 +4037,7 @@ alias gta="gta"
 
 # this function for gta alias
 function gta(){
-  cd /mnt/d/NTSOA/INSTALLED/GTA\ SAN\ ANDREAS
+  cd /mnt/g/NTSOA/INSTALLED/GTA\ SAN\ ANDREAS
   cmd.exe /c start /affinity 2 gta_sa.exe
   cd - &>/dev/null
 }
@@ -4047,7 +4047,7 @@ alias paradigm="paradigm"
 
 # this function for paradigm alias
 function paradigm(){
-  cd /mnt/d/NTSOA/INSTALLED/VISUAL\ PARADIGM/Visual\ Paradigm\ CE\ 17.2/bin
+  cd /mnt/g/NTSOA/INSTALLED/VISUAL\ PARADIGM/Visual\ Paradigm\ CE\ 17.2/bin
   explorer.exe visual.lnk
   cd - &>/dev/null
 }
@@ -4067,7 +4067,7 @@ alias boost="boost"
 
 # this function for boost alias
 function boost(){
-  cd "/mnt/d/NTSOA/INSTALLED/DRIVER BOOSTER/11.6.0"
+  cd "/mnt/g/NTSOA/INSTALLED/DRIVER BOOSTER/11.6.0"
   cmd.exe /c start DriverBooster.exe
   cd - &>/dev/null
 }
@@ -4077,7 +4077,7 @@ alias gns="gns"
 
 # this function for gns alias
 function gns(){
-  cd /mnt/d/NTSOA/INSTALLED/GNS3
+  cd /mnt/g/NTSOA/INSTALLED/GNS3
   cmd.exe /c start gns3.exe
   cd - &>/dev/null
 }
@@ -4087,7 +4087,7 @@ alias debug="debug"
 
 # this function for debug alias
 function debug(){
-  cd /mnt/d/NTSOA/INSTALLED/DOSBOX/DOSBox-0.74-3
+  cd /mnt/g/NTSOA/INSTALLED/DOSBOX/DOSBox-0.74-3
   cmd.exe /c start DOSBox.exe DEBUGX.COM
   cd - &>/dev/null
 }
@@ -4097,7 +4097,7 @@ alias dbg64="dbg64"
 
 # this function for debug alias
 function dbg64(){
-  cd /mnt/d/NTSOA/INSTALLED/SHORTCUTS/
+  cd /mnt/g/NTSOA/INSTALLED/SHORTCUTS/
   explorer.exe x64dbg.lnk
   cd - &>/dev/null
 }
@@ -4107,7 +4107,7 @@ alias dbg32="dbg32"
 
 # this function for debug alias
 function dbg32(){
-  cd /mnt/d/NTSOA/INSTALLED/SHORTCUTS/
+  cd /mnt/g/NTSOA/INSTALLED/SHORTCUTS/
   explorer.exe x32dbg.lnk
   cd - &>/dev/null
 }
