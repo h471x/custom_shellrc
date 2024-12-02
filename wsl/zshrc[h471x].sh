@@ -1576,6 +1576,9 @@ alias hn="op /mnt/g/NTSOA"
 # this alias to open the dev folder
 alias dev="op /mnt/g/NTSOA/dev/github_repo/"
 
+# this alias to open the forks directory
+alias fork="op /mnt/g/NTSOA/dev/github_repo/forks"
+
 # this alias to open the notes folder
 alias nt="op /mnt/g/NTSOA/dev/0\ NOTES"
 
@@ -2130,6 +2133,9 @@ function gthb(){
     # check if the repo has a remote
     # on github otherwise open the pwa
     if [ "$has_remote" ]; then
+      # Fetch updates from the remote to ensure up-to-date branch info
+      git fetch --quiet origin
+
       local is_remote_branch=$(git branch -r | grep "origin/$current_branch")
 
       # check if the current branch has remote
