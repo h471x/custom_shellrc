@@ -301,6 +301,22 @@ function flc(){
       wc -l "$1" | awk '{print $1, "lines"}';
       echo -ne " ==> ";
       wc -w "$1" | awk '{print $1, "words"}';
+
+      # Display the file size using Bash arithmetic
+      file_size=$(stat -c%s "$1")
+      if (( file_size < 1024 )); then
+        echo " ==> Size : $file_size bytes"
+      elif (( file_size < 1048576 )); then
+        size_kb=$(awk "BEGIN {printf \"%.2f\", $file_size/1024}")
+        echo " ==> Size : $size_kb KB"
+      elif (( file_size < 1073741824 )); then
+        size_mb=$(awk "BEGIN {printf \"%.2f\", $file_size/1048576}")
+        echo " ==> Size : $size_mb MB"
+      else
+        size_gb=$(awk "BEGIN {printf \"%.2f\", $file_size/1073741824}")
+        echo " ==> Size : $size_gb GB"
+      fi
+
       br;
     else
       grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
@@ -463,6 +479,17 @@ alias paste="xsel --output --clipboard"
 
 # this alias to use python3 when typing python
 alias python="python3"
+
+# this alias to push to pypi
+alias pypush="pypush"
+
+# this function for pypush alias
+function pypush {
+  local token_path=/home/h471x/NTSOA/credentials/pypi_h471x_token
+  local TWINE_USERNAME=__token__
+  local TWINE_PASSWORD=$(cat $token_path)
+  twine upload --username $TWINE_USERNAME --password $TWINE_PASSWORD dist/*
+}
 
 # this alias to use pip3 when typing pip
 alias pip="pip3"
@@ -1449,8 +1476,8 @@ function rld(){
   local shellrc=.$(basename $SHELL)rc;
   local is_wsl=$(grep -qi microsoft /proc/version && echo true || echo false)
   local platform=$($is_wsl && echo "wsl" || echo "linux")
-  local backup_dir=$HOME/NTSOA/zshrc/$platform;
-  local backup_file=zshrc[$USER];
+  local backup_dir=$HOME/NTSOA/custom_shellrc/$platform;
+  local backup_file=zshrc[$USER].sh;
   local saved_message="$shellrc backed up"
 
   # source the config file and save it
@@ -1683,34 +1710,114 @@ function downnet(){
   sudo ifconfig "$1" down;
 }
 
+# # this alias to show the network configuration
+# alias ipsh="ipsh"
+#
+# # this function for ntsh alias
+# function ipsh(){
+#   c && br;
+#   echo "  Available IP Adresses : ";
+#   br;
+#   # ifconfig wlan0;
+#   # br;
+#   local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
+#
+#   # Add a conditon to make it view
+#   # IP from interface passed as argument
+#   if [[ $# -eq 1 ]]; then
+#     local iface_ip=$(ifconfig "$1" | grep "inet " | awk '{print $2}');
+#     echo " $1 ==> $iface_ip";
+#   else
+#     if [ -d /sys/class/net/wlan0 ]; then
+#       local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
+#       echo " wlan0 ==> $wlan_ip";
+#       echo " eth0  ==> $eth_ip" && br;
+#     else
+#       echo " eth0 IP ==> $eth_ip" && br;
+#     fi
+#   fi
+#
+#   # ifconfig | awk -F '[ :]+' '/^[a-z]/ {interface=$1} /inet / {print interface " ==> " $3}'
+# }
+
+# this alias to show IPV4 IP addresses
+alias show_ip="show_ip"
+
+# this fucntion for show_ip alias
+function show_ip {
+  # Declare an associative array (Zsh specific syntax)
+  typeset -A iface_ip_map
+
+  # Logical parts of the AWK command
+  match_interfaces='/^[a-z]/ { iface=$1; sub(":", "", iface) }'
+  match_ip='/inet / && $2 != "127.0.0.1" { print iface, $2 }'
+
+  # Combine the parts into the full AWK command
+  awk_cmd="$match_interfaces $match_ip"
+
+  # Extract interface names and IPs into a variable
+  interfaces=$(ifconfig | awk "$awk_cmd")
+
+  # Loop through the extracted data and populate the associative array
+  while read iface ip; do
+    iface_ip_map["$iface"]="$ip"
+  done <<< "$interfaces"
+
+  # Output the associative array in a key-value format
+  for iface in ${(k)iface_ip_map}; do
+    echo $iface:${iface_ip_map[$iface]}
+  done
+}
+
 # this alias to show the network configuration
 alias ipsh="ipsh"
 
 # this function for ntsh alias
-function ipsh(){
-  c && br;
-  echo "  Available IP Adresses : ";
-  br;
-  # ifconfig wlan0;
-  # br;
-  local eth_ip=$(ifconfig eth0 | grep "inet " | awk '{print $2}');
+function ipsh {
+  # Example of predefined commands (modify as needed)
+  c && br  # Your predefined commands
+  echo " Available IP Addresses: "
+  br  # Your predefined command
 
-  # Add a conditon to make it view
-  # IP from interface passed as argument
-  if [[ $# -eq 1 ]]; then
-    local iface_ip=$(ifconfig "$1" | grep "inet " | awk '{print $2}');
-    echo " $1 ==> $iface_ip";
-  else
-    if [ -d /sys/class/net/wlan0 ]; then
-      local wlan_ip=$(ifconfig wlan0 | grep "inet " | awk '{print $2}');
-      echo " wlan0 ==> $wlan_ip";
-      echo " eth0  ==> $eth_ip" && br;
+  # Capture the output of show_ip
+  map_output=$(show_ip)
+
+  # # Debugging: print the raw output of show_ip
+  # echo "Raw map_output:"
+  # echo "$map_output"
+
+  # Find the length of the longest interface name (after stripping quotes and colons)
+  longest_iface_length=$(echo "$map_output" | sed -E 's/"([^"]+)":.*/\1/' | awk '{ print length }' | sort -n | tail -n 1)
+
+  # # Debugging: print the longest interface length
+  # echo "The longest interface length is: $longest_iface_length"
+
+  # Loop through each line of the map_output, stripping quotes from iface and aligning
+  while IFS=: read -r iface ip; do
+    iface=$(echo "$iface" | tr -d '"')  # Remove any quotes from iface
+    iface=$(echo "$iface" | tr -d ' ')  # Remove any extra spaces from iface
+
+    # # Debugging: print the current interface and IP
+    # echo "Processing iface: $iface, ip: $ip"
+
+    # Calculate how many spaces need to be added to align the '==>'
+    spaces_to_add=$((longest_iface_length - ${#iface}))
+
+    # # Debugging: print the number of spaces to add
+    # echo "Spaces to add for $iface: $spaces_to_add"
+
+    # Only add spaces if spaces_to_add is greater than 0
+    if (( spaces_to_add > 0 )); then
+      padded_iface="$iface$(printf ' %.0s' {1..$spaces_to_add})"
     else
-      echo " eth0 IP ==> $eth_ip" && br;
+      padded_iface="$iface"
     fi
-  fi
 
-  # ifconfig | awk -F '[ :]+' '/^[a-z]/ {interface=$1} /inet / {print interface " ==> " $3}'
+    # Print the iface and ip, ensuring alignment of '==>'
+    echo "$padded_iface ==> $ip"
+  done <<< "$map_output"
+
+  br
 }
 
 # this alias to list the local IP adresses
