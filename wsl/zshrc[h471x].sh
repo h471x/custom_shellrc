@@ -1745,18 +1745,87 @@ function cmd(){
 
 ### WSL Network Aliases
 
+# this alias to show IPV4 IP addresses
+alias show_ip="show_ip"
+
+# this fucntion for show_ip alias
+function show_ip {
+  # Declare an associative array (Zsh specific syntax)
+  typeset -A iface_ip_map
+
+  # Logical parts of the AWK command
+  match_interfaces='/^[a-z]/ { iface=$1; sub(":", "", iface) }'
+  match_ip='/inet / && $2 != "127.0.0.1" { print iface, $2 }'
+
+  # Combine the parts into the full AWK command
+  awk_cmd="$match_interfaces $match_ip"
+
+  # Extract interface names and IPs into a variable
+  interfaces=$(ifconfig | awk "$awk_cmd")
+
+  # Loop through the extracted data and populate the associative array
+  while read iface ip; do
+    iface_ip_map["$iface"]="$ip"
+  done <<< "$interfaces"
+
+  # Output the associative array in a key-value format
+  for iface in ${(k)iface_ip_map}; do
+    echo $iface:${iface_ip_map[$iface]}
+  done
+}
+
 # this alias to show the network configuration
 alias ipsh="ipsh"
 
 # this function for ntsh alias
-function ipsh(){
-  c && br;
-  echo "  Available IP Adresses : ";
-  br;
-  local eth_ip=$(ip addr show eth0 | grep -oP 'inet \K[\d.]+');
-  local wifi_ip=$(ip addr show wifi0 | grep -oP 'inet \K[\d.]+');
-  echo " eth0  ==> $eth_ip" && br;
-  echo " wifi0  ==> $wifi_ip" && br;
+
+
+
+function ipsh {
+  # Example of predefined commands (modify as needed)
+  c && br  # Your predefined commands
+  echo " Available IP Addresses: "
+  br  # Your predefined command
+
+  # Capture the output of show_ip
+  map_output=$(show_ip)
+
+  # # Debugging: print the raw output of show_ip
+  # echo "Raw map_output:"
+  # echo "$map_output"
+
+  # Find the length of the longest interface name (after stripping quotes and colons)
+  longest_iface_length=$(echo "$map_output" | sed -E 's/"([^"]+)":.*/\1/' | awk '{ print length }' | sort -n | tail -n 1)
+
+  # # Debugging: print the longest interface length
+  # echo "The longest interface length is: $longest_iface_length"
+
+  # Loop through each line of the map_output, stripping quotes from iface and aligning
+  while IFS=: read -r iface ip; do
+    iface=$(echo "$iface" | tr -d '"')  # Remove any quotes from iface
+    iface=$(echo "$iface" | tr -d ' ')  # Remove any extra spaces from iface
+
+    # # Debugging: print the current interface and IP
+    # echo "Processing iface: $iface, ip: $ip"
+
+    # Calculate how many spaces need to be added to align the '==>'
+    spaces_to_add=$((longest_iface_length - ${#iface}))
+
+    # # Debugging: print the number of spaces to add
+    # echo "Spaces to add for $iface: $spaces_to_add"
+
+    # Only add spaces if spaces_to_add is greater than 0
+    if (( spaces_to_add > 0 )); then
+      padded_iface="$iface$(printf ' %.0s' {1..$spaces_to_add})"
+    else
+      padded_iface="$iface"
+    fi
+
+    # Print the iface and ip, ensuring alignment of '==>'
+    echo "$padded_iface ==> $ip"
+  done <<< "$map_output"
+
+  br
 }
 
 function clean_argument() {
