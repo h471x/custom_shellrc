@@ -1778,9 +1778,6 @@ function show_ip {
 alias ipsh="ipsh"
 
 # this function for ntsh alias
-
-
-
 function ipsh {
   # Example of predefined commands (modify as needed)
   c && br  # Your predefined commands
@@ -3079,7 +3076,7 @@ alias thm="thm"
 
 # this function for thm alias
 function thm(){
-  powershell.exe -command "Start-Process C:\Users\lab_l\Downloads\SecureUxTheme-amd64\ThemeTool.exe -Verb RunAs"
+  powershell.exe -command "Start-Process G:\NTSOA\INSTALLED\THEME_TOOL\ThemeTool.exe -Verb RunAs"
 }
 
 # this alias to call the sqlite3.Exe file
@@ -3806,6 +3803,25 @@ function activate_env(){
   # environment path is given below
   export VIRTUAL_ENV=$PWD/$display_env
 
+  # symlinking the executables
+  local scripts_dir="$PWD/$env_name/Scripts"
+  local target_dir="/usr/bin"
+
+  # Check if Scripts directory exists
+  if [[ -d "$scripts_dir" ]]; then
+    for exe_file in "$scripts_dir"/*.exe; do
+      # Check if there are .exe files in the directory
+      if [[ -e "$exe_file" ]]; then
+        # Remove the .exe extension
+        local base_name=$(basename "$exe_file" .exe)
+        sudo ln -sf "$exe_file" "$target_dir/$base_name"
+        # echo "Symlinked $base_name to $target_dir"
+      fi
+    done
+  else
+    echo "Scripts directory not found in $scripts_dir"
+  fi
+
   # # handle hidden env
   # local env_dir=$(dirname "$VIRTUAL_ENV")/$env_name
 
@@ -3854,6 +3870,35 @@ function reset_path(){
 function disable_env(){
   # reset the path
   # reset_path
+ 
+  # get the env path
+  local env_path="$(basename $VIRTUAL_ENV)"
+
+  # symlinking the executables
+  local scripts_dir="$PWD/.$env_path/Scripts"
+  local target_dir="/usr/bin"
+
+  # Check if Scripts directory exists
+  if [[ -d "$scripts_dir" ]]; then
+    for exe_file in "$scripts_dir"/*.exe; do
+      # Check if there are .exe files in the directory
+      if [[ -e "$exe_file" ]]; then
+        # Remove the .exe extension
+        local base_name=$(basename "$exe_file" .exe)
+        local target_symlink="$target_dir/$base_name"
+
+        # Check if the symlink exists
+        if [[ -L "$target_symlink" ]]; then
+          sudo unlink "$target_symlink"
+          # echo "Unlinked $target_symlink"
+        else
+          echo "No symlink found for $base_name in $target_dir"
+        fi
+      fi
+    done
+  else
+    echo "Scripts directory not found in $scripts_dir"
+  fi
 
   # unset the virtual environment
   unset VIRTUAL_ENV
@@ -3882,14 +3927,15 @@ function delete_env() {
 # of the Windows python virtual environment.
 # No need to activate it; Python and pip will automatically
 # use the executables in that environment if VIRTUAL_ENV is set.
-alias pyenv="pyenv"
+alias pyenv="allow_sudo && pyenv"
 
 # this function for pyenv alias
 function pyenv(){
   if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
     if [[ $# -eq 0 ]]; then
       if [[ -n "$VIRTUAL_ENV" ]]; then
-        unset VIRTUAL_ENV
+        # unset VIRTUAL_ENV
+        disable_env
       else
         # an array to store the envs
         local envs=($(find_envs))
@@ -3914,7 +3960,13 @@ function pyenv(){
         if [[ ${#envs[@]} -eq 1 ]]; then
           # activate if it has atched on env
           local env_name=$(basename ${envs[1]})
+          local display_env="${env_name#.}"
+
+          echo -ne "${BOLD} Activating ${LIGHT_BLUE}$display_env ${WHITE}environment... ${RESET}"
           activate_env "$env_name"
+          echo "${BOLD}${GREEN} ${RESET}"
+
+          # activate_env "$env_name"
         elif [[ ${#envs[@]} -gt 1 ]]; then
           # prompt user to choose the env to activate
           echo "\n${BOLD}${GREEN} Multiple ${WHITE}virtual ${LIGHT_BLUE}environments ${WHITE}found (${#envs[@]}) ${RESET}\n"
