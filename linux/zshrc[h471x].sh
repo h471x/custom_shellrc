@@ -2441,8 +2441,6 @@ function rn(){
       java "$1";;
     py)
       if [[ $# -eq 1 ]]; then
-        # all "$1";
-        # c && br;
         python3 "$1";
         return 0;
         # br;
