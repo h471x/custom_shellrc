@@ -2049,29 +2049,6 @@ function facp(){
   check_quit
 }
 
-# function facp(){
-#   if [ -d /sys/class/net/wlan0 ]; then
-#     sudo systemctl stop NetworkManager
-#     sudo systemctl stop wpa_supplicant
-#     sudo ifconfig wlan0 down
-#     sudo ifconfig wlan0 up
-#
-#     sudo airbase-ng --essid "$*" -c 11 wlan0 &
-#
-#     sleep 5  # Wait for airbase-ng to create the at0 interface
-#
-#     sudo ifconfig at0 up 10.0.0.1 netmask 255.255.255.0
-#     sudo dnsmasq -C /etc/dnsmasq.conf -d &
-#
-#     echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward
-#     sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-#     sudo iptables -A FORWARD -i eth0 -o at0 -m state --state RELATED,ESTABLISHED -j ACCEPT
-#     sudo iptables -A FORWARD -i at0 -o eth0 -j ACCEPT
-#   else
-#     echo "No wireless adapter found"
-#   fi
-# }
-
 # this alias to deauth wireless connection
 alias deauth="deauth"
 
