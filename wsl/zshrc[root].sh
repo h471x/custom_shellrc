@@ -1149,6 +1149,13 @@ function rld(){
 
 #######################################################################
 
+### WSL Shortcuts
+
+# this alias to go to home directory
+alias hm="cd && cv"
+
+#######################################################################
+
 ### p10k Config
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
