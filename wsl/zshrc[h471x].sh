@@ -816,16 +816,52 @@ alias hm="cd && cv"
 alias dtp="op ~/Desktop"
 
 # this alias to access ENI directory
-alias eni="op $eni_path"
+alias eni="op $ENI_PATH"
 
 # this alias to open the Dev directory
-alias dev="op $dev_path"
+alias dev="op $DEV_PATH"
 
 # this alias to open Notes directory
-alias nt="op $dev_path/notes"
+alias nt="op $DEV_PATH/notes"
 
 # this alias to view the pc state
-alias pc="c && br 2 && neofetch --source $custom_neofetch"
+alias pc="c && br 2 && neofetch --source $CUSTOM_NEOFETCH"
+
+#######################################################################
+
+### WSL Programs Shortcuts
+
+# this alias to start screen
+# recording using OBS Studio
+alias obs="obs"
+
+# this function for obs alias
+function obs(){
+  # change directory
+  cd $OBS_PATH
+
+  # Check if OBS is running
+  # therefore kill it
+  if cmd.exe /c tasklist | findstr obs64.exe &>/dev/null; then
+    cmd.exe /c taskkill /IM obs64.exe /F &>/dev/null
+  fi
+
+  # Minimze all
+  powershell.exe -command \
+    "(New-Object -ComObject Shell.Application).MinimizeAll()"
+
+  # start recording
+  cmd.exe /c start obs64.exe \
+    --startrecording \
+    --multi \
+    --allow-multiple-instances
+
+  # Get back to the old directory
+  cd - &>/dev/null
+
+  # clear the terminal
+  cv
+}
 
 #######################################################################
 
@@ -940,12 +976,12 @@ function open_web_app(){
     echo " Status  : $1"
   }
 
-  # check the stat
-  if eval $reachable; then
-    web_app_stat "Connected"
-  else
-    web_app_stat "Not Connected"
-  fi
+  # # check the stat
+  # if eval $reachable; then
+  #   web_app_stat "Connected"
+  # else
+  #   web_app_stat "Not Connected"
+  # fi
 
   # here to call the open_app function
   open_app
@@ -979,6 +1015,9 @@ alias lnk="open_web_app linkedin.com LinkedIn"
 
 # this alias to open Facebook app
 alias fb="open_web_app facebook.com Facebook"
+
+# this alias to open Instagram app
+alias itg="open_web_app instagram.com Instagram"
 
 # this alias to open the GitHub app
 alias gthb="gthb"
