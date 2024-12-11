@@ -141,18 +141,17 @@ QUESTION_MARK="$(printf '\xE2\x9D\x93')"
 
 #######################################################################
 
-### WSL Paths
-
-PYTHON_PATH=/mnt/c/Program\ Files/Python
-
-PATH=$PATH:$PYTHON_PATH
-
-#######################################################################
-
 ### WSL Environment Variables
 
 source ~/.shellrc_env/pwa.sh
 source ~/.shellrc_env/shortcuts.sh
+source ~/.shellrc_env/windows.sh
+
+#######################################################################
+
+### WSL Paths
+
+PATH=$PATH:$PYTHON_PATH
 
 #######################################################################
 
@@ -380,6 +379,75 @@ function all(){
     fi
   fi
 }
+
+#######################################################################
+
+### Compression Aliases
+
+# Compress function
+function compress {
+  local input_source="$1"
+  local output_dir="$2"
+  local archive_name="$input_source.tar.xz"
+  local flag=""
+
+  if [[ "$input_source" = /* ]]; then
+    archive_name="$(echo "$input_source" | tr '/' '_').tar.xz"
+  fi
+
+  if [[ "output_dir" = /* ]]; then
+    flag="-C"
+  fi
+
+  # tar -cJvf $archive_name $flag $output_dir
+  echo "archive name : $archive_name"
+  echo "flag         : $flag"
+  echo "output dir   : $output_dir"
+}
+
+# Decompress function
+function decompress {
+  local archive_file="$1"
+  local dest_dir="$2"
+  local target_dir
+
+  # If it's a relative path, prepend $PWD to the archive file
+  if [[ "$archive_file" != /* ]]; then
+    archive_file="$PWD/$archive_file"
+  fi
+
+  # Check if the archive file exists
+  if [[ ! -f "$archive_file" ]]; then
+    echo "Error: $archive_file does not exist."
+    return 1
+  fi
+
+  # Extract the directory name from the archive (basename without .tar.xz)
+  target_dir="$(basename "$archive_file" .tar.xz)"
+
+  # If destination directory is provided, extract into that directory
+  if [ -n "$dest_dir" ]; then
+    # Ensure the destination directory exists
+    mkdir -p "$dest_dir"
+    cd "$dest_dir" || return
+  else
+    # Default to the current directory if no destination is provided
+    cd "$(pwd)" || return
+  fi
+
+  # Check if the target directory already exists, rename it if it does
+  if [[ -d "$target_dir" ]]; then
+    echo "Directory $target_dir already exists. Renaming it to $target_dir.bak..."
+    mv "$target_dir" "$target_dir.bak"
+  fi
+
+  # Perform the decompression
+  echo "Decompressing $archive_file into $target_dir..."
+  tar -xJvf "$archive_file" -C .
+  echo "Decompression complete."
+}
+
+#######################################################################
 
 ### Navigation Aliases
 
@@ -861,6 +929,15 @@ function obs(){
 
   # clear the terminal
   cv
+}
+
+# this alias to access WSL2 GUI
+alias vm="vm"
+
+# this function for vm alias
+function vm {
+  explorer.exe $KALI_LINUX_PATH
+  return 0
 }
 
 #######################################################################
