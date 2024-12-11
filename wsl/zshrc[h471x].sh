@@ -1054,11 +1054,11 @@ function open_web_app(){
   }
 
   # # check the stat
-  # if eval $reachable; then
-  #   web_app_stat "Connected"
-  # else
-  #   web_app_stat "Not Connected"
-  # fi
+  if eval $reachable; then
+    web_app_stat "Connected"
+  else
+    web_app_stat "Not Connected"
+  fi
 
   # here to call the open_app function
   open_app
