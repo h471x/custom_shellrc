@@ -936,6 +936,7 @@ alias vm="vm"
 
 # this function for vm alias
 function vm {
+  kex --esm -s &>/dev/null
   explorer.exe $KALI_LINUX_PATH
   return 0
 }
