@@ -827,6 +827,36 @@ alias pc="c && br 2 && neofetch --source $CUSTOM_NEOFETCH"
 
 #######################################################################
 
+### WSL Programs
+
+function obs() {
+  # change directory
+  cd $OBS_PATH
+
+  # Check if OBS is running
+  if cmd.exe /c "tasklist | findstr obs64.exe" &>/dev/null; then
+    cmd.exe /c "taskkill /IM obs64.exe /F"
+  fi
+
+  # Minimize all windows
+  powershell.exe -command \
+    "(New-Object -ComObject Shell.Application).MinimizeAll()"
+
+  # start recording on OBS
+  cmd.exe /c start obs64.exe \
+    --startrecording \
+    --multi \
+    --allow-multiple-instances
+
+  # get back to the old directory
+  cd - &>/dev/null
+
+  # clear terminal
+  cv
+}
+
+#######################################################################
+
 ### WSL Browser
 
 # SOLVED :
