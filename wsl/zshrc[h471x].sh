@@ -141,18 +141,16 @@ QUESTION_MARK="$(printf '\xE2\x9D\x93')"
 
 #######################################################################
 
-### WSL Paths
+### WSL Environment Variables
 
-PYTHON_PATH=/mnt/c/Program\ Files/Python
-
-PATH=$PATH:$PYTHON_PATH
+source ~/.shellrc_env/shortcuts.sh
+source ~/.shellrc_env/pwa.sh
 
 #######################################################################
 
-### WSL Environment Variables
+### WSL Paths
 
-source ~/.shellrc_env/pwa.sh
-source ~/.shellrc_env/shortcuts.sh
+PATH=$PATH:$PYTHON_PATH
 
 #######################################################################
 
@@ -816,16 +814,16 @@ alias hm="cd && cv"
 alias dtp="op ~/Desktop"
 
 # this alias to access ENI directory
-alias eni="op $eni_path"
+alias eni="op $ENI_PATH"
 
 # this alias to open the Dev directory
-alias dev="op $dev_path"
+alias dev="op $DEV_PATH"
 
 # this alias to open Notes directory
-alias nt="op $dev_path/notes"
+alias nt="op $DEV_PATH/notes"
 
 # this alias to view the pc state
-alias pc="c && br 2 && neofetch --source $custom_neofetch"
+alias pc="c && br 2 && neofetch --source $CUSTOM_NEOFETCH"
 
 #######################################################################
 
@@ -1670,16 +1668,15 @@ alias exop="exop"
 function exop() {
   [ $# -eq 1 ] && cd "$1"
 
-  # check WSL
-  local is_wsl=$(
-    grep -qi microsoft /proc/version && echo true || echo false
-  )
-
-  if $is_wsl; then
-    explorer.exe .
+  # Check if DISPLAY corresponds to Win-KeX (e.g., :13.0 for RDP)
+  if [[ "$DISPLAY" == ":13.0" ]]; then
+    explorer="xdg-open"
   else
-    xdg-open .
+    explorer="explorer.exe"
   fi
+
+  # Use the appropriate file explorer
+  $explorer .
   cv
 }
 
