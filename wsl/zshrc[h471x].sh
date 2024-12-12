@@ -820,6 +820,9 @@ alias eni="op $ENI_PATH"
 # this alias to open the Dev directory
 alias dev="op $DEV_PATH"
 
+# this alias to open learning directory
+alias learn="op $DEV_PATH/learning"
+
 # this alias to open Notes directory
 alias nt="op $DEV_PATH/notes"
 
