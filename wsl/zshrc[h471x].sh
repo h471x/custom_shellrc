@@ -145,6 +145,7 @@ QUESTION_MARK="$(printf '\xE2\x9D\x93')"
 
 source ~/.shellrc_env/shortcuts.sh
 source ~/.shellrc_env/pwa.sh
+source ~/.shellrc_env/kex.sh
 
 #######################################################################
 
@@ -829,6 +830,18 @@ alias pc="c && br 2 && neofetch --source $CUSTOM_NEOFETCH"
 
 ### WSL Programs
 
+# this function to open kali-win-kex
+function vm {
+  kex --esm -s &>/dev/null
+  explorer.exe $KALI_PATH
+  return 0
+}
+
+# this alias to start screen recording
+# using windows OBS Studio
+alias obs="obs"
+
+# this function for obs alias
 function obs() {
   # change directory
   cd $OBS_PATH
@@ -1007,6 +1020,12 @@ alias lnk="open_web_app linkedin.com LinkedIn"
 
 # this alias to open Facebook app
 alias fb="open_web_app facebook.com Facebook"
+
+# this alias to open Instagram app
+alias itg="open_web_app instagram.com Instagram"
+
+# this alias to open TwitterX app
+alias twx="open_web_app x.com X"
 
 # this alias to open the GitHub app
 alias gthb="gthb"
