@@ -12,13 +12,14 @@ fastfile_var_prefix='$'
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
-CHROME_PATH=/mnt/c/Program\ Files/Google/chrome/Application/
+# CHROME_PATH=/mnt/c/Program\ Files/Google/chrome/Application/
 # Add clip.exe to Path
-PATH="$PATH:/mnt/c/Windows/System32/WindowsPowerShell/v1.0:mnt/c/Windows/System32:$CHROME_PATH"
+SYSTEM32_PATH="/mnt/c/Windows/System32/"
+PATH="$PATH:$SYSTEM32_PATH"
 
 # this to make Github CLI know which default browser it would use
 # this WSL issue was solved in gh GitHub Repo Pull Request
-export BROWSER="chrome.exe"
+# export BROWSER="chrome.exe"
 
 ZSH_THEME="powerlevel10k/powerlevel10k"
 
@@ -41,15 +42,11 @@ ZSH_HIGHLIGHT_STYLES[globbing]='fg=#ff9000,bold'
 ZSH_HIGHLIGHT_STYLES[command-substitution-unquoted]='fg=#d30ccf,bold'
 ZSH_HIGHLIGHT_STYLES[command-substitution-delimiter]='fg=#d30ccf,bold'
 
-
-#Here to launch tmux as default
-#case $TERM in
-#        screen|tmux-256color);;
-#        *)tmux att -t 0 2>/dev/null|| tmux;;
-#esac;
-
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(fastfile copyfile vscode extract docker zsh-autosuggestions git nmap terraform sudo themes encode64 python)
+
+# Here to disable oh-my-zsh auto update
+DISABLE_AUTO_UPDATE="true"
 
 source $ZSH/oh-my-zsh.sh
 
@@ -80,12 +77,30 @@ function all(){
 	fi
 }
 
-#this alias to reload the zshrc file
+# this alias to reload the zshrc file
 alias rld="rld"
 
-#this function for rld alias
+# this function for rld alias
 function rld(){
-  clear && source /root/.zshrc && cat /root/.zshrc > /home/h471x/NTSOA/zshrc/wsl/"zshrc[root]" && all /home/h471x/NTSOA/zshrc/wsl/"zshrc[root]" && c && echo -e && echo "z s h    s a v e d " | figlet -t -c | lolcat && echo -e && sleep 0.5 && cv;
+  c;
+
+  # local variables
+  local shellrc=.$(basename $SHELL)rc;
+  local is_wsl=$(grep -qi microsoft /proc/version && echo true || echo false)
+  local platform=$($is_wsl && echo "wsl" || echo "linux")
+  local backup_dir=$HOME/Files/custom_shellrc/$platform;
+  local backup_file=zshrc[$USER].sh;
+  local saved_message="$shellrc backed up"
+
+  # source the config file and save it
+  source ~/$shellrc;
+  cat ~/$shellrc > $backup_dir/$backup_file;
+
+  # saved message display
+  c && br;
+  echo "${BOLD}${WHITE}$saved_message";
+  br && sleep 0.5;
+  op $backup_dir;
 }
 
 #this alias to break a line
@@ -125,40 +140,46 @@ function cvii(){
 # of working directory content using ls
 alias cv="cv"
 
-#this function for cv alias
-#updated today 01/25/2024 to adjust the title
-#when we have more than 50 visible items
+# this function for cv alias
+# UPDATED : 01/25/2024
+# to adjust the title
+# when we have more than 50 visible items
 function cv() {
-  local folder_content="${target:-$PWD}"
   local target="$1"
+  local folder_content="${target:-$PWD}"
   local folder_name=$(basename $folder_content)
   local visible_item=$(ls $folder_content | wc -l)
-  local total_item=$(ls -a $folder_content | wc -l)
-  local hidden_item=$((total_item - visible_item - 2))
+  local total_item=$(ls -A $folder_content | wc -l)
+  local hidden_item=$((total_item - visible_item))
 
-  #this function for the header of cv alias
+  # this function for the header of cv alias
   function show_header(){
     local folder_header
-    if [[ $hidden_item -eq 0 ]]; then
+    if [[ $total_item -eq 0 ]]; then
+      folder_header="Empty(0)";
+      folder_icon=" "
+    elif [[ $hidden_item -eq 0 ]]; then
       folder_header="total($visible_item)";
+      folder_icon=" "
     else
-      folder_header="visible($visible_item) hidden($hidden_item) total($(($total_item - 2))) ";
+      folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
+      folder_icon=" "
     fi
-    echo " ■■▶ $folder_name folder content : $folder_header";
+    echo "${BOLD}${WHITE} $folder_icon $folder_name -> $folder_header ${RESET}";
   }
 
-  #this function to show the content of the cv
+  # this function to show the content of the cv
   function show_content(){
     # local flag="${1:-}"
     # ls $flag $folder_content;
-    ls $folder_content
+    eza --icons=always --no-quotes --group-directories-first $folder_content
   }
 
-  #this function to show the all of the cv content
+  # this function to show the all of the cv content
   function show_all(){
     c && br;
 
-    if [[ $visible_item -lt 50 ]]; then
+    if [[ $visible_item -lt 30 ]]; then
       show_header;
       br;
       show_content;
@@ -173,43 +194,47 @@ function cv() {
   show_all;
 }
 
-cv
-
-#this alias to view the current directory content
+# this alias to view the current directory content
 alias cvf="cvf"
 
-#this function for cvf alias
-#updated today 01/25/2024 to adjust the title
-#when we have more than 50 visible items
+# this function for cvf alias
+# UPDATED : 01/25/2024
+# to adjust the title
+# when we have more than 50 visible items
 function cvf() {
-  local folder_content="${target:-$PWD}"
   local target="$1"
+  local folder_content="${target:-$PWD}"
   local folder_name=$(basename $folder_content)
   local visible_item=$(ls $folder_content | wc -l)
-  local total_item=$(ls -a $folder_content | wc -l)
-  local hidden_item=$((total_item - visible_item - 2))
+  local total_item=$(ls -A $folder_content | wc -l)
+  local hidden_item=$((total_item - visible_item))
 
-  #this function for the header of cv alias
+  # this function for the header of cv alias
   function show_header(){
     local folder_header
-    if [[ $hidden_item -eq 0 ]]; then
+    if [[ $total_item -eq 0 ]]; then
+      folder_header="Empty(0)";
+      folder_icon=" "
+    elif [[ $hidden_item -eq 0 ]]; then
       folder_header="total($visible_item)";
+      folder_icon=" "
     else
-      folder_header="visible($visible_item) hidden($hidden_item) total($(($total_item - 2))) ";
+      folder_header="visible($visible_item) hidden($hidden_item) total($total_item) ";
+      folder_icon=" "
     fi
-    echo " ■■▶ $folder_name folder content : $folder_header";
+    echo "${BOLD}${WHITE} $folder_icon $folder_name -> $folder_header ${RESET}";
   }
 
-  #this function to show the content of the cv
+  # this function to show the content of the cv
   function show_content(){
-    ls -a $folder_content;
+    eza --icons=always --no-quotes -a --group-directories-first $folder_content;
   }
 
-  #this function to show the cv
+  # this function to show the cv
   function show_all(){
     c && br;
 
-    if [[ $hidden_item -lt 50 ]]; then
+    if [[ $hidden_item -lt 30 ]]; then
       show_header;
       br;
       show_content;
@@ -222,6 +247,39 @@ function cvf() {
     fi
   }
   show_all;
+}
+
+# this alias to view the current directory content
+# with specifications
+alias cvg="cvg"
+
+# this function for cvg alias
+function cvg(){
+  local folder_name=$(basename $PWD)
+  local item="$1"
+  local matched_items=$(ls -A | grep "$item" | wc -l)
+
+  function show_header(){
+    echo "${BOLD}   $folder_name -> contains $matched_items '$1' ${RESET}";
+  }
+
+  function show_content(){
+    eza --icons=always --color=always -a --group-directories-first | grep "$1";
+  }
+
+  # this function to show the cv
+  function show_all(){
+    c && br;
+
+    if [[ $matched_items -lt 20 ]]; then
+      show_header $1; br;
+      show_content $1; br;
+    else
+      show_content $1; br;
+      show_header $1;
+    fi
+  }
+  show_all $item;
 }
 
 #call the cv alias whenever a wrong command is typed which doesn't surely exist
