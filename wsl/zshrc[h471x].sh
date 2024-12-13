@@ -145,7 +145,6 @@ QUESTION_MARK="$(printf '\xE2\x9D\x93')"
 
 source ~/.shellrc_env/shortcuts.sh
 source ~/.shellrc_env/pwa.sh
-source ~/.shellrc_env/kex.sh
 
 #######################################################################
 
@@ -836,7 +835,12 @@ alias pc="c && br 2 && neofetch --source $CUSTOM_NEOFETCH"
 # this function to open kali-win-kex
 function vm {
   kex --esm -s &>/dev/null
-  explorer.exe $KALI_PATH
+  return 0
+}
+
+# this function to open virtual box
+function vbox {
+  explorer.exe "$(wslpath -w $VIRTUAL_BOX_PATH)\\VirtualBox.exe"
   return 0
 }
 
@@ -1720,11 +1724,12 @@ alias exop="exop"
 function exop() {
   [ $# -eq 1 ] && cd "$1"
 
-  # Check if DISPLAY corresponds to Win-KeX (e.g., :13.0 for RDP)
-  if [[ "$DISPLAY" == ":13.0" ]]; then
-    explorer="xdg-open"
-  else
+  # Check if DISPLAY 'does not' correspond
+  # to Win-KeX (e.g., :13.0 for RDP)
+  if [[ "$DISPLAY" == ":0" ]]; then
     explorer="explorer.exe"
+  else
+    explorer="xdg-open"
   fi
 
   # Use the appropriate file explorer
