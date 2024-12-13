@@ -834,6 +834,26 @@ alias pc="c && br 2 && neofetch --source $CUSTOM_NEOFETCH"
 
 ### WSL Programs
 
+# this alias to not mess up vscode
+alias code="code"
+
+# this function for code alias
+function code {
+  if [[ "$DISPLAY" == ":0" ]]; then
+    cmd.exe /c start code "$@"
+  else
+    /usr/bin/code-oss "$@" &>/dev/null
+  fi
+}
+
+# this function to open windows app
+function open_win_app {
+  local APP_PATH="$1"
+  local EXECUTABLE="$2"
+  explorer.exe "$(wslpath -w $APP_PATH)\\$EXECUTABLE.exe"
+  return 0
+}
+
 # this function to open kali-win-kex
 function vm {
   kex --esm -s &>/dev/null
@@ -842,8 +862,12 @@ function vm {
 
 # this function to open virtual box
 function vbox {
-  explorer.exe "$(wslpath -w $VIRTUAL_BOX_PATH)\\VirtualBox.exe"
-  return 0
+  open_win_app $VIRTUAL_BOX_PATH VirtualBox
+}
+
+# this alias to launch canva
+function canva {
+  open_win_app $CANVA_PATH Canva
 }
 
 # this alias to start screen recording
@@ -1035,11 +1059,24 @@ function thm {
   elif [[ "$1" == "disconnect" ]]; then
     cmd.exe /c openvpn-gui \
       --command disconnect thm_h471x
+  elif [[ "$1" == "status" ]]; then
+    local check="ping -c 1 -W 5 "
+    local check_message="Checking TryHackMe Connectivity ..."
+    local reachable="echo ' $check_message' && eval $check tryhackme &> /dev/null;"
+
+    if eval $reachable; then
+      echo " ${GREEN}Connected ${RESET}to TryHackMe OpenVPN"
+    else
+      echo " ${RED}Disconnected ${RESET}from TryHackMe OpenVPN"
+    fi
+
+    return 0
   else
     open_web_app tryhackme.com TryHackMe
   fi
 
-  nd
+  # get back to the old directory
+  cd $dest
 }
 
 # this alias to open chatGpt app
