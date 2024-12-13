@@ -145,6 +145,7 @@ QUESTION_MARK="$(printf '\xE2\x9D\x93')"
 
 source ~/.shellrc_env/shortcuts.sh
 source ~/.shellrc_env/pwa.sh
+source ~/.shellrc_env/paths.sh
 
 #######################################################################
 
@@ -793,7 +794,9 @@ alias nvmr="allow_sudo && nvmr"
 
 # this function for nvmr alias
 function nvmr(){
-  sudo nvim "${1:-.}";
+  sudo \
+    PATH=$PATH:$SYSTEM32_PATH \
+    nvim "${1:-.}"
 }
 
 # this alias to edit a file
