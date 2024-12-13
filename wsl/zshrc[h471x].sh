@@ -664,7 +664,9 @@ alias nd="nd"
 
 # this function for nd alias
 function nd(){
-  cd - &>/dev/null;
+  [[ -n "$dest" ]] && \
+    cd $dest || \
+    cd - &>/dev/null;
   cv;
 }
 
@@ -1017,7 +1019,28 @@ alias rtr='open_web_app "www.airtel.mg" "Airtel Router"'
 alias htx="open_web_app 192.168.8.1 HTX_AP"
 
 # this alias to open Try Hack Me Web app
-alias thm="open_web_app tryhackme.com TryHackMe"
+alias thm="thm"
+
+# this function for thm alias
+function thm {
+  dest="$PWD"
+  cd /mnt/c
+
+  if [[ "$1" == "connect" ]]; then
+    cmd.exe /c openvpn-gui \
+      --command silent_connection 1
+
+    cmd.exe /c openvpn-gui \
+      --command connect thm_h471x
+  elif [[ "$1" == "disconnect" ]]; then
+    cmd.exe /c openvpn-gui \
+      --command disconnect thm_h471x
+  else
+    open_web_app tryhackme.com TryHackMe
+  fi
+
+  nd
+}
 
 # this alias to open chatGpt app
 alias gpt="open_web_app chatgpt.com ChatGPT"
