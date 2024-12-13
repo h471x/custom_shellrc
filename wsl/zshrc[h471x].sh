@@ -1072,8 +1072,6 @@ function thm {
     else
       echo " ${RED}Disconnected ${RESET}from TryHackMe OpenVPN"
     fi
-
-    return 0
   else
     open_web_app tryhackme.com TryHackMe
   fi
