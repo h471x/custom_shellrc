@@ -144,8 +144,9 @@ QUESTION_MARK="$(printf '\xE2\x9D\x93')"
 ### WSL Environment Variables
 
 source ~/.shellrc_env/shortcuts.sh
-source ~/.shellrc_env/pwa.sh
+source ~/.shellrc_env/screen.sh
 source ~/.shellrc_env/paths.sh
+source ~/.shellrc_env/pwa.sh
 
 #######################################################################
 
@@ -806,6 +807,17 @@ alias ed="ed"
 function ed(){
   # nvim -c "startinsert" "$1" && cv;
   nvim "$1" && cv;
+}
+
+#######################################################################
+
+### WSL Kex
+
+# this function to check if
+# we use kex server screen
+function check_kex {
+  [[ "$DISPLAY" == "$WINDOWS_SCREEN" ]] \
+    && return 1 || return 0
 }
 
 #######################################################################
@@ -1785,16 +1797,10 @@ alias exop="exop"
 function exop() {
   [ $# -eq 1 ] && cd "$1"
 
-  # Check if DISPLAY 'does not' correspond
-  # to Win-KeX (e.g., :13.0 for RDP)
-  if [[ "$DISPLAY" == ":0" ]]; then
-    explorer="explorer.exe"
-  else
-    explorer="xdg-open"
-  fi
+  check_kex && \
+    xdg-open . || \
+    explorer.exe .
 
-  # Use the appropriate file explorer
-  $explorer .
   cv
 }
 
