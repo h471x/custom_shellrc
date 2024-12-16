@@ -880,6 +880,11 @@ function vbox {
   open_win_app $VIRTUAL_BOX_PATH VirtualBox
 }
 
+# this function to open Wub
+function wub {
+  open_win_app $WUB_PATH Wub_x64
+}
+
 # this alias to launch canva
 function canva {
   open_win_app $CANVA_PATH Canva
@@ -1107,8 +1112,8 @@ alias itg="open_web_app instagram.com Instagram"
 # this alias to open TwitterX app
 alias twx="open_web_app x.com X"
 
-# this alias to open the GitHub app
-alias gthb="gthb"
+# this alias to open dockerhub
+alias dckhb="open_web_app hub.docker.com DockerHub"
 
 # this alias to open YouTube Web App
 alias ytb="open_web_app youtube.com YouTube"
@@ -1122,6 +1127,9 @@ alias gmail="open_web_app gmail.com Gmail"
 #######################################################################
 
 ### GitHub Alias
+
+# this alias to open the GitHub app
+alias gthb="gthb"
 
 # this function for gthb alias
 function gthb(){
