@@ -885,6 +885,11 @@ function wub {
   open_win_app $WUB_PATH Wub_x64
 }
 
+# this function to open tor browser
+function tor {
+  open_win_app $TOR_PATH tor
+}
+
 # this alias to launch canva
 function canva {
   open_win_app $CANVA_PATH Canva
@@ -928,7 +933,7 @@ function obs() {
 # SOLVED :
 # this to make Github CLI know which default browser it would use
 # this WSL issue was solved in gh GitHub Repo Pull Request
-export BROWSER="chrome.exe"
+export BROWSER="brave.exe"
 
 # this alias to open file with browser
 alias bwsop="bwsop"
@@ -1030,7 +1035,7 @@ function open_web_app(){
     c && br
     echo " WebApp  : $app_name"
     echo " Link    : $app_domain"
-    echo " Browser : $BROWSER"
+    echo " Browser : chrome.exe"
     echo " Status  : $1"
   }
 
