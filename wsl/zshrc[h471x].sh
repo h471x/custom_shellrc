@@ -356,7 +356,8 @@ function cvii(){
   br 2;
 }
 
-x;
+# Clear screen at startup
+x
 
 # this alias to exit
 alias q='exit'
@@ -1001,55 +1002,67 @@ alias open_web_app="allow_sudo && open_web_app";
 # Shell access after execution
 # UPDATED : 12-09-2024 18:35
 # Open PWAs using shortcuts instead
-function open_web_app(){
-  local app_domain="$1"
-  local app_name="$2"
-  local pwa_path="$PWA_BASE_PATH/$app_name.lnk"
-  local pwa_name="$PWA_PATH\\$app_name.lnk"
+# UPDATED : 12-16-2024 16:14
+# Multiple Browser
+function open_web_app {
+  local browser="$1"
+  local app_domain="$2"
+  local app_name="$3"
 
-  if [ ! -f $pwa_path ]; then
-    echo "${BOLD} The shortcut for $app_name PWA doesn't exist ! ${RESET}"
+  # Access the array using the correct Zsh syntax
+  local pwa_base_path="${BROWSER_PATHS[\"$browser\"]}"
+
+  # Check if the browser path exists
+  if [ -z "$pwa_base_path" ]; then
+    echo "${BOLD} The browser path for $browser doesn't exist in the array! ${RESET}"
+    return 0
+  fi
+
+  local pwa_path="$pwa_base_path/$app_name.lnk"
+  local pwa_path_windows="$(wslpath -w "$pwa_base_path")\\$app_name.lnk"
+
+  if [ ! -f "$pwa_path" ]; then
+    echo "$pwa_path"
+    echo "${BOLD} The shortcut for $app_name PWA doesn't exist! ${RESET}"
     return 0
   fi
 
   local current_directory="$PWD"
-  local check="sudo ping -c 1 -W 5 "
+  local check="sudo ping -c 1 -W 5"
   local check_message="Checking $app_name ..."
   local reachable="c && br && echo ' $check_message' && eval $check $app_domain &> /dev/null;"
 
-  # if the current directory is a WSL
-  # directory then switch to windows
-  # directory before executing the script
+  # Change to Windows directory if in a WSL directory
   if [[ "$current_directory" != "/mnt/"* ]]; then
     cd /mnt/c
   fi
 
-  # this function to open the shortcut
-  function open_app(){
-    explorer.exe $pwa_name
+  # Function to open the shortcut
+  function open_app {
+    explorer.exe "$pwa_path_windows"
     return 0
   }
 
-  # this function to display the web app status
-  function web_app_stat(){
+  # Function to display the web app status
+  function web_app_stat {
     c && br
     echo " WebApp  : $app_name"
     echo " Link    : $app_domain"
-    echo " Browser : chrome.exe"
+    echo " Browser : ${browser:l}.exe"
     echo " Status  : $1"
   }
 
-  # check the stat
-  if eval $reachable; then
+  # Check connection status
+  if eval "$reachable"; then
     web_app_stat "Connected"
   else
     web_app_stat "Not Connected"
   fi
 
-  # here to call the open_app function
+  # Call the open_app function
   open_app
 
-  # if we changed directory then get back
+  # Return to original directory if it was changed
   if [[ "$PWD" != "$current_directory" ]]; then
     cd - &>/dev/null
   fi
@@ -1057,15 +1070,23 @@ function open_web_app(){
   return 0
 }
 
+function open_chrome_app {
+  open_web_app "CHROME" "$1" "$2"
+}
+
+function open_brave_app {
+  open_web_app "BRAVE" "$1" "$2"
+}
+
 #######################################################################
 
 ### PWAs Aliases
 
 # this alias to recharge the router
-alias rtr='open_web_app "www.airtel.mg" "Airtel Router"'
+alias rtr='open_chrome_app "www.airtel.mg" "Airtel Router"'
 
 # this alias to view the HTX_AP dashboard
-alias htx="open_web_app 192.168.8.1 HTX_AP"
+alias htx="open_chrome_app 192.168.8.1 HTX_AP"
 
 # this alias to open Try Hack Me Web app
 alias thm="thm"
@@ -1095,7 +1116,7 @@ function thm {
       echo " ${RED}Disconnected ${RESET}from TryHackMe OpenVPN"
     fi
   else
-    open_web_app tryhackme.com TryHackMe
+    open_chrome_app tryhackme.com TryHackMe
   fi
 
   # get back to the old directory
@@ -1103,31 +1124,34 @@ function thm {
 }
 
 # this alias to open chatGpt app
-alias gpt="open_web_app chatgpt.com ChatGPT"
+alias gpt="open_chrome_app chatgpt.com ChatGPT"
 
 # this alias to open LinkedIn WebApp
-alias lnk="open_web_app linkedin.com LinkedIn"
+alias lnk="open_chrome_app linkedin.com LinkedIn"
 
 # this alias to open Facebook app
-alias fb="open_web_app facebook.com Facebook"
+alias fb="open_brave_app facebook.com Facebook"
 
 # this alias to open Instagram app
-alias itg="open_web_app instagram.com Instagram"
+alias itg="open_chrome_app instagram.com Instagram"
 
 # this alias to open TwitterX app
-alias twx="open_web_app x.com X"
+alias twx="open_chrome_app x.com X"
 
 # this alias to open dockerhub
-alias dckhb="open_web_app docker.com DockerHub"
+alias dckhb="open_chrome_app docker.com DockerHub"
 
 # this alias to open YouTube Web App
-alias ytb="open_web_app youtube.com YouTube"
+alias ytb="open_brave_app youtube.com YouTube"
+
+# this alias to open reddit Web App
+alias rdt="open_brave_app reddit.com Reddit"
 
 # this alias to open Virus Total Web App
-alias vrst="open_web_app virustotal.com VirusTotal"
+alias vrst="open_chrome_app virustotal.com VirusTotal"
 
 # this alias to open Gmail WebApp
-alias gmail="open_web_app gmail.com Gmail"
+alias gmail="open_chrome_app gmail.com Gmail"
 
 #######################################################################
 
@@ -1164,7 +1188,7 @@ function gthb(){
       if [ "$check_view" = "y" ]; then
         cd /mnt/c
 
-        cmd.exe /c start chrome.exe \
+        cmd.exe /c start brave.exe \
           --profile-directory=Default --app-id=$github_id \
           --app=https://github.com/$repo_owner/$repo_name/tree/$current_branch \
 
@@ -1173,7 +1197,7 @@ function gthb(){
         #   --web --branch $current_branch \
         #   &>/dev/null
       elif [ "$check_view" = "n" ];then
-        open_web_app $github_link $github_name
+        open_chrome_app $github_link $github_name
       else
         check_view
       fi
@@ -1191,14 +1215,14 @@ function gthb(){
       if [ -n "$is_remote_branch" ]; then
         check_view
       else
-        echo "${BOLD} ΓûáΓûáΓû╢ The remote repo ${LIGHT_BLUE}$repo_name ${WHITE}has no branch named ${GREEN}$current_branch ${WHITE}!" && br;
+        echo "${BOLD} The remote repo ${LIGHT_BLUE}$repo_name ${WHITE}has no branch named ${GREEN}$current_branch ${WHITE}!" && br;
       fi
     else
-      open_web_app $github_link $github_name
+      open_brave_app $github_link $github_name
     fi
   else
     if [[ $# -eq 0 ]]; then
-      open_web_app $github_link $github_name
+      open_brave_app $github_link $github_name
     fi
   fi
 }
