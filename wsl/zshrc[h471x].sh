@@ -1113,7 +1113,7 @@ alias itg="open_web_app instagram.com Instagram"
 alias twx="open_web_app x.com X"
 
 # this alias to open dockerhub
-alias dckhb="open_web_app hub.docker.com DockerHub"
+alias dckhb="open_web_app docker.com DockerHub"
 
 # this alias to open YouTube Web App
 alias ytb="open_web_app youtube.com YouTube"
