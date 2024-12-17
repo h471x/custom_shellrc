@@ -864,6 +864,11 @@ function code {
 
 # this function to open windows app
 function open_win_app {
+  if [[ "$DISPLAY" != ":0" ]]; then
+    echo "Sorry, this is not a Linux app !"
+    return 0
+  fi
+
   local APP_PATH="$1"
   local EXECUTABLE="$2"
   explorer.exe "$(wslpath -w $APP_PATH)\\$EXECUTABLE.exe"
@@ -879,6 +884,11 @@ function vm {
 # this function to open virtual box
 function vbox {
   open_win_app $VIRTUAL_BOX_PATH VirtualBox
+}
+
+# this function to open wireshark
+function wsh {
+  open_win_app $WIRESHARK_PATH Wireshark
 }
 
 # this function to open Wub
@@ -1005,6 +1015,11 @@ alias open_web_app="allow_sudo && open_web_app";
 # UPDATED : 12-16-2024 16:14
 # Multiple Browser
 function open_web_app {
+  if [[ "$DISPLAY" != ":0" ]]; then
+    echo "Sorry, this is not a Linux app !"
+    return 0
+  fi
+
   local browser="$1"
   local app_domain="$2"
   local app_name="$3"
@@ -1872,6 +1887,11 @@ alias python="python"
 # Check if the VIRTUAL_ENV is set
 # then use python.exe in there
 function python() {
+  if [[ "$DISPLAY" != ":0" ]]; then
+    python "$@"
+    return 0
+  fi
+
   if [[ "$PWD" != "/mnt/"* ]]; then
     $PYTHON_PATH/python.exe "$@"
   else
@@ -2181,6 +2201,11 @@ alias pip="pip"
 
 # Function for pip alias
 function pip() {
+  if [[ "$DISPLAY" != ":0" ]]; then
+    pip "$@"
+    return 0
+  fi
+
   # Check if we are inside WSL directory or a symbolic link
   if [[ "$PWD" == "/mnt/"* || -L "$PWD" ]]; then
     if [[ -n "$VIRTUAL_ENV" ]]; then
