@@ -871,7 +871,23 @@ function open_win_app {
 
   local APP_PATH="$1"
   local EXECUTABLE="$2"
+
   explorer.exe "$(wslpath -w $APP_PATH)\\$EXECUTABLE.exe"
+  return 0
+}
+
+# this function to run windows CLI app
+function run_win_app {
+  local APP_CLI_PATH="$1"
+  local PROGRAM="$2"
+  local old_path="$PWD"
+
+  cd /mnt/c
+  echo "$APP_CLI_PATH"
+  echo "$(wslpath -w "$APP_CLI_PATH")"
+
+  cmd.exe /c "$(wslpath -w "$APP_CLI_PATH")"\\$PROGRAM.exe "$@"
+  cd $old_path
   return 0
 }
 
@@ -901,9 +917,18 @@ function tor {
   open_win_app $TOR_PATH tor
 }
 
-# this alias to launch canva
+# this function to launch canva
 function canva {
   open_win_app $CANVA_PATH Canva
+}
+
+# this function to launch usbipd
+function usbipd {
+  # run_win_app $USBIPD_PATH usbipd "$@"
+  old_path="$PWD"
+  cd /mnt/c
+  cmd.exe /c usbipd "$@"
+  cd $old_path
 }
 
 # this alias to start screen recording
@@ -1371,6 +1396,7 @@ function ipsh {
 
 function clean_argument() {
   local arg="$1"
+
   # Replace spaces with backslashes
   local clean_arg="${arg// /\\}"
 
@@ -1715,13 +1741,13 @@ alias cpf="cpf"
 # this function for cpf alias
 function cpf(){
   if [[ $# -eq 2 ]]; then
-    if [[ -d "$1" ]]; then #here to check if the first argument is a directory
+    if [[ -d "$1" ]]; then # here to check if the first argument is a directory
       cp -r "$1" "$2" && op "$2" && all "$1";
     else
       cp "$1" "$2" && op "$2" && all "$1";
     fi
   elif [[ $# -eq 1 ]]; then
-    if [[ -d "$1" ]]; then #here to check if the first argument is a directory
+    if [[ -d "$1" ]]; then # here to check if the first argument is a directory
       cp -r "$1" "$dest" && op "$dest" && all "$1";
     else
       cp "$@" "$dest" && op "$dest" && all "$@";
