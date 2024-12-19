@@ -1186,6 +1186,9 @@ alias twx="open_chrome_app x.com X"
 # this alias to open dockerhub
 alias dckhb="open_chrome_app docker.com DockerHub"
 
+# this alias to open reverse shell generator
+alias revshell="open_chrome_app www.revshells.com Revshell"
+
 # this alias to open YouTube Web App
 alias ytb="open_brave_app youtube.com YouTube"
 
@@ -1318,6 +1321,22 @@ function cmd(){
 #######################################################################
 
 ### WSL Network Aliases
+
+# this alias to edit windows host
+alias winhost="winhost"
+
+# this function for winhost alias
+function winhost {
+  if [[ "$DISPLAY" != ":0" ]]; then
+    echo "Sorry, this is not a Linux app !"
+    return 0
+  fi
+
+  old_path="$PWD"
+  cd "$(dirname "$(wslpath "$WINDOWS_HOSTS_PATH")")"
+  cmd.exe /c sudo notepad "$WINDOWS_HOSTS_PATH"
+  cd $old_path
+}
 
 # this alias to show IPV4 IP addresses
 alias show_ip="show_ip"
