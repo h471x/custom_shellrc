@@ -907,6 +907,11 @@ function wsh {
   open_win_app $WIRESHARK_PATH Wireshark
 }
 
+# this function to launch mobaXterm
+function moba {
+  open_win_app $MOBAXTERM_PATH MobaXterm
+}
+
 # this function to open Wub
 function wub {
   open_win_app $WUB_PATH Wub_x64
