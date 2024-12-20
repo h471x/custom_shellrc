@@ -1322,6 +1322,33 @@ function cmd(){
 
 ### WSL Network Aliases
 
+# this function to prompt for input
+# with regex matching check
+function check_input {
+  # Remove the debug print statement
+  # echo "check_input called"
+
+  local input_message="$1"
+  local input
+
+  # Prompt user for input
+  echo -ne "$input_message"
+  read input
+
+  # Return the valid input
+  echo "$input"
+}
+
+# Function to add hosts interactively
+function add_host {
+  # Now use check_input to get the host
+  # local host
+  host=$(check_input "Enter a valid IP address: ")
+
+  # Print the result after input
+  # echo "You entered a valid host: $host"
+}
+
 # this alias to edit windows host
 alias winhost="winhost"
 
