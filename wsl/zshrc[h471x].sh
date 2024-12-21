@@ -1407,29 +1407,16 @@ function ipsh {
   # Capture the output of show_ip
   map_output=$(show_ip)
 
-  # # Debugging: print the raw output of show_ip
-  # echo "Raw map_output:"
-  # echo "$map_output"
-
   # Find the length of the longest interface name (after stripping quotes and colons)
   longest_iface_length=$(echo "$map_output" | sed -E 's/"([^"]+)":.*/\1/' | awk '{ print length }' | sort -n | tail -n 1)
-
-  # # Debugging: print the longest interface length
-  # echo "The longest interface length is: $longest_iface_length"
 
   # Loop through each line of the map_output, stripping quotes from iface and aligning
   while IFS=: read -r iface ip; do
     iface=$(echo "$iface" | tr -d '"')  # Remove any quotes from iface
     iface=$(echo "$iface" | tr -d ' ')  # Remove any extra spaces from iface
 
-    # # Debugging: print the current interface and IP
-    # echo "Processing iface: $iface, ip: $ip"
-
     # Calculate how many spaces need to be added to align the '==>'
     spaces_to_add=$((longest_iface_length - ${#iface}))
-
-    # # Debugging: print the number of spaces to add
-    # echo "Spaces to add for $iface: $spaces_to_add"
 
     # Only add spaces if spaces_to_add is greater than 0
     if (( spaces_to_add > 0 )); then
