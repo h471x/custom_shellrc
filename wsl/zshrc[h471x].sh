@@ -1339,14 +1339,42 @@ function check_input {
   echo "$input"
 }
 
+# this alias to add host
+alias add_host="allow_sudo && add_host"
+
 # Function to add hosts interactively
 function add_host {
   # Now use check_input to get the host
-  # local host
-  host=$(check_input "Enter a valid IP address: ")
+  local host
+  local redirection
+  local description
 
-  # Print the result after input
-  # echo "You entered a valid host: $host"
+  # Get the host
+  echo -ne " Source Host : "
+  read host
+
+  # Get the redirection
+  echo -ne " Redirection : "
+  read redirection
+
+  # Get the description
+  echo -ne " Description : "
+  read description
+
+  # Remove any ANSI escape codes from inputs
+  host=$(echo "$host" | sed 's/\x1b\[[0-9;]*m//g')
+  redirection=$(echo "$redirection" | sed 's/\x1b\[[0-9;]*m//g')
+  description=$(echo "$description" | sed 's/\x1b\[[0-9;]*m//g')
+
+  # Add to windows host if we use
+  # windows terminal
+  if [[ "$DISPLAY" == ":0" ]]; then
+    powershell.exe -Command "Start-Process -FilePath 'powershell.exe' -ArgumentList \"-Command Add-Content -Path 'C:\\Windows\\System32\\drivers\\etc\\hosts' -Value '\`n# $description\`n$host $redirection'\" -Verb RunAs -WindowStyle Hidden"
+  fi
+
+  # Add to WSL2 host
+  sudo echo -e "\n# $description\n$host $redirection" \
+    | sudo tee -a /etc/hosts > /dev/null
 }
 
 # this alias to edit windows host
