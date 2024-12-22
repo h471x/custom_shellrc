@@ -1189,11 +1189,15 @@ alias dckhb="open_chrome_app docker.com DockerHub"
 # this alias to open reverse shell generator
 alias revshell="open_chrome_app www.revshells.com Revshell"
 
+
 # this alias to open YouTube Web App
 alias ytb="open_brave_app youtube.com YouTube"
 
 # this alias to open reddit Web App
 alias rdt="open_brave_app reddit.com Reddit"
+
+# this alias to open reverse shell generator
+alias ipinfo="open_chrome_app ipinfo.io IPInfo"
 
 # this alias to open Virus Total Web App
 alias vrst="open_chrome_app virustotal.com VirusTotal"
