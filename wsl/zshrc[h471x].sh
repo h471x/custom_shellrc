@@ -1186,9 +1186,14 @@ alias twx="open_chrome_app x.com X"
 # this alias to open dockerhub
 alias dckhb="open_chrome_app docker.com DockerHub"
 
+# this alias to open GitLab
+alias gtlb="open_brave_app gitlab.com GitLab"
+
 # this alias to open reverse shell generator
 alias revshell="open_chrome_app www.revshells.com Revshell"
 
+# this alias to open Cisco Networking Academy
+alias cna="open_chrome_app www.netacad.com 'Cisco Networking Academy'"
 
 # this alias to open YouTube Web App
 alias ytb="open_brave_app youtube.com YouTube"
@@ -1348,7 +1353,6 @@ alias add_host="allow_sudo && add_host"
 
 # Function to add hosts interactively
 function add_host {
-  # Now use check_input to get the host
   local host
   local redirection
   local description
