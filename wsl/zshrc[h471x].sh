@@ -551,7 +551,7 @@ alias vf="vf"
 function vf() {
   if [[ -f "$1" ]]; then
     case "${1##*.}" in
-      db|sqlite*|xlsx|docx|pptx|ppt|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3) 
+      db|sqlite*|xlsx|docx|pptx|ppt|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3|rdp) 
         explorer.exe "$1"
         ;;
       # open all files that have default app with windows explorer
@@ -1988,7 +1988,7 @@ alias python="python"
 # then use python.exe in there
 function python() {
   if [[ "$DISPLAY" != ":0" ]]; then
-    python "$@"
+    /usr/bin/python3 "$@"
     return 0
   fi
 
@@ -2302,7 +2302,7 @@ alias pip="pip"
 # Function for pip alias
 function pip() {
   if [[ "$DISPLAY" != ":0" ]]; then
-    pip "$@"
+    /usr/bin/pip3 "$@"
     return 0
   fi
 
