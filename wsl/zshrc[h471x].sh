@@ -1000,7 +1000,7 @@ function bwsop(){
   local isPdf="[[ "$file_extension" == "pdf" ]]"
 
   # Open Pdf file with edge and the other files with chrome
-  local browser=$( eval $isPdf && echo msedge.exe || echo chrome.exe)
+  local browser=$( eval $isPdf && echo msedge.exe || echo brave.exe)
 
   # if the current directory is a WSL
   # directory then switch to windows
