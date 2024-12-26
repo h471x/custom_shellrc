@@ -1942,7 +1942,7 @@ function tp(){
 
 # this alias to open the current
 # directory inside windows explorer
-# or bu the default explorer on Linux
+# or by the default explorer on Linux
 alias exop="exop"
 
 # this function for exop alias
