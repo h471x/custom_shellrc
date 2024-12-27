@@ -152,7 +152,7 @@ source ~/.shellrc_env/pwa.sh
 
 ### WSL Paths
 
-PATH=$PATH:$PYTHON_PATH
+PATH=$PATH:$PYTHON_PATH:$PYTHON_PACKAGES_PATH
 
 #######################################################################
 
@@ -551,7 +551,7 @@ alias vf="vf"
 function vf() {
   if [[ -f "$1" ]]; then
     case "${1##*.}" in
-      db|sqlite*|xlsx|docx|pptx|ppt|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3|rdp) 
+      vnc|db|sqlite*|xlsx|docx|pptx|ppt|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3|rdp) 
         explorer.exe "$1"
         ;;
       # open all files that have default app with windows explorer
