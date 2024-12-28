@@ -306,6 +306,10 @@ function flc(){
         echo " ==> Size : $size_gb GB"
       fi
 
+      if command -v exiftool >/dev/null 2>&1; then
+        br
+        exiftool "$1"
+      fi
       br;
     else
       grep -c "$1" "$2" | awk -v var="$1" '{print $1, var, "in it"}'
@@ -902,6 +906,11 @@ function vbox {
   open_win_app $VIRTUAL_BOX_PATH VirtualBox
 }
 
+# this function to open x64 debug program
+function dbg {
+  open_win_app $X64_DBG_PATH x64dbg
+}
+
 # this function to open wireshark
 function wsh {
   open_win_app $WIRESHARK_PATH Wireshark
@@ -1246,8 +1255,8 @@ function gthb(){
         cd /mnt/c
 
         cmd.exe /c start brave.exe \
-          --profile-directory=Default --app-id=$github_id \
-          --app=https://github.com/$repo_owner/$repo_name/tree/$current_branch \
+          --profile-directory=Default \
+          --app=https://github.com/$repo_owner/$repo_name/tree/$current_branch
 
         cd - &>/dev/null
         # gh repo view $repo_owner/$repo_name \
