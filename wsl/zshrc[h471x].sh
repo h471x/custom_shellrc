@@ -162,7 +162,7 @@ PATH=$PATH:$PYTHON_PATH:$PYTHON_PACKAGES_PATH
 alias upd="allow_sudo && upd"
 
 # this function for up alias
-function upd(){
+function upd {
   echo "u p d a t i n g .  .  ." | figlet -t -c;
   br && sudo apt update && br;
 }
@@ -171,7 +171,7 @@ function upd(){
 alias upg="allow_sudo && upg"
 
 # this function for up alias
-function upg(){
+function upg {
   echo "u p g r a d i n g . . ." | figlet -t -c;
   br && sudo apt upgrade && br;
 }
@@ -180,7 +180,7 @@ function upg(){
 alias ist="allow_sudo && ist"
 
 # this function for ist alias
-function ist(){
+function ist {
   case "${1##*.}" in
     git)
       echo "   C l o n i n g .  .  . " | figlet;
@@ -199,7 +199,7 @@ function ist(){
 alias rmv="rmv"
 
 # this function for ist alias
-function rmv(){
+function rmv {
   case "${1##*.}" in
     deb)
       c && echo -e && echo -e && sudo clear && echo -e && echo -e && echo "   r e m o v i n g .  .  . " | figlet | lolcat && echo -e && echo "Package =======> "${1%.*}" " && echo -e && sudo dpkg -r "$1" && echo -e;
@@ -214,7 +214,7 @@ function rmv(){
 alias nm="nm"
 
 # this function for cpf alias
-function nm(){
+function nm {
   mv "$1" "$2" && cv;
 }
 
@@ -222,7 +222,7 @@ function nm(){
 alias cl="linecount"
 
 # this function for the cl alias
-function linecount() {
+function linecount {
   if [ -z "$1" ]; then
     echo "Please provide a filename"
   elif [ -z "$2" ]; then
@@ -236,7 +236,7 @@ function linecount() {
 alias mn="mn"
 
 # this function for mn alias
-function mn(){
+function mn {
   if [[ $# -eq 1 ]]; then
     man $1 | less
   else
@@ -248,7 +248,7 @@ function mn(){
 alias hst="hst"
 
 # this function for hst alias
-function hst(){
+function hst {
   if [[ $# -eq 0 ]]; then
     history | less && cv
   else
@@ -266,7 +266,7 @@ function hst(){
 alias hsg="hsg"
 
 # this function for hsg alias
-function hsg(){
+function hsg {
   if [[ $# -eq 0 ]]; then
     history | less && cv;
   else
@@ -278,7 +278,7 @@ function hsg(){
 alias flc="flc"
 
 # this function for the cl alias
-function flc(){
+function flc {
   if [[ -f "$1" ]]; then
     if [ -z "$1" ]; then
       echo "Please provide a filename"
@@ -319,7 +319,7 @@ function flc(){
   fi
 }
 
-kill-line() {
+kill-line {
   if [[ $BUFFER == "" ]]; then
     zle backward-kill-line
   else
@@ -340,7 +340,7 @@ alias x="clear && echo -e && echo -e && echo -e && echo -e && echo -e && echo -e
 alias br="br"
 
 # this function for br alias
-function br(){
+function br {
   if [[ $# -eq 1 ]]; then
     for ((i=1; i<=$1;i++)); do
       echo -e;
@@ -354,7 +354,7 @@ function br(){
 alias cvi="cvii"
 
 # here to write a welcome message
-function cvii(){
+function cvii {
   clear && br 2;
   echo "H    4    7    1    X" | figlet -t -c;
   br 2;
@@ -370,7 +370,7 @@ alias q='exit'
 alias all="all"
 
 # this function for all alias
-function all(){
+function all {
   if [[ $# -eq 0 ]]; then
     if [[ -d "$1" ]]; then
       chmod 700 * && cv;
@@ -392,7 +392,7 @@ function all(){
 alias symlink="symlink"
 
 # this function for symlink alias
-function symlink(){
+function symlink {
   if [ "$#" -eq 0 ]; then
     echo "wrong usage"
   elif [ "$#" -eq 1 ]; then
@@ -410,7 +410,7 @@ alias cv="cv"
 # UPDATED : 01/25/2024
 # to adjust the title
 # when we have more than 50 visible items
-function cv() {
+function cv {
   local target="$1"
   local folder_content="${target:-$PWD}"
   local folder_name=$(basename $folder_content)
@@ -419,7 +419,7 @@ function cv() {
   local hidden_item=$((total_item - visible_item))
 
   # this function for the header of cv alias
-  function show_header(){
+  function show_header {
     local folder_header
     if [[ $total_item -eq 0 ]]; then
       folder_header="Empty(0)";
@@ -435,14 +435,16 @@ function cv() {
   }
 
   # this function to show the content of the cv
-  function show_content(){
-    # local flag="${1:-}"
-    # ls $flag $folder_content;
-    eza --icons=always --no-quotes --group-directories-first $folder_content
+  function show_content {
+    if command -v eza >/dev/null 2>&1; then
+      eza --icons=always --no-quotes --group-directories-first $folder_content
+    else
+      ls $folder_content
+    fi
   }
 
   # this function to show the all of the cv content
-  function show_all(){
+  function show_all {
     c && br;
 
     if [[ $visible_item -lt 30 ]]; then
@@ -467,7 +469,7 @@ alias cvf="cvf"
 # UPDATED : 01/25/2024
 # to adjust the title
 # when we have more than 50 visible items
-function cvf() {
+function cvf {
   local target="$1"
   local folder_content="${target:-$PWD}"
   local folder_name=$(basename $folder_content)
@@ -476,7 +478,7 @@ function cvf() {
   local hidden_item=$((total_item - visible_item))
 
   # this function for the header of cv alias
-  function show_header(){
+  function show_header {
     local folder_header
     if [[ $total_item -eq 0 ]]; then
       folder_header="Empty(0)";
@@ -492,12 +494,16 @@ function cvf() {
   }
 
   # this function to show the content of the cv
-  function show_content(){
-    eza --icons=always --no-quotes -a --group-directories-first $folder_content;
+  function show_content {
+    if command -v eza >/dev/null 2>&1; then
+      eza --icons=always --no-quotes -a --group-directories-first $folder_content;
+    else
+      ls -A $folder_content
+    fi
   }
 
   # this function to show the cv
-  function show_all(){
+  function show_all {
     c && br;
 
     if [[ $hidden_item -lt 30 ]]; then
@@ -520,21 +526,25 @@ function cvf() {
 alias cvg="cvg"
 
 # this function for cvg alias
-function cvg(){
+function cvg {
   local folder_name=$(basename $PWD)
   local item="$1"
   local matched_items=$(ls -A | grep "$item" | wc -l)
 
-  function show_header(){
+  function show_header {
     echo "${BOLD}   $folder_name -> contains $matched_items '$1' ${RESET}";
   }
 
-  function show_content(){
-    eza --icons=always --color=always -a --group-directories-first | grep "$1";
+  function show_content {
+    if command -v eza >/dev/null 2>&1; then
+      eza --icons=always --color=always -a --group-directories-first | grep "$1";
+    else
+      ls -A | grep "$1"
+    fi
   }
 
   # this function to show the cv
-  function show_all(){
+  function show_all {
     c && br;
 
     if [[ $matched_items -lt 20 ]]; then
@@ -552,7 +562,7 @@ function cvg(){
 alias vf="vf"
 
 # this function for vf alias
-function vf() {
+function vf {
   if [[ -f "$1" ]]; then
     case "${1##*.}" in
       vnc|db|sqlite*|xlsx|docx|pptx|ppt|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3|rdp) 
@@ -581,7 +591,7 @@ function vf() {
 alias op="op"
 
 # this function for op alias
-function op() {
+function op {
   # Check if $1 is a symbolic link
   if [[ -L "$1" ]]; then
     # Resolve the real path of the symbolic link
@@ -614,7 +624,7 @@ function op() {
 alias dr="dr"
 
 # this function for dr alias
-function dr(){
+function dr {
   mkdir "$@" && cv;
 }
 
@@ -622,7 +632,7 @@ function dr(){
 alias rd="rd"
 
 # this function for rd alias
-function rd(){
+function rd {
   rm -r "$@" && cv;
 }
 
@@ -630,7 +640,7 @@ function rd(){
 alias dt="dt"
 
 # this function for dst alias
-function dt(){
+function dt {
   dest="$PWD" && c && echo -e && echo "d e s t   s a v e d" | figlet -t -c && sleep 0.6 && cv;
 }
 
@@ -639,7 +649,7 @@ function dt(){
 alias opd="opd"
 
 # this function for opd alias
-function opd(){
+function opd {
   op "$1" && dt && nd;
 }
 
@@ -648,7 +658,7 @@ function opd(){
 alias opdr="opdr"
 
 # this function for opdr alias
-function opdr(){
+function opdr {
   dr "$*" && op "$*";
 }
 
@@ -656,7 +666,7 @@ function opdr(){
 alias b="b"
 
 # this function for b alias
-function b(){
+function b {
   if [[ $# -eq 0 ]]; then
     cd .. && cv
   else
@@ -670,7 +680,7 @@ function b(){
 alias nd="nd"
 
 # this function for nd alias
-function nd(){
+function nd {
   [[ -n "$dest" ]] && \
     cd $dest || \
     cd - &>/dev/null;
@@ -690,7 +700,7 @@ alias allow_sudo="allow_sudo"
 # check if sudo requires a password
 # then show the password prompt,
 # otherwise just execute the next command
-function allow_sudo(){
+function allow_sudo {
   sudo -n true &>/dev/null
   if [ $? -eq 1 ]; then
     sudo echo && return 0 || return 1
@@ -702,7 +712,7 @@ function allow_sudo(){
 alias hndo="hndo"
 
 # this function for hndo alias
-function hndo(){
+function hndo {
   local attempts=3
   local attempts_num=$(echo $attempts)
   local expected_hashed_password="5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"
@@ -741,7 +751,7 @@ function hndo(){
 alias ad="ad"
 
 # this function for ad alias
-function ad(){
+function ad {
   c && echo -e && echo -e && sudo su && cv;
 }
 
@@ -756,7 +766,7 @@ alias ct="nvim ~/.zshrc"
 alias rld="rld"
 
 # this function for rld alias
-function rld(){
+function rld {
   c;
 
   # local variables
@@ -788,7 +798,7 @@ alias nvm="nvm"
 # this function for nvm aliases
 # if we have one argument then nvim will be launched with it,
 # otherwise open the current directory if there is no argument
-function nvm(){
+function nvm {
   nvim "${1:-.}";
 }
 
@@ -799,7 +809,7 @@ alias hnvim="nvim"
 alias nvmr="allow_sudo && nvmr"
 
 # this function for nvmr alias
-function nvmr(){
+function nvmr {
   sudo \
     PATH=$PATH:$SYSTEM32_PATH \
     nvim "${1:-.}"
@@ -809,7 +819,7 @@ function nvmr(){
 alias ed="ed"
 
 # this function for ed alias
-function ed(){
+function ed {
   # nvim -c "startinsert" "$1" && cv;
   nvim "$1" && cv;
 }
@@ -950,7 +960,7 @@ function usbipd {
 alias obs="obs"
 
 # this function for obs alias
-function obs() {
+function obs {
   # change directory
   cd $OBS_PATH
 
@@ -996,7 +1006,7 @@ alias bwsop="bwsop"
 # Handled the shell access after launch
 #
 # this function bwsop alias
-function bwsop(){
+function bwsop {
   local file_name="$1"
   local file_extension="${file_name##*.}"
   local current_directory="$PWD"
@@ -1227,7 +1237,7 @@ alias gmail="open_chrome_app gmail.com Gmail"
 alias gthb="gthb"
 
 # this function for gthb alias
-function gthb(){
+function gthb {
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   local github_link="github.com"
@@ -1246,7 +1256,7 @@ function gthb(){
 
     local current_branch=$(git branch | awk '/\*/ {print $2}');
 
-    function check_view(){
+    function check_view {
       echo -ne "${BOLD}${GREEN}Open ${WHITE}the repo ${LIGHT_BLUE}$repo_name ${WHITE}on GitHub ? (y/n) ";
       read check_view
       echo ${RESET}
@@ -1301,7 +1311,7 @@ function gthb(){
 alias wds="wds"
 
 # this function for wds alias
-function wds(){
+function wds {
   c && br 2;
   # Check the current directory
   # because cmd will work only
@@ -1321,7 +1331,7 @@ function wds(){
 alias pws="pws"
 
 # this function for pws alias
-function pws(){
+function pws {
   c && br 2;
   powershell.exe;
   cv;
@@ -1331,7 +1341,7 @@ function pws(){
 alias cmd="cmd"
 
 # this function for cmd alias
-function cmd(){
+function cmd {
   powershell.exe -command "Start-Process cmd -Verb RunAs";
   x;
 }
@@ -1477,7 +1487,7 @@ function ipsh {
   br
 }
 
-function clean_argument() {
+function clean_argument {
   local arg="$1"
 
   # Replace spaces with backslashes
@@ -1504,7 +1514,7 @@ function clean_argument() {
 alias wpass="wpass"
 
 # this function for wpass alias
-function wpass(){
+function wpass {
   cd /mnt/c
   if [[ $# -eq 0 ]]; then
     # consider all arguments as one string
@@ -1535,7 +1545,7 @@ function wpass(){
 }
 
 # Completion function for wpass
-_wpass_completion() {
+_wpass_completion {
   cd /mnt/c
   local cur
 
@@ -1561,10 +1571,10 @@ complete -F _wpass_completion wpass
 alias wls="wls"
 
 # this function for wls alias
-function wls(){
+function wls {
   cd /mnt/c
 
-  function print_message(){
+  function print_message {
     wifi="$1"
     password="$2"
     # Print Wi-Fi SSID and password
@@ -1573,7 +1583,7 @@ function wls(){
     echo
   }
 
-  function wifi_and_pass(){
+  function wifi_and_pass {
     num_profiles="$1"
     grep_string="$2"
     # Loop through each Wi-Fi profile
@@ -1593,7 +1603,7 @@ function wls(){
     )
   }
 
-  function wifi_name(){
+  function wifi_name {
     wifi_count=0
     # Loop through each Wi-Fi profile
     while IFS= read -r wifi; do
@@ -1638,7 +1648,7 @@ alias reach="allow_sudo && reach";
 
 # this function to check if pfsense is reachable
 # coded 01/29/2024
-function reach(){
+function reach {
   c && br;
 
   local target_IP="$1"
@@ -1669,7 +1679,7 @@ function reach(){
 alias svc_on="allow_sudo && svc_on"
 
 # this function for svc_on alias
-function svc_on(){
+function svc_on {
   sudo service "$1" start;
 }
 
@@ -1677,7 +1687,7 @@ function svc_on(){
 alias svc_off="allow_sudo && svc_off"
 
 # this function for svc_off alias
-function svc_off(){
+function svc_off {
   sudo service "$1" stop;
 }
 
@@ -1686,7 +1696,7 @@ function svc_off(){
 alias svc_stat="allow_sudo && svc_stat"
 
 # this function for svc_stat alias
-function svc_stat(){
+function svc_stat {
   sudo service "$1" status;
 }
 
@@ -1694,7 +1704,7 @@ function svc_stat(){
 alias svc_show_stat="allow_sudo && svc_show_stat"
 
 # this function for svc_show_stat alias
-function svc_show_stat(){
+function svc_show_stat {
   br;
 
   local service_name="$1";
@@ -1715,7 +1725,7 @@ function svc_show_stat(){
 alias sth="sth"
 
 # this function for sth alias
-function sth(){
+function sth {
   c && br;
   if [[ $(pgrep sshd) ]]; then
     c && br;
@@ -1745,7 +1755,7 @@ function sth(){
 alias sshon="allow_sudo && sshon"
 
 # this function for sshon alias
-function sshon(){
+function sshon {
   local is_wsl=$(grep -qi microsoft /proc/version && echo true || echo false)
 
   if $is_wsl; then
@@ -1760,7 +1770,7 @@ function sshon(){
 alias sshoff="allow_sudo && sshoff"
 
 # this function for sshoff alias
-function sshoff(){
+function sshoff {
   # sudo /etc/init.d/ssh stop;
   if [[ $(pgrep sshd) ]]; then
     sudo kill $(pgrep sshd);
@@ -1770,7 +1780,7 @@ function sshoff(){
 
 # this function to view the current apache2
 # service, its status
-function stap(){
+function stap {
   c && br;
   if [[ $(pgrep apache2) ]]; then
     echo "${BOLD}Apache Server Active ${BOLD}${GREEN} ${RESET}"
@@ -1806,7 +1816,7 @@ function stap(){
 alias tf="tf"
 
 # this function for tf alias
-function tf(){
+function tf {
   touch "$@" && all "$@" && cv;
 }
 
@@ -1814,7 +1824,7 @@ function tf(){
 alias dlf="dlf"
 
 # this function for dlf alias
-function dlf(){
+function dlf {
   rm "$@" && cv;
 }
 
@@ -1822,7 +1832,7 @@ function dlf(){
 alias cpf="cpf"
 
 # this function for cpf alias
-function cpf(){
+function cpf {
   if [[ $# -eq 2 ]]; then
     if [[ -d "$1" ]]; then # here to check if the first argument is a directory
       cp -r "$1" "$2" && op "$2" && all "$1";
@@ -1842,7 +1852,7 @@ function cpf(){
 alias cnf="cnf"
 
 # this function for cnf alias
-function cnf(){
+function cnf {
   cat "$1" > "$2" && dlf "$1" && all "$2";
 }
 
@@ -1850,7 +1860,7 @@ function cnf(){
 alias mvf="mvf"
 
 # this function for cpf alias
-function mvf(){
+function mvf {
   if [[ $# -eq 2 ]]; then
     mv "$1" "$2" && op "$2";
   elif [[ $# -eq 1 ]]; then
@@ -1866,7 +1876,7 @@ function mvf(){
 alias rdf="allow_sudo && rdf"
 
 # this function for rdf alias
-function rdf(){
+function rdf {
   sudo rm -rfv "$@";
   cv;
 }
@@ -1876,7 +1886,7 @@ function rdf(){
 alias dc="dc"
 
 #this function for dc alias
-function dc(){
+function dc {
   if [[ $# -eq 0 ]]; then
     clear;
     br;
@@ -1933,7 +1943,7 @@ function dc(){
 alias tp="tp"
 
 # this function for tp alias
-function tp(){
+function tp {
   type=$(ls -ld "$1" | cut -c1)
   case $type in
     -) echo "File" ;;
@@ -1955,7 +1965,7 @@ function tp(){
 alias exop="exop"
 
 # this function for exop alias
-function exop() {
+function exop {
   [ $# -eq 1 ] && cd "$1"
 
   check_kex && \
@@ -1970,7 +1980,7 @@ function exop() {
 ### Custom command not found
 
 # Printing command not found when it is the case
-command_not_found_handler() {
+command_not_found_handler {
   local command=$1
   local command_found=0
 
@@ -1995,7 +2005,7 @@ alias python="python"
 # IMPROVED : 10-05-2024 22:28
 # Check if the VIRTUAL_ENV is set
 # then use python.exe in there
-function python() {
+function python {
   if [[ "$DISPLAY" != ":0" ]]; then
     /usr/bin/python3 "$@"
     return 0
@@ -2034,7 +2044,7 @@ function python() {
 }
 
 # this function to create a linux python environment
-function create_env(){
+function create_env {
   local env_name="$1"
   python -m venv $env_name
 }
@@ -2042,7 +2052,7 @@ function create_env(){
 # this function to activate a linux python
 # environment, a functionality found on
 # the activate script
-function activate_env(){
+function activate_env {
   # reset the PATH first
   # reset_path
 
@@ -2085,7 +2095,7 @@ function activate_env(){
 
 # This function finds all Python virtual
 # environments in the current directory and returns them as an array.
-function find_envs() {
+function find_envs {
   local envs=()
 
   # Enable 'nullglob' to prevent errors when using glob patterns (e.g., "$PWD"/*/)
@@ -2105,7 +2115,7 @@ function find_envs() {
 
 # this function to remove
 # python virtual env from path
-function reset_path(){
+function reset_path {
   if [[ -n "$VIRTUAL_ENV" ]]; then
     # get the path to VIRTUAL_ENV
     local env_dir=$(dirname $VIRTUAL_ENV)
@@ -2120,7 +2130,7 @@ function reset_path(){
 # global variable and restore the PATH to
 # the original one, yet this is the code
 # behind python environment deactivate
-function disable_env(){
+function disable_env {
   # reset the path
   # reset_path
  
@@ -2159,7 +2169,7 @@ function disable_env(){
 
 # This function deletes the specified Python virtual
 # environment and unsets the VIRTUAL_ENV variable.
-function delete_env() {
+function delete_env {
   local env_name="$1"
 
   dir_name=$(basename "$env_name")
@@ -2183,7 +2193,7 @@ function delete_env() {
 alias pyenv="allow_sudo && pyenv"
 
 # this function for pyenv alias
-function pyenv(){
+function pyenv {
     if [[ $# -eq 0 ]]; then
       if [[ -n "$VIRTUAL_ENV" ]]; then
         # unset VIRTUAL_ENV
@@ -2309,7 +2319,7 @@ function pyenv(){
 alias pip="pip"
 
 # Function for pip alias
-function pip() {
+function pip {
   if [[ "$DISPLAY" != ":0" ]]; then
     /usr/bin/pip3 "$@"
     return 0
@@ -2344,7 +2354,7 @@ function pip() {
 alias pycheck="pycheck"
 
 # this function for pycheck alias
-function pycheck(){
+function pycheck {
   local package="$1"
 
   if pip show $package 2>&1 | grep -q "WARNING"; then
