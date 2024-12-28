@@ -319,7 +319,7 @@ function flc {
   fi
 }
 
-kill-line {
+kill-line() {
   if [[ $BUFFER == "" ]]; then
     zle backward-kill-line
   else
@@ -1545,7 +1545,7 @@ function wpass {
 }
 
 # Completion function for wpass
-_wpass_completion {
+_wpass_completion() {
   cd /mnt/c
   local cur
 
@@ -1980,7 +1980,7 @@ function exop {
 ### Custom command not found
 
 # Printing command not found when it is the case
-command_not_found_handler {
+command_not_found_handler() {
   local command=$1
   local command_found=0
 
