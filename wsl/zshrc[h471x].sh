@@ -1202,6 +1202,9 @@ alias itg="open_chrome_app instagram.com Instagram"
 # this alias to open TwitterX app
 alias twx="open_chrome_app x.com X"
 
+# this function to open CloudConvert
+alias conv="open_chrome_app cloudconvert.com CloudConvert"
+
 # this alias to open dockerhub
 alias dckhb="open_chrome_app docker.com DockerHub"
 
