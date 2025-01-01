@@ -143,10 +143,10 @@ QUESTION_MARK="$(printf '\xE2\x9D\x93')"
 
 ### WSL Environment Variables
 
-source ~/.shellrc_env/shortcuts.sh
-source ~/.shellrc_env/screen.sh
-source ~/.shellrc_env/paths.sh
-source ~/.shellrc_env/pwa.sh
+source ~/.shellrc_env/env/shortcuts.sh
+source ~/.shellrc_env/env/screen.sh
+source ~/.shellrc_env/env/paths.sh
+source ~/.shellrc_env/env/pwa.sh
 
 #######################################################################
 
@@ -336,6 +336,13 @@ alias c="clear"
 # this alias to clear but with extra lines
 alias x="clear && echo -e && echo -e && echo -e && echo -e && echo -e && echo -e"
 
+# Clear screen at startup
+# x
+
+# Enable MOTD message at startup
+# Edit it inside /etc/update-motd.d/10-uname
+run-parts /etc/update-motd.d
+
 # this alias to break a line
 alias br="br"
 
@@ -359,9 +366,6 @@ function cvii {
   echo "H    4    7    1    X" | figlet -t -c;
   br 2;
 }
-
-# Clear screen at startup
-x
 
 # this alias to exit
 alias q='exit'
@@ -564,23 +568,32 @@ alias vf="vf"
 # this function for vf alias
 function vf {
   if [[ -f "$1" ]]; then
-    case "${1##*.}" in
-      vnc|db|sqlite*|xlsx|docx|pptx|ppt|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3|rdp) 
-        explorer.exe "$1"
-        ;;
-      # open all files that have default app with windows explorer
-      html)
-        if [[ "$PWD" == "/mnt/"* ]]; then
+    if [[ "$DISPLAY" == ":0" ]]; then
+      case "${1##*.}" in
+        mkv|vnc|db|sqlite*|xlsx|docx|pptx|ppt|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3|rdp)
           explorer.exe "$1"
-        else
-          bwsop "$1"
-        fi
-        ;;
-      # fxml)
-      #   cmd.exe /c start SceneBuilder.exe "$@"
-      #   ;;
-      *) nvim "$1" ;;
-    esac
+          ;;
+        # open all files that have default app with windows explorer
+        html)
+          if [[ "$PWD" == "/mnt/"* ]]; then
+            explorer.exe "$1"
+          else
+            bwsop "$1"
+          fi
+          ;;
+        # fxml)
+        #   cmd.exe /c start SceneBuilder.exe "$@"
+        #   ;;
+        *) nvim "$1" ;;
+      esac
+    else
+      case "${1##*.}" in
+        html|vnc|db|sqlite*|xlsx|docx|pptx|ppt|wmv|pcapng|pdf|jpg|png|JPG|PNG|lnk|docx|xslsx|pptx|mp*|zip|rar|gns3|rdp)
+          xdg-open "$1"
+          ;;
+        *) nvim "$1" ;;
+      esac
+    fi
     return 0
   elif [[ -d "$1" ]]; then
     op "$1"
@@ -916,6 +929,11 @@ function vbox {
   open_win_app $VIRTUAL_BOX_PATH VirtualBox
 }
 
+# this function to open FL Studio
+function fl {
+  open_win_app $FL_STUDIO_PATH FL64
+}
+
 # this function to open x64 debug program
 function dbg {
   open_win_app $X64_DBG_PATH x64dbg
@@ -939,6 +957,11 @@ function wub {
 # this function to open tor browser
 function tor {
   open_win_app $TOR_PATH tor
+}
+
+# this function to open total commander
+function tcmd {
+  open_win_app $TOTAL_CMD_PATH TOTALCMD64
 }
 
 # this function to launch canva
@@ -1232,6 +1255,9 @@ alias vrst="open_chrome_app virustotal.com VirusTotal"
 # this alias to open Gmail WebApp
 alias gmail="open_chrome_app gmail.com Gmail"
 
+# this alias to open StackOverFlow
+alias stk="open_chrome_app stackoverflow.com StackOverflow"
+
 #######################################################################
 
 ### GitHub Alias
@@ -1241,6 +1267,11 @@ alias gthb="gthb"
 
 # this function for gthb alias
 function gthb {
+  if [[ "$DISPLAY" != ":0" ]]; then
+    echo "Sorry, this is not a Linux app !"
+    return 0
+  fi
+
   local is_a_git_repo=$(git rev-parse --is-inside-work-tree 2>/dev/null)
 
   local github_link="github.com"
