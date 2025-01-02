@@ -883,7 +883,7 @@ alias code="code"
 # this function for code alias
 function code {
   if [[ "$DISPLAY" == ":0" ]]; then
-    cmd.exe /c start code "$@"
+    cmd.exe /c code "$@"
   else
     /usr/bin/code-oss "$@" &>/dev/null
   fi
@@ -923,6 +923,36 @@ function vm {
   kex --esm -s &>/dev/null
   return 0
 }
+
+# tasklist | findstr "Docker"
+#
+# taskkill /IM "Docker Desktop.exe" /F
+
+# Stop-Process -Name "Docker Desktop" -Force
+
+# this function to run docker
+# function docker {
+#   # Check if Docker Service is not running
+#   if ! cmd.exe /c "tasklist | findstr Docker" &>/dev/null; then
+#     echo "didn't find docker"
+#     return 0
+#     # # Cannot start docker inside kali-win-kex
+#     # if [[ "$DISPLAY" != ":0" ]]; then
+#     #   echo "Please start docker service inside Windows Terminal first !"
+#     #   return 0
+#     # fi
+#     #
+#     # # Debugging message
+#     # echo "Starting docker desktop ..."
+#     #
+#     # # Start the docker service
+#     # open_win_app $DOCKER_DESKTOP_PATH "Docker Desktop"
+#   fi
+#
+#   # run the default docker
+#   # command integration for WSL2
+#   $DOCKER_DESKTOP_PATH/resources/bin/docker "$@"
+# }
 
 # this function to open virtual box
 function vbox {
@@ -1184,13 +1214,13 @@ function thm {
   cd /mnt/c
 
   if [[ "$1" == "connect" ]]; then
-    cmd.exe /c openvpn-gui \
+    cmd.exe /c start openvpn-gui \
       --command silent_connection 1
 
-    cmd.exe /c openvpn-gui \
+    cmd.exe /c start openvpn-gui \
       --command connect thm_h471x
   elif [[ "$1" == "disconnect" ]]; then
-    cmd.exe /c openvpn-gui \
+    cmd.exe /c start openvpn-gui \
       --command disconnect thm_h471x
   elif [[ "$1" == "status" ]]; then
     local check="ping -c 1 -W 5 "
@@ -1245,6 +1275,9 @@ alias ytb="open_brave_app youtube.com YouTube"
 
 # this alias to open reddit Web App
 alias rdt="open_brave_app reddit.com Reddit"
+
+# this alias to open Cybr (AWS CybSec Learning Platform)
+alias cybr="open_chrome_app cybr.com Cybr"
 
 # this alias to open reverse shell generator
 alias ipinfo="open_chrome_app ipinfo.io IPInfo"
