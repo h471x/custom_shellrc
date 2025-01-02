@@ -103,6 +103,10 @@ function rld(){
   op $backup_dir;
 }
 
+# Enable MOTD message at startup
+# Edit it inside /etc/update-motd.d/10-uname
+run-parts /etc/update-motd.d
+
 #this alias to break a line
 alias br="br"
 
