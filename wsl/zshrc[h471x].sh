@@ -875,7 +875,25 @@ alias pc="c && br 2 && neofetch --source $CUSTOM_NEOFETCH"
 
 #######################################################################
 
+
 ### WSL Programs
+
+# CREATED : 10-24-2024 19:19
+# this alias to forcefully
+# run a windows command inside
+# WSL by temporarely move to C drive
+alias force_run="force_run"
+
+# this function for force_run alias
+function force_run(){
+  if [[ "$PWD" != "/mnt/"* && ! -L "$PWD" ]]; then
+    cd /mnt/c
+    eval "$@"
+    cd - &>/dev/null
+  else
+    eval "$@"
+  fi
+}
 
 # this alias to not mess up vscode
 alias code="code"
@@ -957,6 +975,36 @@ function vm {
 # this function to open virtual box
 function vbox {
   open_win_app $VIRTUAL_BOX_PATH VirtualBox
+}
+
+# this function to launch apple music
+function music {
+  force_run cmd.exe /c start AppleMusic.exe
+}
+
+# this function to run bluestacks
+function android {
+  open_win_app $BLUESTACKS_PATH HD-Player
+}
+
+# this function to launch Office Word
+function word {
+  open_win_app $MICROSOFT_OFFICE_PATH WINWORD
+}
+
+# this function to launch Office Excel
+function xls {
+  open_win_app $MICROSOFT_OFFICE_PATH EXCEL
+}
+
+# this function to launch Office Powerpoint
+function ppt {
+  open_win_app $MICROSOFT_OFFICE_PATH POWERPNT
+}
+
+# this function to launch Office Access
+function acc {
+  open_win_app $MICROSOFT_OFFICE_PATH MSACCESS
 }
 
 # this function to open FL Studio
@@ -1802,20 +1850,31 @@ function sth {
     echo "${BOLD}Ssh Server Active ${BOLD}${GREEN} ${RESET}"
     br;
 
-    local is_wsl=$(grep -qi microsoft /proc/version && echo true || echo false)
+    # Capture the output of show_ip
+    map_output=$(show_ip)
 
-    if $is_wsl; then
-     local wifi_iface="wifi0"
-    else
-     # at least it is on kali linux
-     local wifi_iface="wlan0"
-    fi
+    # Find the length of the longest interface name (after stripping quotes and colons)
+    longest_iface_length=$(echo "$map_output" | sed -E 's/"([^"]+)":.*/\1/' | awk '{ print length }' | sort -n | tail -n 1)
 
-    local wifi_ip=$(ifconfig $wifi_iface | grep inet | awk '{print $2}');
-    # echo " Connect Via  ==>  ssh $USER@$ip";
-    # check_ngrok="cmd.exe /c 'tasklist | findstr /I "ngrok"'"
-    echo "Ssh Connection via $wifi_iface Interface";
-    echo "${BOLD}${WHITE}==> ssh $USER@$wifi_ip";
+    # Loop through each line of the map_output, stripping quotes from iface and aligning
+    while IFS=: read -r iface ip; do
+      iface=$(echo "$iface" | tr -d '"')  # Remove any quotes from iface
+      iface=$(echo "$iface" | tr -d ' ')  # Remove any extra spaces from iface
+
+      # Calculate how many spaces need to be added to align the '==>'
+      spaces_to_add=$((longest_iface_length - ${#iface}))
+
+      # Only add spaces if spaces_to_add is greater than 0
+      if (( spaces_to_add > 0 )); then
+        padded_iface="$iface$(printf ' %.0s' {1..$spaces_to_add})"
+      else
+        padded_iface="$iface"
+      fi
+
+      # Print the iface and ip, ensuring alignment of '==>'
+      echo "${BOLD}${WHITE}$padded_iface ==> ssh $USER@$ip";
+    done <<< "$map_output"
+
   else
     echo "${BOLD}Ssh Server Off ${BOLD}${RED}✘ ${WHITE}"
   fi
