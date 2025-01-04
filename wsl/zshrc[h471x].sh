@@ -942,11 +942,20 @@ function vm {
   return 0
 }
 
+# Open new tab inside windows terminal
+# cmd.exe /c wt -w 0 nt
+
 # tasklist | findstr "Docker"
 #
 # taskkill /IM "Docker Desktop.exe" /F
 
 # Stop-Process -Name "Docker Desktop" -Force
+
+# cmd.exe /c wt -w 0 nt && sudo openvpn /home/h471x/Desktop/tryhackme_ctf/thm_openvpn/thm_h471x.ovpn
+#
+# twitter link https://t.co/OSGeowHZ7G
+#
+# window terminal new tab : cmd.exe /c wt -w 0 nt
 
 # this function to run docker
 # function docker {
@@ -1301,7 +1310,13 @@ alias fb="open_brave_app facebook.com Facebook"
 alias itg="open_chrome_app instagram.com Instagram"
 
 # this alias to open TwitterX app
-alias twx="open_chrome_app x.com X"
+alias twx="open_brave_app x.com X"
+
+# this alias to open CloudFlare
+alias flare="open_chrome_app cloudflare.com Cloudflare"
+
+# this alias to open Discord
+alias dsc="open_chrome_app discord.com Discord"
 
 # this function to open ascii art archive
 alias ascii="open_chrome_app asciiart.eu AsciiArt"
