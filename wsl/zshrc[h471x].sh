@@ -1297,6 +1297,41 @@ function thm {
   cd $dest
 }
 
+# this alias to open Pwned Labs Web App
+alias pwn="pwn"
+
+# this function for pwn alias
+function pwn {
+  dest="$PWD"
+  cd /mnt/c
+
+  if [[ "$1" == "connect" ]]; then
+    cmd.exe /c start openvpn-gui \
+      --command silent_connection 1
+
+    cmd.exe /c start openvpn-gui \
+      --command connect pwndlb_h471x
+  elif [[ "$1" == "disconnect" ]]; then
+    cmd.exe /c start openvpn-gui \
+      --command disconnect pwndlb_h471x
+  elif [[ "$1" == "status" ]]; then
+    local check="ping -c 1 -W 5 "
+    local check_message="Checking Pwned Labs Connectivity ..."
+    local reachable="echo ' $check_message' && eval $check pwnedlb &> /dev/null;"
+
+    if eval $reachable; then
+      echo " ${GREEN}Connected ${RESET}to Pwned Labs OpenVPN"
+    else
+      echo " ${RED}Disconnected ${RESET}from Pwned Labs OpenVPN"
+    fi
+  else
+    open_chrome_app pwnedlabs.io PwnedLabs
+  fi
+
+  # get back to the old directory
+  cd $dest
+}
+
 # this alias to open chatGpt app
 alias gpt="open_chrome_app chatgpt.com ChatGPT"
 
@@ -1315,6 +1350,9 @@ alias twx="open_brave_app x.com X"
 # this alias to open CloudFlare
 alias flare="open_chrome_app cloudflare.com Cloudflare"
 
+# this alias to open Exploit Database
+alias xdb="open_brave_app exploit-db.com ExploitDB"
+
 # this alias to open Discord
 alias dsc="open_chrome_app discord.com Discord"
 
@@ -1324,14 +1362,26 @@ alias ascii="open_chrome_app asciiart.eu AsciiArt"
 # this function to open CloudConvert
 alias conv="open_chrome_app cloudconvert.com CloudConvert"
 
+# this alias to open GTFOBins App
+alias gtfo="open_chrome_app gtfobins.github.io GTFOBins"
+
 # this alias to open dockerhub
 alias dckhb="open_chrome_app docker.com DockerHub"
 
 # this alias to open GitLab
 alias gtlb="open_brave_app gitlab.com GitLab"
 
+# this alias to open naga the trading app
+alias naga="open_chrome_app nagacap.com Naga"
+
 # this alias to open reverse shell generator
 alias revshell="open_chrome_app www.revshells.com Revshell"
+
+# this alias to open CrackStation App
+alias crack="open_chrome_app crackstation.net CrackStation"
+
+# this alias to open 247 CTF App
+alias ctf="open_chrome_app 247ctf.com 247CTF"
 
 # this alias to open Cisco Networking Academy
 alias cna="open_chrome_app www.netacad.com 'Cisco Networking Academy'"
