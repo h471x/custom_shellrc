@@ -1252,6 +1252,19 @@ function open_brave_app {
   open_web_app "BRAVE" "$1" "$2"
 }
 
+# this function to open a link as PWA window
+function open_link {
+  local app_link="$1"
+  old_path="$PWD"
+  cd /mnt/c
+
+  cmd.exe /c start brave.exe \
+    --profile-directory=Default \
+    --app=$app_link
+
+  cd $old_path
+}
+
 #######################################################################
 
 ### PWAs Aliases
@@ -1374,6 +1387,9 @@ alias gtlb="open_brave_app gitlab.com GitLab"
 # this alias to open naga the trading app
 alias naga="open_chrome_app nagacap.com Naga"
 
+# this alias to open Trading View
+alias trdv="open_chrome_app tradingview.com TradingView"
+
 # this alias to open reverse shell generator
 alias revshell="open_chrome_app www.revshells.com Revshell"
 
@@ -1402,7 +1418,7 @@ alias ipinfo="open_chrome_app ipinfo.io IPInfo"
 alias vrst="open_chrome_app virustotal.com VirusTotal"
 
 # this alias to open Gmail WebApp
-alias gmail="open_chrome_app gmail.com Gmail"
+alias gmail="open_link https://gmail.com"
 
 # this alias to open StackOverFlow
 alias stk="open_chrome_app stackoverflow.com StackOverflow"
@@ -1665,6 +1681,9 @@ function ipsh {
 
     # Print the iface and ip, ensuring alignment of '==>'
     echo "$padded_iface ==> $ip"
+
+    # Future Feature
+    #  ipconfig.exe | grep -A 5 "OpenVPN TAP" | grep "IPv4 Address" | awk '{print $NF}'
   done <<< "$map_output"
 
   br
