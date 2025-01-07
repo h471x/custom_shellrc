@@ -1390,6 +1390,9 @@ alias naga="open_chrome_app nagacap.com Naga"
 # this alias to open Trading View
 alias trdv="open_chrome_app tradingview.com TradingView"
 
+# this alias to open clock
+alias clock="open_chrome_app localhost Clock"
+
 # this alias to open reverse shell generator
 alias revshell="open_chrome_app www.revshells.com Revshell"
 
@@ -1419,6 +1422,12 @@ alias vrst="open_chrome_app virustotal.com VirusTotal"
 
 # this alias to open Gmail WebApp
 alias gmail="open_link https://gmail.com"
+
+# this alias to open Proton Mail
+alias proton="open_chrome_app proton.me ProtonMail"
+
+# this alias to open google drive
+alias drive="open_link https://drive.google.com"
 
 # this alias to open StackOverFlow
 alias stk="open_chrome_app stackoverflow.com StackOverflow"
