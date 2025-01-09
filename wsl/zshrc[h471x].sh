@@ -996,6 +996,21 @@ function android {
   open_win_app $BLUESTACKS_PATH HD-Player
 }
 
+# this function to run Adobe Photoshop
+function aps {
+  open_win_app $PHOTOSHOP_PATH Photoshop
+}
+
+# this function to open GNS3
+function gns {
+  open_win_app $GNS3_PATH gns3
+}
+
+# this function to launch MuseScore
+function msc {
+  open_win_app $MUSESCORE_PATH MuseScore4
+}
+
 # this function to launch Office Word
 function word {
   open_win_app $MICROSOFT_OFFICE_PATH WINWORD
@@ -1311,6 +1326,7 @@ function thm {
 }
 
 # this alias to open Pwned Labs Web App
+# AWS Learning Platform
 alias pwn="pwn"
 
 # this function for pwn alias
@@ -1349,7 +1365,7 @@ function pwn {
 alias gpt="open_chrome_app chatgpt.com ChatGPT"
 
 # this alias to open LinkedIn WebApp
-alias lnk="open_chrome_app linkedin.com LinkedIn"
+alias lnk="open_link https://linkedin.com/feed"
 
 # this alias to open Facebook app
 alias fb="open_brave_app facebook.com Facebook"
@@ -1370,7 +1386,7 @@ alias xdb="open_brave_app exploit-db.com ExploitDB"
 alias dsc="open_chrome_app discord.com Discord"
 
 # this function to open ascii art archive
-alias ascii="open_chrome_app asciiart.eu AsciiArt"
+alias ascii="open_link https://www.asciiart.eu/logos"
 
 # this function to open CloudConvert
 alias conv="open_chrome_app cloudconvert.com CloudConvert"
@@ -1414,6 +1430,9 @@ alias rdt="open_brave_app reddit.com Reddit"
 # this alias to open Cybr (AWS CybSec Learning Platform)
 alias cybr="open_chrome_app cybr.com Cybr"
 
+# this alias to open HackerRank
+alias hcrk="open_chrome_app hackerrank.com HackerRank"
+
 # this alias to open reverse shell generator
 alias ipinfo="open_chrome_app ipinfo.io IPInfo"
 
@@ -1424,7 +1443,16 @@ alias vrst="open_chrome_app virustotal.com VirusTotal"
 alias gmail="open_link https://gmail.com"
 
 # this alias to open Proton Mail
-alias proton="open_chrome_app proton.me ProtonMail"
+alias pmail="open_brave_app mail.proton.me ProtonMail"
+
+# this alias to open ProtonDrive
+alias pdrive="open_brave_app drive.proton.me ProtonDrive"
+
+# this alias to open ProtonVPN
+alias pvpn="open_link https://account.proton.me/u/0/vpn"
+
+# this alias to open udemy
+alias udemy="open_link https://www.udemy.com"
 
 # this alias to open google drive
 alias drive="open_link https://drive.google.com"
@@ -2105,61 +2133,61 @@ function rdf {
 
 # this alias to count the number of file/directory
 # inside a directory
-alias dc="dc"
+# alias dc="dc"
 
-#this function for dc alias
-function dc {
-  if [[ $# -eq 0 ]]; then
-    clear;
-    br;
-    case "$(ls -1 | wc -l)" in
-      0)
-        br;
-        echo "There is nothing inside $(basename $PWD)";
-        br;;
-      *)
-        case "$(ls -1 | wc -l)" in
-          1)it="item";;
-          *)it="items";;
-        esac
-        echo "   $(basename $PWD) folder has $(ls -1 | wc -l) $it : ";
-        br;
-        if [[ $(ls -1 | wc -l) -gt 50 ]]; then
-          br;
-        else
-          ls
-        fi
-        br;
-    esac
-  elif [[ $# -eq 1 ]]; then
-    clear;
-    br;
-    case "$(ls -1 $1 | wc -l)" in
-      0)
-        br;
-        echo "There is nothing inside $(basename $1)";
-        br;
-        sleep 1;
-        cv;
-        br;;
-      *)
-        case "$(ls -1 $1 | wc -l)" in
-          1)it="item";;
-          *)it="items";;
-        esac
-        echo "   $(basename $1) folder has $(ls -1 $1 | wc -l) $it : ";
-        br;
-        if [[ $(ls -1 "$1" | wc -l) -gt 50 ]]; then
-          br;
-        else
-          ls "$1";
-        fi
-        br;
-        sleep 1;
-        cv;
-    esac
-  fi
-}
+# #this function for dc alias
+# function dc {
+#   if [[ $# -eq 0 ]]; then
+#     clear;
+#     br;
+#     case "$(ls -1 | wc -l)" in
+#       0)
+#         br;
+#         echo "There is nothing inside $(basename $PWD)";
+#         br;;
+#       *)
+#         case "$(ls -1 | wc -l)" in
+#           1)it="item";;
+#           *)it="items";;
+#         esac
+#         echo "   $(basename $PWD) folder has $(ls -1 | wc -l) $it : ";
+#         br;
+#         if [[ $(ls -1 | wc -l) -gt 50 ]]; then
+#           br;
+#         else
+#           ls
+#         fi
+#         br;
+#     esac
+#   elif [[ $# -eq 1 ]]; then
+#     clear;
+#     br;
+#     case "$(ls -1 $1 | wc -l)" in
+#       0)
+#         br;
+#         echo "There is nothing inside $(basename $1)";
+#         br;
+#         sleep 1;
+#         cv;
+#         br;;
+#       *)
+#         case "$(ls -1 $1 | wc -l)" in
+#           1)it="item";;
+#           *)it="items";;
+#         esac
+#         echo "   $(basename $1) folder has $(ls -1 $1 | wc -l) $it : ";
+#         br;
+#         if [[ $(ls -1 "$1" | wc -l) -gt 50 ]]; then
+#           br;
+#         else
+#           ls "$1";
+#         fi
+#         br;
+#         sleep 1;
+#         cv;
+#     esac
+#   fi
+# }
 
 # this alias to know the file type
 alias tp="tp"
