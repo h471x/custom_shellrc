@@ -1394,6 +1394,9 @@ alias conv="open_chrome_app cloudconvert.com CloudConvert"
 # this alias to open GTFOBins App
 alias gtfo="open_chrome_app gtfobins.github.io GTFOBins"
 
+# this alias to open lolbas
+alias lolbas="open_link https://lolbas-project.github.io"
+
 # this alias to open dockerhub
 alias dckhb="open_chrome_app docker.com DockerHub"
 
@@ -1405,6 +1408,7 @@ alias naga="open_chrome_app nagacap.com Naga"
 
 # this alias to open Trading View
 alias trdv="open_chrome_app tradingview.com TradingView"
+
 
 # this alias to open clock
 alias clock="open_chrome_app localhost Clock"
